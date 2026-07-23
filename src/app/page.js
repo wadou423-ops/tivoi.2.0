@@ -10,21 +10,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 md:px-12 py-6">
-        <span className="font-display text-3xl tracking-wide text-[#E8A33D]">
-          TiVoi
-        </span>
-        <nav className="hidden md:flex items-center gap-8 text-sm text-[#C7CCD6]">
-          <a href="#" className="hover:text-[#F4F1EA] transition">Catalogue</a>
-          <a href="#" className="hover:text-[#F4F1EA] transition">Lives</a>
-          <a href="#" className="hover:text-[#F4F1EA] transition">Chaînes TV</a>
-        </nav>
-        <button className="rounded-full border border-[#E8A33D] px-5 py-2 text-sm text-[#E8A33D] hover:bg-[#E8A33D] hover:text-[#0B0E14] transition">
-          Connexion
-        </button>
-      </header>
-
       {/* Hero */}
       <section className="px-6 md:px-12 pt-16 pb-12 max-w-3xl">
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] text-[#F4F1EA]">

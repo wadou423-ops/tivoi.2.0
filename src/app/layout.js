@@ -1,5 +1,6 @@
 import { Bebas_Neue, Sora } from "next/font/google";
 import "./globals.css";
+import Header from "./components/Header";
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
@@ -24,6 +25,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${bebasNeue.variable} ${sora.variable} antialiased bg-[#0B0E14] text-[#F4F1EA]`}
       >
+        <Header />
         {children}
       </body>
     </html>
