@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --font-display: "Bebas Neue", sans-serif;
-  --font-body: "Sora", sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Manrope", sans-serif;
 }
 
 body {
@@ -11,7 +11,7 @@ body {
 
 h1, h2, h3, .font-display {
   font-family: var(--font-display);
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
 }
 
 @keyframes ticker-scroll {

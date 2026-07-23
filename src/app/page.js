@@ -1,4 +1,30 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+
 export default function Home() {
+  const [connecte, setConnecte] = useState(false);
+
+  useEffect(() => {
+    async function checkUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setConnecte(!!user);
+    }
+
+    checkUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      checkUser();
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const ticker = [
     "🎬 À la une : Le Trône d'Abidjan",
     "🔴 EN DIRECT — Konan Live",
@@ -22,9 +48,11 @@ export default function Home() {
           au même endroit.
         </p>
         <div className="mt-8 flex gap-4">
-          <button className="rounded-full bg-[#E8A33D] px-6 py-3 text-sm font-semibold text-[#0B0E14] hover:brightness-110 transition">
-            Créer un compte
-          </button>
+          {!connecte && (
+            <button className="rounded-full bg-[#E8A33D] px-6 py-3 text-sm font-semibold text-[#0B0E14] hover:brightness-110 transition">
+              Créer un compte
+            </button>
+          )}
           <button className="rounded-full border border-[#2A2E38] px-6 py-3 text-sm text-[#F4F1EA] hover:border-[#E8A33D] transition">
             Voir le catalogue
           </button>
