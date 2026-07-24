@@ -9,6 +9,7 @@ export default function Header() {
   const router = useRouter();
   const [pseudo, setPseudo] = useState(null);
   const [email, setEmail] = useState(null);
+  const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -23,13 +24,15 @@ export default function Header() {
         setEmail(user.email);
         const { data: profile } = await supabase
           .from("profiles")
-          .select("pseudo")
+          .select("pseudo, role")
           .eq("id", user.id)
           .single();
         setPseudo(profile?.pseudo || null);
+        setRole(profile?.role || null);
       } else {
         setPseudo(null);
         setEmail(null);
+        setRole(null);
       }
       setLoading(false);
     }
@@ -82,7 +85,9 @@ export default function Header() {
               <div className="px-4 py-2 border-b border-[#1C2029]">
                 <p className="text-sm text-[#F4F1EA]">@{pseudo}</p>
                 <p className="text-xs text-[#9AA0AC] truncate">{email}</p>
-              </div>
+              </div>{role === "admin" && (
+                <a href="/admin" className="block px-4 py-2 text-sm text-[#9AA0AC] hover:text-[#F4F1EA] hover:bg-[#1C2029] transition">Dashboard admin</a>
+              )}
               <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-[#9AA0AC] hover:text-[#F4F1EA] hover:bg-[#1C2029] transition">
                 Déconnexion
               </button>

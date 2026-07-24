@@ -1,13 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function AdminVTC() {
-  const router = useRouter();
-  const [autorise, setAutorise] = useState(false);
-  const [checking, setChecking] = useState(true);
   const [items, setItems] = useState([]);
   const [message, setMessage] = useState("");
 
@@ -19,35 +15,8 @@ export default function AdminVTC() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    async function checkAdmin() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        router.push("/connexion");
-        return;
-      }
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-
-      if (profile?.role !== "admin") {
-        setAutorise(false);
-        setChecking(false);
-        return;
-      }
-
-      setAutorise(true);
-      setChecking(false);
-      loadItems();
-    }
-
-    checkAdmin();
-  }, [router]);
+    loadItems();
+  }, []);
 
   async function loadItems() {
     const { data } = await supabase
@@ -96,24 +65,8 @@ export default function AdminVTC() {
     loadItems();
   }
 
-  if (checking) {
-    return (
-      <main className="min-h-screen flex items-center justify-center">
-        <p className="text-[#9AA0AC]">Vérification...</p>
-      </main>
-    );
-  }
-
-  if (!autorise) {
-    return (
-      <main className="min-h-screen flex items-center justify-center">
-        <p className="text-[#9AA0AC]">Accès réservé aux administrateurs.</p>
-      </main>
-    );
-  }
-
   return (
-    <main className="min-h-screen px-6 md:px-12 py-12 max-w-3xl mx-auto">
+    <main className="px-6 md:px-12 py-12 max-w-3xl">
       <h1 className="font-display text-3xl text-[#E8A33D] mb-8">
         Gestion de la playlist VTC
       </h1>

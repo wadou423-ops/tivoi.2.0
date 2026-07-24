@@ -37,7 +37,14 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Hero */}
-      <section className="px-6 md:px-12 pt-16 pb-12 max-w-3xl">
+      <section className="relative px-6 md:px-12 pt-16 pb-12 max-w-3xl overflow-hidden">
+        <div
+          className="absolute inset-0 -z-10"
+          style={{
+            background:
+              "radial-gradient(circle at 15% 20%, rgba(232,163,61,0.18), transparent 45%), radial-gradient(circle at 90% 10%, rgba(232,163,61,0.10), transparent 40%), repeating-linear-gradient(115deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 60px)",
+          }}
+        />
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] text-[#F4F1EA]">
           Films, lives et chaînes TV.<br />
           <span className="text-[#E8A33D]">Un seul écran.</span>
