@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function Connexion() {
@@ -17,10 +18,7 @@ export default function Connexion() {
     setLoading(true);
     setMessage("");
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       setLoading(false);
@@ -45,61 +43,62 @@ export default function Connexion() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-6">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-sm bg-[#0F131B] border border-[#1C2029] rounded-2xl p-8"
-      >
-        <h1 className="font-display text-3xl text-[#E8A33D] mb-6">
-          Se connecter
-        </h1>
-
-        <label className="block text-sm text-[#9AA0AC] mb-2">Email</label>
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full mb-4 rounded-lg bg-[#0B0E14] border border-[#2A2E38] px-4 py-2 text-[#F4F1EA] focus:outline-none focus:border-[#E8A33D]"
+    <main className="relative min-h-[calc(100vh-73px)] flex items-center justify-center overflow-hidden px-6">
+      <div className="absolute inset-0 -z-10">
+        <div
+          className="w-full h-full bg-cover bg-center opacity-40"
+          style={{
+            backgroundImage:
+              "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAlqFn-sW_T2tzf2DMkA1ID0OorjDeqzm2SXbLiQZ8FeSzLWsSIOiR7L6W3anilp9EaiN2Ip15COOESIb5itzFEUqkZiEQu048LEiJ1bhPU9VlFdENE8V7S_9T5sCcJ7rwg4F6V293vfjb5lRHVG2Kt0fd48_MWPStnrKQLMSHCSmVAZvXxtGv5ig--Dy7tlN8q3Z4go9uj9ysydpjMTBRSWt9bvCG9nP7HU03SvSOtILC-DvazlNTS')",
+          }}
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#131313] via-[#131313]/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#131313] via-transparent to-[#131313]" />
+      </div>
 
-        <label className="block text-sm text-[#9AA0AC] mb-2">Mot de passe</label>
-        <input
-          type={showPassword ? "text" : "password"}
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full mb-2 rounded-lg bg-[#0B0E14] border border-[#2A2E38] px-4 py-2 text-[#F4F1EA] focus:outline-none focus:border-[#E8A33D]"
-        />
+      <form onSubmit={handleSubmit} className="relative z-10 w-full max-w-md p-8 rounded-xl bg-[#1C1B1B]/80 border border-[#4D4635]/20 backdrop-blur-xl shadow-2xl">
+        <div className="text-center mb-8">
+          <h1 className="font-heading text-4xl text-[#F2CA50] tracking-tight mb-3">TiVoi</h1>
+          <p className="font-narrow text-[#D0C5AF]">Connectez-vous pour découvrir le meilleur du cinéma.</p>
+        </div>
 
-        <label className="flex items-center gap-2 mb-6 text-sm text-[#9AA0AC] cursor-pointer">
-          <input
-            type="checkbox"
-            checked={showPassword}
-            onChange={(e) => setShowPassword(e.target.checked)}
-            className="accent-[#E8A33D]"
-          />
-          Afficher le mot de passe
-        </label>
+        <div className="space-y-5">
+          <div>
+            <label htmlFor="email" className="font-heading text-sm text-[#E5E2E1] mb-2 block">Email</label>
+            <div className="relative">
+              <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#D0C5AF]" />
+              <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="votre@email.com" className="w-full bg-[#353534]/50 border-0 border-b-2 border-[#4D4635] text-[#E5E2E1] pl-10 pr-4 py-3 outline-none focus:border-[#D4AF37] focus:shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all" />
+            </div>
+          </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-full bg-[#E8A33D] py-3 text-sm font-semibold text-[#0B0E14] hover:brightness-110 transition disabled:opacity-50"
-        >
-          {loading ? "Connexion..." : "Se connecter"}
-        </button>
+          <div>
+            <label htmlFor="password" className="font-heading text-sm text-[#E5E2E1] mb-2 block">Mot de passe</label>
+            <div className="relative">
+              <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#D0C5AF]" />
+              <input id="password" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full bg-[#353534]/50 border-0 border-b-2 border-[#4D4635] text-[#E5E2E1] pl-10 pr-10 py-3 outline-none focus:border-[#D4AF37] focus:shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all" />
+              <button type="button" onClick={() => setShowPassword((s) => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#D0C5AF] hover:text-[#F2CA50] transition-colors">
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
 
-        {message && (
-          <p className="mt-4 text-sm text-center text-[#9AA0AC]">{message}</p>
-        )}
+          <div className="flex justify-end">
+            <a href="#" className="font-narrow text-xs text-[#F2CA50] hover:text-[#D4AF37] transition-colors">Mot de passe oublié ?</a>
+          </div>
 
-        <p className="mt-6 text-sm text-center text-[#9AA0AC]">
-          Pas encore de compte ?{" "}
-          <a href="/inscription" className="text-[#E8A33D] hover:underline">
-            S&apos;inscrire
-          </a>
-        </p>
+          <button type="submit" disabled={loading} className="w-full bg-[#D4AF37] text-[#3C2F00] font-heading text-sm py-4 rounded-lg hover:-translate-y-0.5 hover:shadow-[0_5px_15px_rgba(212,175,55,0.2)] transition-all disabled:opacity-50">
+            {loading ? "Connexion..." : "Se connecter"}
+          </button>
+
+          {message && <p className="text-sm text-center text-[#D0C5AF] font-narrow">{message}</p>}
+        </div>
+
+        <div className="mt-8 text-center border-t border-[#4D4635]/20 pt-6">
+          <p className="font-narrow text-sm text-[#D0C5AF]">
+            Nouveau sur TiVoi ?{" "}
+            <a href="/inscription" className="text-[#F2CA50] font-bold hover:text-[#D4AF37] transition-colors">Créer un compte</a>
+          </p>
+        </div>
       </form>
     </main>
   );
