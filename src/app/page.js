@@ -117,8 +117,12 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    loadCatalogue();
-    loadALaUne();
+    // Différé d'une frame pour éviter un setState synchrone pendant l'effet
+    const t = setTimeout(() => {
+      loadCatalogue();
+      loadALaUne();
+    }, 0);
+    return () => clearTimeout(t);
   }, [loadCatalogue, loadALaUne]);
 
   // Mises à jour automatiques : plus besoin de rafraîchir
