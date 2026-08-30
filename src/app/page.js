@@ -64,6 +64,25 @@ function CarteFilm({ film }) {
   );
 }
 
+function Etagere({ titre, films, lien }) {
+  if (!films || films.length === 0) return null;
+  return (
+    <section className="px-5 md:px-20 py-6">
+      <div className="flex justify-between items-end mb-4">
+        <h2 className="headline-md text-on-surface">{titre}</h2>
+        <Link href={lien || "/catalogue"} className="caption text-primary hover:text-primary-container transition-colors">
+          Tout voir →
+        </Link>
+      </div>
+      <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
+        {films.map((film) => (
+          <CarteFilm key={film.id} film={film} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const router = useRouter();
   const [catalogue, setCatalogue] = useState([]);
@@ -128,25 +147,6 @@ export default function Home() {
     .slice(0, 10);
 
   const categories = [...new Set(catalogue.map((f) => f.categorie).filter(Boolean))];
-
-  function Etagere({ titre, films, lien }) {
-    if (!films || films.length === 0) return null;
-    return (
-      <section className="px-5 md:px-20 py-6">
-        <div className="flex justify-between items-end mb-4">
-          <h2 className="headline-md text-on-surface">{titre}</h2>
-          <Link href={lien || "/catalogue"} className="caption text-primary hover:text-primary-container transition-colors">
-            Tout voir →
-          </Link>
-        </div>
-        <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
-          {films.map((film) => (
-            <CarteFilm key={film.id} film={film} />
-          ))}
-        </div>
-      </section>
-    );
-  }
 
   // ---------- Mode connecté : expérience Netflix ----------
   if (connecte && !chargement) {
