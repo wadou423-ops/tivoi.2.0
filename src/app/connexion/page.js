@@ -38,6 +38,20 @@ function ConnexionContent() {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
+        const { data: p } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+        // Les comptes admin ne se connectent pas sur le site client
+        if (p?.role === "admin") {
+          await supabase.auth.signOut();
+          setVerification(false);
+          setMessage(
+            "Ce compte est un compte administrateur. Utilisez le portail administrateur pour vous connecter."
+          );
+          return;
+        }
         router.replace(searchParams.get("redirect") || "/");
         return;
       }
@@ -71,11 +85,21 @@ function ConnexionContent() {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("pseudo")
+      .select("role, pseudo")
       .eq("id", data.user.id)
       .single();
 
     setLoading(false);
+
+    // Les comptes admin ne se connectent pas sur le site client
+    if (profile?.role === "admin") {
+      await supabase.auth.signOut();
+      setMessage(
+        "Ce compte est un compte administrateur. Utilisez le portail administrateur pour vous connecter."
+      );
+      return;
+    }
+
     terminerConnexion(profile);
   }
 
@@ -131,11 +155,21 @@ function ConnexionContent() {
     } = await supabase.auth.getUser();
     const { data: profile } = await supabase
       .from("profiles")
-      .select("pseudo")
+      .select("role, pseudo")
       .eq("id", user.id)
       .single();
 
     setLoading(false);
+
+    // Les comptes admin ne se connectent pas sur le site client
+    if (profile?.role === "admin") {
+      await supabase.auth.signOut();
+      setMessage(
+        "Ce compte est un compte administrateur. Utilisez le portail administrateur pour vous connecter."
+      );
+      return;
+    }
+
     terminerConnexion(profile);
   }
 
