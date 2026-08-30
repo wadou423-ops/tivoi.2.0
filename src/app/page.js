@@ -72,10 +72,15 @@ export default function Home() {
     async function loadSlides() {
       const { data } = await supabase
         .from("a_une")
-        .select("id, contenu_id, titre, accroche, image_url")
+        .select("id, contenu_id, titre, accroche, image_url, catalogue(image_url)")
         .eq("actif", true)
         .order("ordre", { ascending: true });
-      setSlides(data || []);
+      setSlides(
+        (data || []).map((s) => ({
+          ...s,
+          image_url: s.image_url || s.catalogue?.image_url || "",
+        }))
+      );
     }
     loadTendances();
     loadSlides();
@@ -105,10 +110,6 @@ export default function Home() {
           <h1 className="display-lg text-on-surface drop-shadow-2xl">
             Le cinéma premium ouest-africain.
           </h1>
-          <p className="body-lg text-on-surface-variant max-w-2xl">
-            Découvrez le sommet de la narration : sélection VOD exclusive, directs
-            des meilleurs créateurs et chaînes TV en continu.
-          </p>
           <div className="flex flex-wrap justify-center gap-6 mt-8">
             <Link
               href="/catalogue"

@@ -53,10 +53,7 @@ export default function GuideTV() {
   return (
     <main className="flex-grow pt-24 pb-20 px-5 md:px-20">
       <header className="mb-8">
-        <h1 className="display-lg text-on-surface mb-3">Chaînes TV</h1>
-        <p className="body-lg text-on-surface-variant">
-          Le direct 24h/24 — actualités, sport et divertissement en continu.
-        </p>
+        <h1 className="display-lg text-on-surface">Chaînes TV</h1>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

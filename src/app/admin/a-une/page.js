@@ -16,7 +16,7 @@ export default function AdminAUne() {
   async function load() {
     const [{ data: s }, { data: c }] = await Promise.all([
       supabase.from("a_une").select("*, catalogue(titre)").order("ordre", { ascending: true }),
-      supabase.from("catalogue").select("id, titre").eq("actif", true).order("titre"),
+      supabase.from("catalogue").select("id, titre, image_url").eq("actif", true).order("titre"),
     ]);
     setSlides(s || []);
     setContenus(c || []);
@@ -29,7 +29,7 @@ export default function AdminAUne() {
     await supabase.from("a_une").insert({
       contenu_id: parseInt(choix, 10),
       titre: contenu?.titre,
-      image_url: null,
+      image_url: contenu?.image_url || null,
       ordre: slides.length,
       actif: true,
     });

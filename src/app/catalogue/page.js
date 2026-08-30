@@ -32,7 +32,7 @@ export default function CatalogueVOD() {
     categorie === "Tous les genres" ? films : films.filter((f) => f.categorie === categorie);
 
   return (
-    <main className="px-6 md:px-20 py-12">
+    <main className="px-6 md:px-20 pt-28 pb-12">
       <div className="mb-12">
         <h1 className="font-display font-bold text-5xl md:text-6xl text-on-surface tracking-[-0.02em] mb-3">
           Catalogue VOD

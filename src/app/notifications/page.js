@@ -34,8 +34,7 @@ export default function Notifications() {
 
   return (
     <main className="flex-grow pt-28 pb-20 px-5 md:px-20 max-w-3xl mx-auto w-full">
-      <h1 className="display-lg text-on-surface mb-3">Notifications</h1>
-      <p className="body-lg text-on-surface-variant mb-10">Vos dernières activités sur TiVoi.</p>
+      <h1 className="display-lg text-on-surface mb-10">Notifications</h1>
 
       {notifs.length === 0 ? (
         <div className="glass-panel rounded-xl p-10 text-center">

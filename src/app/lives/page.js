@@ -30,10 +30,7 @@ export default function Lives() {
   return (
     <main className="flex-grow pt-28 pb-20 px-5 md:px-20">
       <header className="mb-12">
-        <h1 className="display-lg text-on-surface mb-3">Lives en Direct</h1>
-        <p className="body-lg text-on-surface-variant max-w-2xl">
-          Rejoignez vos créateurs en temps réel — chat, cadeaux virtuels et émotions partagées.
-        </p>
+        <h1 className="display-lg text-on-surface">Lives en Direct</h1>
       </header>
 
       <div className="flex gap-2 mb-8">

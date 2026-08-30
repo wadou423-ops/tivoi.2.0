@@ -22,10 +22,7 @@ export default function Abonnements() {
   return (
     <main className="flex-grow pt-28 pb-20 px-5 md:px-20">
       <header className="text-center mb-12">
-        <h1 className="display-lg text-on-surface mb-3">Formules d&apos;abonnement</h1>
-        <p className="body-lg text-on-surface-variant max-w-2xl mx-auto">
-          Un abonnement TiVoi, tout le catalogue. Choisissez la formule adaptée à votre rythme.
-        </p>
+        <h1 className="display-lg text-on-surface">Formules d&apos;abonnement</h1>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">

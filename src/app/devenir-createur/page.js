@@ -175,11 +175,7 @@ export default function DevenirCreateur() {
   return (
     <main className="flex-grow pt-28 pb-20 px-5 md:px-20">
       <div className="max-w-2xl mx-auto">
-        <h1 className="display-lg text-on-surface mb-3">Devenir créateur</h1>
-        <p className="body-lg text-on-surface-variant mb-10">
-          Rejoignez les créateurs TiVoi : diffusez vos lives, recevez des cadeaux virtuels
-          et touchez 70 % des revenus générés.
-        </p>
+        <h1 className="display-lg text-on-surface mb-10">Devenir créateur</h1>
 
         <form onSubmit={soumettre} className="glass-panel rounded-xl p-8 flex flex-col gap-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">

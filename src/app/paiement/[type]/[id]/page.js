@@ -142,10 +142,7 @@ export default function Paiement() {
           </Link>
 
           <div>
-            <h1 className="display-lg text-on-surface mb-2">Paiement</h1>
-            <p className="body-lg text-on-surface-variant">
-              Choisissez votre mode de paiement pour finaliser la commande.
-            </p>
+            <h1 className="display-lg text-on-surface">Paiement</h1>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">

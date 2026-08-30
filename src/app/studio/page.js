@@ -112,7 +112,6 @@ export default function StudioCreateur() {
       <header className="mb-10 flex flex-wrap justify-between items-center gap-4">
         <div>
           <h1 className="display-lg text-on-surface mb-2">Studio Créateur</h1>
-          <p className="body-lg text-on-surface-variant">Vos statistiques, revenus et gestion.</p>
         </div>
         <button
           onClick={exporterCSV}

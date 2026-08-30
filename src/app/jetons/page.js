@@ -35,10 +35,7 @@ export default function AcheterJetons() {
   return (
     <main className="flex-grow pt-28 pb-20 px-5 md:px-20">
       <header className="text-center mb-12">
-        <h1 className="display-lg text-on-surface mb-3">Acheter des Jetons</h1>
-        <p className="body-lg text-on-surface-variant max-w-2xl mx-auto">
-          Les jetons servent à offrir des cadeaux pendant les lives. 100 jetons = 500 FCFA.
-        </p>
+        <h1 className="display-lg text-on-surface">Acheter des Jetons</h1>
         {solde !== null && (
           <p className="label-md text-primary mt-4">
             Solde actuel : {solde.toLocaleString("fr-FR")} jetons

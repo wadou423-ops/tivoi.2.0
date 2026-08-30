@@ -69,10 +69,7 @@ export default function Portefeuille() {
   return (
     <main className="pt-28 pb-20 px-5 md:px-20 max-w-7xl mx-auto">
       <header className="mb-12">
-        <h1 className="headline-md text-on-surface mb-2">Mon Portefeuille</h1>
-        <p className="body-md text-on-surface-variant">
-          Gérez vos Jetons TiVoi et consultez vos transactions récentes.
-        </p>
+        <h1 className="headline-md text-on-surface">Mon Portefeuille</h1>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
