@@ -138,7 +138,7 @@ export default function AdminLayout({ children }) {
           </a>
         </nav>
       </aside>
-      <div className="flex-1 md:ml-72 pt-20">{children}</div>
+      <div className="flex-1 md:ml-72">{children}</div>
     </div>
   );
 }

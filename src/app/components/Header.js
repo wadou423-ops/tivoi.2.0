@@ -70,8 +70,10 @@ export default function Header() {
     { label: "TV", href: "/guide-tv" },
   ];
 
-  // Écrans plein écran sans navigation
-  if (["/bienvenue", "/vtc", "/tv"].includes(pathname)) return null;
+  // Écrans plein écran et back-office : sans navigation publique
+  if (["/bienvenue", "/vtc", "/tv"].includes(pathname) || pathname.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-outline-variant/10 shadow-md shadow-primary/5">
