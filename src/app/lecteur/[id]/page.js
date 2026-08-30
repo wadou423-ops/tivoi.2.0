@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import LoaderCentered from "../../components/LoaderCentered";
 
 export default function Lecteur() {
   const { id } = useParams();
@@ -21,7 +22,7 @@ export default function Lecteur() {
   if (chargement) {
     return (
       <main className="min-h-screen bg-surface-lowest flex items-center justify-center">
-        <p className="text-on-surface-variant">Chargement...</p>
+        <LoaderCentered />
       </main>
     );
   }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { User, Wallet, Clapperboard, Settings, LogOut, ChevronRight, Star } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import LoaderCentered from "../components/LoaderCentered";
 
 export default function Profil() {
   const router = useRouter();
@@ -46,7 +47,7 @@ export default function Profil() {
   if (!profile) {
     return (
       <main className="pt-28 pb-20 px-5 md:px-20 flex items-center justify-center min-h-screen">
-        <p className="text-on-surface-variant">Chargement...</p>
+        <LoaderCentered />
       </main>
     );
   }

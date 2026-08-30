@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import LoaderCentered from "../../components/LoaderCentered";
 
 export default function AdminUtilisateurs() {
   const [profils, setProfils] = useState([]);
@@ -46,8 +47,8 @@ export default function AdminUtilisateurs() {
 
   if (loading) {
     return (
-      <main className="px-6 md:px-12 py-12 flex items-center justify-center">
-        <p className="text-on-surface-variant">Chargement...</p>
+      <main className="px-6 md:px-12 py-12 flex items-center justify-center min-h-[60vh]">
+        <LoaderCentered />
       </main>
     );
   }

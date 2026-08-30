@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2, Pencil } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import UploadFichier from "../../components/UploadFichier";
 
 const VIDE = {
   titre: "",
@@ -93,10 +94,11 @@ export default function AdminCatalogue() {
             <label className="caption text-on-surface-variant block mb-1">Acteurs</label>
             <input value={edition.acteurs || ""} onChange={(e) => setEdition({ ...edition, acteurs: e.target.value })} className={inputClass} />
           </div>
-          <div>
-            <label className="caption text-on-surface-variant block mb-1">Image (URL)</label>
-            <input required type="url" value={edition.image_url || ""} onChange={(e) => setEdition({ ...edition, image_url: e.target.value })} className={inputClass} />
-          </div>
+          <UploadFichier
+            label="Image"
+            url={edition.image_url || ""}
+            onChange={(u) => setEdition({ ...edition, image_url: u })}
+          />
           <div>
             <label className="caption text-on-surface-variant block mb-1">Vidéo (URL YouTube/MP4)</label>
             <input value={edition.bande_annonce_url || ""} onChange={(e) => setEdition({ ...edition, bande_annonce_url: e.target.value })} className={inputClass} />

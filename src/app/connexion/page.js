@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import Spinner from "../components/Spinner";
 
 export default function Connexion() {
   const router = useRouter();
@@ -122,8 +123,9 @@ export default function Connexion() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary-container text-on-primary font-title font-semibold text-sm py-4 rounded-lg hover:-translate-y-0.5 hover:shadow-[0_5px_15px_rgba(212,175,55,0.2)] transition-all disabled:opacity-50"
+            className="w-full bg-primary-container text-on-primary font-title font-semibold text-sm py-4 rounded-lg hover:-translate-y-0.5 hover:shadow-[0_5px_15px_rgba(212,175,55,0.2)] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
           >
+            {loading && <Spinner size={16} />}
             {loading ? "Connexion..." : "Se connecter"}
           </button>
 

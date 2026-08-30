@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Star, Play } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import LoaderCentered from "../components/LoaderCentered";
 
 export default function CatalogueVOD() {
   const [films, setFilms] = useState([]);
@@ -59,7 +60,7 @@ export default function CatalogueVOD() {
       </div>
 
       {loading ? (
-        <p className="text-on-surface-variant">Chargement...</p>
+        <LoaderCentered />
       ) : filmsAffiches.length === 0 ? (
         <p className="text-on-surface-variant">
           Aucun contenu pour l&apos;instant dans cette catégorie.

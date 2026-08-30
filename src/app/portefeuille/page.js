@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Wallet, TrendingUp, ShoppingCart } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Banniere from "../components/Banniere";
+import LoaderCentered from "../components/LoaderCentered";
 
 export default function Portefeuille() {
   const [solde, setSolde] = useState(null);
@@ -49,6 +50,10 @@ export default function Portefeuille() {
     }
     load();
   }, []);
+
+  if (chargement) {
+    return <LoaderCentered />;
+  }
 
   if (!chargement && solde === null) {
     return (

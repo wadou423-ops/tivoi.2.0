@@ -5,6 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Lock, FileText, ArrowLeft } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import LoaderCentered from "../../../components/LoaderCentered";
+import Spinner from "../../../components/Spinner";
 
 const FOURNISSEURS = [
   { code: "wave", nom: "Wave", emoji: "🌊" },
@@ -14,6 +16,11 @@ const FOURNISSEURS = [
   { code: "carte", nom: "Visa / Mastercard", emoji: "💳" },
   { code: "paypal", nom: "PayPal", emoji: "🅿️" },
 ];
+
+function genererReference() {
+  const suffixe = Math.random().toString(36).slice(2, 7).toUpperCase();
+  return `TVO-${Date.now()}-${suffixe}`;
+}
 
 export default function Paiement() {
   const { type, id } = useParams();
@@ -59,7 +66,7 @@ export default function Paiement() {
       return;
     }
 
-    const reference = `TVO-${Date.now()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+    const reference = genererReference();
 
     const { data: paiement, error } = await supabase
       .from("paiements")
@@ -80,7 +87,29 @@ export default function Paiement() {
       return;
     }
 
-    // Simulation de la confirmation du fournisseur (webhook réel à connecter plus tard)
+    // --- Wave réel (si la fonction Edge est configurée) ---
+    if (fournisseur === "wave") {
+      try {
+        const { data: session } = await supabase.functions.invoke("wave-checkout", {
+          body: {
+            amount: total,
+            reference,
+            success_url: `${window.location.origin}/confirmation/${reference}`,
+            error_url: `${window.location.origin}/paiement/${type}/${id}`,
+          },
+        });
+
+        if (session?.wave_launch_url) {
+          window.location.assign(session.wave_launch_url);
+          return; // la confirmation arrivera par le webhook
+        }
+        // Pas configuré (501) → on retombe sur la simulation ci-dessous
+      } catch {
+        /* fallback simulation */
+      }
+    }
+
+    // --- Simulation de la confirmation du fournisseur (mode démo) ---
     setTimeout(async () => {
       await supabase.rpc("confirmer_paiement", { p_reference: paiement.reference });
       router.push(`/confirmation/${paiement.reference}`);
@@ -88,11 +117,7 @@ export default function Paiement() {
   }
 
   if (chargement) {
-    return (
-      <main className="pt-32 pb-20 px-5 md:px-20 flex items-center justify-center">
-        <p className="text-on-surface-variant">Chargement...</p>
-      </main>
-    );
+    return <LoaderCentered />;
   }
 
   if (!objet) {
@@ -201,7 +226,10 @@ export default function Paiement() {
               className="w-full bg-primary-container text-on-primary label-md py-4 rounded-lg mt-8 hover:bg-primary transition-colors duration-200 flex justify-center items-center gap-2 shadow-[0_0_15px_rgba(212,175,55,0.3)] disabled:opacity-50"
             >
               <Lock size={16} />
-              {processing ? "Traitement en cours..." : "Payer maintenant"}
+              {processing
+                ? "Traitement en cours..."
+                : "Payer maintenant"}
+              {processing && <Spinner size={16} />}
             </button>
             {erreur && <p className="caption text-error mt-3 text-center">{erreur}</p>}
             <p className="caption text-on-surface-variant text-center mt-4 opacity-70">

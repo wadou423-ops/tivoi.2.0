@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Download, TrendingUp, Radio, Gift, LogOut } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import LoaderCentered from "../components/LoaderCentered";
 
 export default function StudioCreateur() {
   const router = useRouter();
@@ -100,8 +101,8 @@ export default function StudioCreateur() {
 
   if (chargement) {
     return (
-      <main className="pt-28 pb-20 px-5 md:px-20 flex items-center justify-center">
-        <p className="text-on-surface-variant">Chargement...</p>
+      <main className="pt-28 pb-20 px-5 md:px-20 flex items-center justify-center min-h-[60vh]">
+        <LoaderCentered />
       </main>
     );
   }

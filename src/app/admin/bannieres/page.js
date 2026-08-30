@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import UploadFichier from "../../components/UploadFichier";
 
 const EMPLACEMENTS = [
   { id: "accueil_h1", label: "Accueil — horizontale 1" },
@@ -76,10 +77,11 @@ export default function AdminBannieres() {
           <label className="caption text-on-surface-variant block mb-1">Annonceur</label>
           <input value={form.annonceur} onChange={(e) => setForm({ ...form, annonceur: e.target.value })} className={inputClass} />
         </div>
-        <div>
-          <label className="caption text-on-surface-variant block mb-1">Image (URL) *</label>
-          <input required type="url" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} className={inputClass} />
-        </div>
+        <UploadFichier
+          label="Image bannière"
+          url={form.image_url}
+          onChange={(u) => setForm({ ...form, image_url: u })}
+        />
         <div>
           <label className="caption text-on-surface-variant block mb-1">Lien de destination</label>
           <input type="url" value={form.lien} onChange={(e) => setForm({ ...form, lien: e.target.value })} className={inputClass} />

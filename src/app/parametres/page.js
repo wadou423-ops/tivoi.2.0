@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import LoaderCentered from "../components/LoaderCentered";
 
 export default function Parametres() {
   const router = useRouter();
@@ -67,7 +68,7 @@ export default function Parametres() {
   if (!profile) {
     return (
       <main className="pt-28 pb-20 px-5 md:px-20 flex items-center justify-center min-h-screen">
-        <p className="text-on-surface-variant">Chargement...</p>
+        <LoaderCentered />
       </main>
     );
   }

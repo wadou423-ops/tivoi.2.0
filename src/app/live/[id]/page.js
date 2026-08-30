@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Send, Gift, Users, Radio } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Banniere from "../../components/Banniere";
+import LoaderCentered from "../../components/LoaderCentered";
 
 export default function LiveEnDirect() {
   const { id } = useParams();
@@ -151,7 +152,7 @@ export default function LiveEnDirect() {
   if (!live) {
     return (
       <main className="pt-28 pb-20 px-5 md:px-20 flex items-center justify-center">
-        <p className="text-on-surface-variant">Chargement...</p>
+        <LoaderCentered />
       </main>
     );
   }

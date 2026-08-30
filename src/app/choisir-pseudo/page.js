@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import Spinner from "../components/Spinner";
+import LoaderCentered from "../components/LoaderCentered";
 
 export default function ChoisirPseudo() {
   const router = useRouter();
@@ -51,7 +53,7 @@ export default function ChoisirPseudo() {
   if (checking) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-on-surface-variant">Chargement...</p>
+        <LoaderCentered />
       </main>
     );
   }
@@ -117,8 +119,9 @@ export default function ChoisirPseudo() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary-container text-on-primary font-title font-semibold text-sm py-4 rounded-lg hover:-translate-y-0.5 hover:shadow-[0_5px_15px_rgba(212,175,55,0.2)] transition-all disabled:opacity-50"
+            className="w-full bg-primary-container text-on-primary font-title font-semibold text-sm py-4 rounded-lg hover:-translate-y-0.5 hover:shadow-[0_5px_15px_rgba(212,175,55,0.2)] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
           >
+            {loading && <Spinner size={16} />}
             {loading ? "Validation..." : "Continuer"}
           </button>
 

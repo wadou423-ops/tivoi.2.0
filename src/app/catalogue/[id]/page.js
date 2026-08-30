@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Star, Play, Coins, Plus, Send } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import LoaderCentered from "../../components/LoaderCentered";
 
 export default function FicheContenu() {
   const { id } = useParams();
@@ -110,7 +111,7 @@ export default function FicheContenu() {
   if (!film) {
     return (
       <main className="min-h-screen pt-20 flex items-center justify-center">
-        <p className="text-on-surface-variant">Chargement...</p>
+        <LoaderCentered />
       </main>
     );
   }
