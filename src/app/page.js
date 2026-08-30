@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Film, Tv, Clapperboard, Star } from "lucide-react";
+import { Film, Tv, Clapperboard, Star, Filter } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import { useRealtimeReload } from "@/lib/useRealtime";
 import Banniere from "./components/Banniere";
 
 const PILIERS = [
@@ -90,6 +91,39 @@ export default function Home() {
   const [connecte, setConnecte] = useState(false);
   const [chargement, setChargement] = useState(true);
   const [filtre, setFiltre] = useState("Tous");
+  const [menuFiltre, setMenuFiltre] = useState(false);
+  const menuRef = useRef(null);
+
+  const loadCatalogue = useCallback(async () => {
+    const { data } = await supabase
+      .from("catalogue")
+      .select("id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces")
+      .eq("actif", true)
+      .order("ordre", { ascending: true });
+    setCatalogue(data || []);
+  }, []);
+
+  const loadALaUne = useCallback(async () => {
+    const { data } = await supabase
+      .from("a_une")
+      .select("id, contenu_id, ordre, catalogue(id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces)")
+      .eq("actif", true)
+      .order("ordre", { ascending: true });
+    setALaUne(
+      (data || [])
+        .filter((s) => s.catalogue)
+        .map((s) => ({ ...s.catalogue }))
+    );
+  }, []);
+
+  useEffect(() => {
+    loadCatalogue();
+    loadALaUne();
+  }, [loadCatalogue, loadALaUne]);
+
+  // Mises à jour automatiques : plus besoin de rafraîchir
+  useRealtimeReload(["catalogue", "a_une"], loadCatalogue, [loadCatalogue]);
+  useRealtimeReload(["a_une"], loadALaUne, [loadALaUne]);
 
   useEffect(() => {
     async function check() {
@@ -116,32 +150,6 @@ export default function Home() {
     check();
   }, [router]);
 
-  useEffect(() => {
-    async function loadCatalogue() {
-      const { data } = await supabase
-        .from("catalogue")
-        .select("id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces")
-        .eq("actif", true)
-        .order("ordre", { ascending: true });
-      setCatalogue(data || []);
-    }
-    async function loadALaUne() {
-      const { data } = await supabase
-        .from("a_une")
-        .select("id, contenu_id, ordre, catalogue(id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces)")
-        .eq("actif", true)
-        .order("ordre", { ascending: true });
-      // Transformer chaque entrée en carte comme celles du catalogue
-      setALaUne(
-        (data || [])
-          .filter((s) => s.catalogue)
-          .map((s) => ({ ...s.catalogue }))
-      );
-    }
-    loadCatalogue();
-    loadALaUne();
-  }, []);
-
   const tendances = [...catalogue]
     .sort((a, b) => (b.note || 0) - (a.note || 0))
     .slice(0, 10);
@@ -153,23 +161,56 @@ export default function Home() {
     const catsAffichees = filtre === "Tous" ? categories : categories.filter((c) => c === filtre);
 
     return (
-      <main className="flex-grow min-h-screen flex flex-col pt-20">
-        {/* Filtres par catégorie */}
-        <section className="px-5 md:px-20 pt-10 pb-2">
-          <div className="flex items-center gap-3 overflow-x-auto pb-2 hide-scrollbar">
-            {["Tous", ...categories].map((c) => (
+      <main className="flex-grow min-h-screen flex flex-col pt-24">
+        {/* Filtre : Tous + entonnoir */}
+        <section className="px-5 md:px-20 pt-4 pb-2">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setFiltre("Tous")}
+              className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors text-sm font-title font-semibold ${
+                filtre === "Tous"
+                  ? "bg-primary-container/20 border border-primary text-primary"
+                  : "bg-transparent border border-outline-variant text-on-surface-variant hover:border-primary/50 hover:text-on-surface"
+              }`}
+            >
+              Tous
+            </button>
+
+            <div className="relative" ref={menuRef}>
               <button
-                key={c}
-                onClick={() => setFiltre(c)}
-                className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors text-sm font-title font-semibold ${
-                  filtre === c
+                onClick={() => setMenuFiltre((o) => !o)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-title font-semibold transition-colors ${
+                  filtre !== "Tous"
                     ? "bg-primary-container/20 border border-primary text-primary"
                     : "bg-transparent border border-outline-variant text-on-surface-variant hover:border-primary/50 hover:text-on-surface"
                 }`}
               >
-                {c}
+                <Filter size={15} />
+                {filtre !== "Tous" ? filtre : "Filtres"}
               </button>
-            ))}
+
+              {menuFiltre && (
+                <div className="absolute left-0 mt-2 w-56 rounded-xl bg-surface-low border border-outline-variant shadow-lg py-2 z-40">
+                  <p className="caption text-on-surface-variant uppercase tracking-widest px-4 py-1.5">
+                    Filtrer par catégorie
+                  </p>
+                  {["Tous", ...categories].map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => { setFiltre(c); setMenuFiltre(false); }}
+                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between ${
+                        filtre === c
+                          ? "text-primary bg-primary/10"
+                          : "text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50"
+                      }`}
+                    >
+                      {c}
+                      {filtre === c && <span className="text-primary">●</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
