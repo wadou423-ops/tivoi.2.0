@@ -15,6 +15,10 @@ function clePresence() {
   return Math.random().toString(36).slice(2, 9);
 }
 
+function positionAleatoire() {
+  return 5 + Math.random() * 80;
+}
+
 export default function LiveEnDirect() {
   const { id } = useParams();
   const router = useRouter();
@@ -70,7 +74,7 @@ export default function LiveEnDirect() {
   }, [id]);
 
   function ajouterReaction(emoji) {
-    const item = { id: nouvelId(), emoji, left: 5 + Math.random() * 80 };
+    const item = { id: nouvelId(), emoji, left: positionAleatoire() };
     setReactions((r) => [...r, item]);
     setTimeout(() => setReactions((r) => r.filter((x) => x.id !== item.id)), 3000);
   }
