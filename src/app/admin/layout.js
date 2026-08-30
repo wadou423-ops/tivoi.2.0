@@ -9,19 +9,29 @@ import {
   Film,
   Radio,
   Megaphone,
+  Star,
+  Tv,
+  BadgeCheck,
+  Wallet,
+  MapPin,
 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 const MENU_ADMIN = [
-  { label: "Tableau de bord", href: "/admin", icon: LayoutDashboard },
+  { label: "Vue d'ensemble", href: "/admin", icon: LayoutDashboard },
   { label: "Utilisateurs", href: "/admin/utilisateurs", icon: Users },
+  { label: "Validation créateurs", href: "/admin/createurs", icon: BadgeCheck },
+  { label: "Catalogue VOD", href: "/admin/catalogue", icon: Film },
+  { label: "Contenus à la une", href: "/admin/a-une", icon: Star },
+  { label: "Chaînes TV", href: "/admin/chaines", icon: Tv },
+  { label: "Bannières & pubs", href: "/admin/bannieres", icon: Megaphone },
+  { label: "Demandes de retrait", href: "/admin/retraits", icon: Wallet },
   { label: "Playlist VTC", href: "/admin/vtc", icon: ListVideo },
 ];
 
 const NAV_FUTUR = [
-  { label: "Catalogue (bientôt)", icon: Film },
-  { label: "Lives (bientôt)", icon: Radio },
-  { label: "Publicité (bientôt)", icon: Megaphone },
+  { label: "Lives (modération)", icon: Radio },
+  { label: "DOOH géociblé", icon: MapPin },
 ];
 
 export default function AdminLayout({ children }) {
@@ -89,7 +99,7 @@ export default function AdminLayout({ children }) {
           </div>
         </div>
 
-        <nav className="flex-1 flex flex-col gap-2 mt-4 overflow-y-auto">
+        <nav className="flex-1 flex flex-col gap-1 mt-4 overflow-y-auto">
           {MENU_ADMIN.map((item) => {
             const actif =
               item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
@@ -97,7 +107,7 @@ export default function AdminLayout({ children }) {
               <a
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 ${
+                className={`flex items-center gap-4 px-4 py-2.5 rounded-lg transition-all duration-200 ${
                   actif
                     ? "text-primary font-bold border-r-2 border-primary bg-primary-container/10"
                     : "text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50"
@@ -112,12 +122,20 @@ export default function AdminLayout({ children }) {
           {NAV_FUTUR.map((item) => (
             <span
               key={item.label}
-              className="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant/50 cursor-not-allowed"
+              className="flex items-center gap-4 px-4 py-2.5 rounded-lg text-on-surface-variant/50 cursor-not-allowed"
             >
               <item.icon size={18} />
               <span className="text-sm">{item.label}</span>
             </span>
           ))}
+          <div className="my-3 border-t border-outline-variant/20" />
+          <a
+            href="/annonceur"
+            className="flex items-center gap-4 px-4 py-2.5 rounded-lg text-on-surface-variant hover:text-primary transition-colors"
+          >
+            <Megaphone size={18} />
+            <span className="text-sm">Espace annonceur</span>
+          </a>
         </nav>
       </aside>
       <div className="flex-1 md:ml-72">{children}</div>
