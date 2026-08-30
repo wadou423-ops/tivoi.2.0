@@ -551,3 +551,6 @@ grant execute on function public.envoyer_cadeau(bigint, bigint) to authenticated
 grant execute on function public.banniere_impression(bigint) to anon, authenticated;
 grant execute on function public.banniere_clic(bigint) to anon, authenticated;
 grant execute on function public.demander_retrait(integer) to authenticated;
+
+-- Onboarding vu une fois par compte
+alter table profiles add column if not exists onboarding_vu boolean not null default false;

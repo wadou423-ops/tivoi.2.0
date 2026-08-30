@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 const SLIDES = [
   {
@@ -40,8 +41,14 @@ export default function Bienvenue() {
     return () => clearInterval(t);
   }, [suivant]);
 
-  function terminer(destination) {
+  async function terminer(destination) {
     localStorage.setItem("tivoi_onboarding_vu", "1");
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.from("profiles").update({ onboarding_vu: true }).eq("id", user.id);
+    }
     router.push(destination);
   }
 

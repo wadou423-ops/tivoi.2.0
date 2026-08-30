@@ -38,9 +38,24 @@ export default function Home() {
   const [slide, setSlide] = useState(0);
 
   useEffect(() => {
-    if (!localStorage.getItem("tivoi_onboarding_vu")) {
-      router.replace("/bienvenue");
+    async function checkOnboarding() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("onboarding_vu")
+          .eq("id", user.id)
+          .single();
+        if (profile && !profile.onboarding_vu) {
+          router.replace("/bienvenue");
+        }
+      } else if (!localStorage.getItem("tivoi_onboarding_vu")) {
+        router.replace("/bienvenue");
+      }
     }
+    checkOnboarding();
   }, [router]);
 
   useEffect(() => {
