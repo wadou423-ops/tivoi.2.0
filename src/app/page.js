@@ -71,6 +71,7 @@ export default function Home() {
   const [slide, setSlide] = useState(0);
   const [connecte, setConnecte] = useState(false);
   const [chargement, setChargement] = useState(true);
+  const [filtre, setFiltre] = useState("Tous");
 
   useEffect(() => {
     async function check() {
@@ -138,6 +139,9 @@ export default function Home() {
 
   const carrousel = slides.length > 0 && (
     <section className="relative w-full h-[420px] md:h-[480px] overflow-hidden">
+      <span className="absolute top-6 left-5 md:left-20 z-20 label-md text-on-surface uppercase tracking-widest drop-shadow-lg">
+        À la une
+      </span>
       {slides.map((s, i) => (
         <div
           key={s.id}
@@ -186,11 +190,32 @@ export default function Home() {
 
   // ---------- Mode connecté : expérience Netflix ----------
   if (connecte && !chargement) {
+    const catsAffichees = filtre === "Tous" ? categories : categories.filter((c) => c === filtre);
+
     return (
       <main className="flex-grow min-h-screen flex flex-col pt-20">
         {carrousel}
 
-        <section className="px-5 md:px-20 pt-10 pb-4">
+        {/* Filtres par catégorie */}
+        <section className="px-5 md:px-20 pt-8 pb-2">
+          <div className="flex items-center gap-3 overflow-x-auto pb-2 hide-scrollbar">
+            {["Tous", ...categories].map((c) => (
+              <button
+                key={c}
+                onClick={() => setFiltre(c)}
+                className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors text-sm font-title font-semibold ${
+                  filtre === c
+                    ? "bg-primary-container/20 border border-primary text-primary"
+                    : "bg-transparent border border-outline-variant text-on-surface-variant hover:border-primary/50 hover:text-on-surface"
+                }`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="px-5 md:px-20 pt-6 pb-4">
           <div className="flex justify-between items-end mb-6">
             <h2 className="headline-md text-on-surface">Tendances actuelles</h2>
             <Link href="/catalogue" className="label-md text-primary hover:text-primary-container transition-colors">
@@ -208,23 +233,31 @@ export default function Home() {
           )}
         </section>
 
-        {categories.map((cat) => (
-          <section key={cat} className="px-5 md:px-20 py-6">
-            <div className="flex justify-between items-end mb-4">
-              <h2 className="headline-md text-on-surface">{cat}</h2>
-              <Link href="/catalogue" className="caption text-primary hover:text-primary-container transition-colors">
-                Tout voir →
-              </Link>
-            </div>
-            <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
-              {catalogue
-                .filter((f) => f.categorie === cat)
-                .map((film) => (
+        {catsAffichees.map((cat) => {
+          const films = catalogue.filter((f) => f.categorie === cat);
+          if (films.length === 0) return null;
+          return (
+            <section key={cat} className="px-5 md:px-20 py-6">
+              <div className="flex justify-between items-end mb-4">
+                <h2 className="headline-md text-on-surface">{cat}</h2>
+                <Link href="/catalogue" className="caption text-primary hover:text-primary-container transition-colors">
+                  Tout voir →
+                </Link>
+              </div>
+              <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
+                {films.map((film) => (
                   <CarteFilm key={film.id} film={film} />
                 ))}
-            </div>
-          </section>
-        ))}
+              </div>
+            </section>
+          );
+        })}
+
+        {catsAffichees.length === 0 && (
+          <p className="px-5 md:px-20 py-10 body-md text-on-surface-variant">
+            Aucun contenu dans cette catégorie pour le moment.
+          </p>
+        )}
 
         <footer className="mt-auto px-5 md:px-20 py-8 border-t border-outline-variant/10 text-xs text-outline flex flex-wrap gap-4 justify-between">
           <span>© {new Date().getFullYear()} TiVoi — Tous droits réservés.</span>
