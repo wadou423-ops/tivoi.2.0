@@ -16,6 +16,7 @@ import {
   Wallet,
   MapPin,
   Shield,
+  LogOut,
 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Spinner from "../components/Spinner";
@@ -144,6 +145,17 @@ export default function AdminLayout({ children }) {
               <span className="text-sm">{item.label}</span>
             </span>
           ))}
+          <div className="my-3 border-t border-outline-variant/20" />
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              router.replace("/admin/connexion");
+            }}
+            className="flex items-center gap-4 px-4 py-2.5 rounded-lg text-on-surface-variant hover:text-error transition-colors w-full text-left"
+          >
+            <LogOut size={18} />
+            <span className="text-sm">Déconnexion</span>
+          </button>
         </nav>
       </aside>
       <div className="flex-1 md:ml-72">

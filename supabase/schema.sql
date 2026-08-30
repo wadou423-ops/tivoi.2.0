@@ -282,6 +282,26 @@ create table if not exists appareils (
 );
 alter table appareils enable row level security;
 
+-- ---------- PLAYLIST VTC (kiosque) ----------
+create table if not exists playlist_vtc (
+  id bigint generated always as identity primary key,
+  titre text not null,
+  type text not null default 'contenu' check (type in ('contenu','publicite')),
+  media_url text not null,
+  duree_secondes integer not null default 8,
+  ordre integer not null default 0,
+  actif boolean not null default true,
+  created_at timestamptz not null default now()
+);
+alter table playlist_vtc enable row level security;
+
+drop policy if exists "lecture playlist vtc" on playlist_vtc;
+create policy "lecture playlist vtc" on playlist_vtc for select using (true);
+
+drop policy if exists "admin playlist vtc" on playlist_vtc;
+create policy "admin playlist vtc" on playlist_vtc for all
+  using (public.est_admin()) with check (public.est_admin());
+
 -- ============================================================
 -- RLS : POLITIQUES
 -- ============================================================
