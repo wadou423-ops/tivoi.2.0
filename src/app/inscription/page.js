@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Lock, User as UserIcon, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, User as UserIcon, Phone, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Spinner from "../components/Spinner";
 
@@ -9,6 +9,7 @@ export default function Inscription() {
   const [prenom, setPrenom] = useState("");
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
+  const [telephone, setTelephone] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
@@ -19,10 +20,14 @@ export default function Inscription() {
     setLoading(true);
     setMessage("");
 
+    const numeroComplet = `+225${telephone.replace(/\D/g, "")}`;
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { nom, prenom } },
+      options: {
+        data: { nom, prenom, telephone: numeroComplet },
+      },
     });
 
     setLoading(false);
@@ -92,6 +97,25 @@ export default function Inscription() {
               placeholder="Email"
               className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant text-on-surface pl-10 pr-4 py-3 outline-none focus:border-primary-container transition-colors"
             />
+          </div>
+
+          <div className="relative rounded-lg glow-focus transition-all">
+            <Phone size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+            <input
+              type="tel"
+              required
+              value={telephone}
+              onChange={(e) => setTelephone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+              placeholder="07 00 00 00 00"
+              inputMode="numeric"
+              className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant text-on-surface pl-16 pr-4 py-3 outline-none focus:border-primary-container transition-colors"
+            />
+            <span className="absolute left-8 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm font-semibold pointer-events-none">
+              +225
+            </span>
+            <p className="caption text-on-surface-variant mt-1.5 opacity-70 -mt-1">
+              Sert à te connecter par SMS avec un code.
+            </p>
           </div>
 
           <div className="relative rounded-lg glow-focus transition-all">

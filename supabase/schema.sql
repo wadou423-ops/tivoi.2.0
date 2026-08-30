@@ -554,3 +554,21 @@ grant execute on function public.demander_retrait(integer) to authenticated;
 
 -- Onboarding vu une fois par compte
 alter table profiles add column if not exists onboarding_vu boolean not null default false;
+
+-- ---------- TELEPHONE (inscription + connexion OTP) ----------
+alter table profiles add column if not exists telephone text;
+
+create or replace function public.handle_new_user()
+returns trigger language plpgsql security definer as $$
+begin
+  insert into public.profiles (id, nom, prenom, telephone)
+  values (
+    new.id,
+    new.raw_user_meta_data->>'nom',
+    new.raw_user_meta_data->>'prenom',
+    new.raw_user_meta_data->>'telephone'
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
