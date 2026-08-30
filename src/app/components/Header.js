@@ -124,18 +124,9 @@ export default function Header() {
                   <div className="absolute right-0 mt-2 w-56 rounded-xl bg-surface-low border border-outline-variant shadow-lg py-2 z-50">
                     <div className="px-4 py-2 border-b border-outline-variant/40">
                       <p className="title-lg text-on-surface">@{pseudo}</p>
-                      {role === "admin" && (
-                        <Link href="/admin" className="block px-0 py-1 text-sm text-primary hover:text-primary-container transition-colors">
-                          Dashboard admin
-                        </Link>
-                      )}
-                      {role === "createur" ? (
+                      {role === "createur" && (
                         <Link href="/studio" className="block px-0 py-1 text-sm text-primary hover:text-primary-container transition-colors">
                           Studio créateur
-                        </Link>
-                      ) : (
-                        <Link href="/devenir-createur" className="block px-0 py-1 text-sm text-primary hover:text-primary-container transition-colors">
-                          Devenir créateur
                         </Link>
                       )}
                       <Link href="/profil" className="block py-1 text-sm text-on-surface-variant hover:text-primary transition-colors">

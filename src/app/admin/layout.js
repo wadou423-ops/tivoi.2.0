@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import {
   LayoutDashboard,
   Users,
@@ -14,8 +15,11 @@ import {
   BadgeCheck,
   Wallet,
   MapPin,
+  Shield,
+  ArrowLeft,
 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import Spinner from "../components/Spinner";
 
 const MENU_ADMIN = [
   { label: "Vue d'ensemble", href: "/admin", icon: LayoutDashboard },
@@ -40,14 +44,18 @@ export default function AdminLayout({ children }) {
   const [autorise, setAutorise] = useState(false);
   const [checking, setChecking] = useState(true);
 
+  const estPageConnexion = pathname === "/admin/connexion";
+
   useEffect(() => {
+    if (estPageConnexion) return;
+
     async function checkAdmin() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
       if (!user) {
-        router.push("/connexion");
+        router.replace("/admin/connexion");
         return;
       }
 
@@ -58,8 +66,9 @@ export default function AdminLayout({ children }) {
         .single();
 
       if (profile?.role !== "admin") {
-        setAutorise(false);
-        setChecking(false);
+        // Ce n'est pas un admin : on le déconnecte de ce portail
+        await supabase.auth.signOut();
+        router.replace("/admin/connexion?refuse=1");
         return;
       }
 
@@ -68,12 +77,17 @@ export default function AdminLayout({ children }) {
     }
 
     checkAdmin();
-  }, [router]);
+  }, [router, estPageConnexion]);
+
+  // Page de connexion admin : rendue seule, sans sidebar ni protection
+  if (estPageConnexion) {
+    return <>{children}</>;
+  }
 
   if (checking) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <p className="text-on-surface-variant">Vérification...</p>
+        <Spinner size={36} />
       </main>
     );
   }
@@ -81,7 +95,7 @@ export default function AdminLayout({ children }) {
   if (!autorise) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <p className="text-on-surface-variant">Accès réservé aux administrateurs.</p>
+        <Spinner size={36} />
       </main>
     );
   }
@@ -130,12 +144,23 @@ export default function AdminLayout({ children }) {
           ))}
           <div className="my-3 border-t border-outline-variant/20" />
           <a
-            href="/annonceur"
-            className="flex items-center gap-4 px-4 py-2.5 rounded-lg text-on-surface-variant hover:text-primary transition-colors"
+            href="/admin/administrateurs"
+            className={`flex items-center gap-4 px-4 py-2.5 rounded-lg transition-colors ${
+              pathname.startsWith("/admin/administrateurs")
+                ? "text-primary font-bold border-r-2 border-primary bg-primary-container/10"
+                : "text-on-surface-variant hover:text-primary"
+            }`}
           >
-            <Megaphone size={18} />
-            <span className="text-sm">Espace annonceur</span>
+            <Shield size={18} />
+            <span className="text-sm">Administrateurs</span>
           </a>
+          <Link
+            href="/"
+            className="flex items-center gap-4 px-4 py-2.5 mt-4 rounded-lg text-on-surface-variant hover:text-primary transition-colors"
+          >
+            <ArrowLeft size={18} />
+            <span className="text-sm">Retour au site</span>
+          </Link>
         </nav>
       </aside>
       <div className="flex-1 md:ml-72">{children}</div>
