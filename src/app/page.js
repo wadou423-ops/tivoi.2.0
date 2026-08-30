@@ -7,6 +7,7 @@ import { Film, Tv, Clapperboard, Star, Filter } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRealtimeReload } from "@/lib/useRealtime";
 import Banniere from "./components/Banniere";
+import LoaderCentered from "./components/LoaderCentered";
 
 const PILIERS = [
   {
@@ -160,8 +161,17 @@ export default function Home() {
 
   const categories = [...new Set(catalogue.map((f) => f.categorie).filter(Boolean))];
 
+  // Tant que la session n'est pas vérifiée : spinner (pas de flash version visiteur)
+  if (chargement) {
+    return (
+      <main className="flex-grow min-h-screen flex items-center justify-center pt-20">
+        <LoaderCentered />
+      </main>
+    );
+  }
+
   // ---------- Mode connecté : expérience Netflix ----------
-  if (connecte && !chargement) {
+  if (connecte) {
     const catsAffichees = filtre === "Tous" ? categories : categories.filter((c) => c === filtre);
 
     return (

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { supabase } from "./supabaseClient";
 
 // Recharge automatiquement les données quand les tables changent en base
+// + au retour sur l'onglet (visibilitychange)
 export function useRealtimeReload(tables, reload, deps = []) {
   useEffect(() => {
     const channel = supabase
@@ -13,7 +14,15 @@ export function useRealtimeReload(tables, reload, deps = []) {
       })
       .subscribe();
 
-    return () => supabase.removeChannel(channel);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") reload();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
+    return () => {
+      supabase.removeChannel(channel);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }
