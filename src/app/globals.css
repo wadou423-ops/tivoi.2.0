@@ -16,10 +16,17 @@
   --color-primary: #f2ca50;
   --color-primary-container: #d4af37;
   --color-on-primary: #3c2f00;
+  --color-on-primary-fixed: #241a00;
   --color-secondary: #c6c7c2;
   --color-error: #ffb4ab;
   --font-display: var(--font-montserrat), sans-serif;
   --font-body: var(--font-archivo-narrow), sans-serif;
+  /* Espacements maquette */
+  --spacing-unit: 8px;
+  --spacing-gutter: 24px;
+  --spacing-section-gap: 48px;
+  --spacing-container-margin-mobile: 20px;
+  --spacing-container-margin-desktop: 80px;
 }
 
 body {
@@ -32,7 +39,19 @@ h1, h2, h3 {
   font-family: var(--font-display);
 }
 
-/* Panneau vitré — superpositions nav / contrôleurs */
+/* ---------- Typographie du design system ---------- */
+.display-lg { font-family: var(--font-display); font-size: 48px; line-height: 56px; font-weight: 700; letter-spacing: -0.02em; }
+.headline-md { font-family: var(--font-display); font-size: 24px; line-height: 32px; font-weight: 600; }
+.title-lg { font-family: var(--font-display); font-size: 20px; line-height: 28px; font-weight: 600; }
+.body-lg { font-size: 18px; line-height: 28px; }
+.body-md { font-size: 16px; line-height: 24px; }
+.label-md { font-family: var(--font-display); font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: 0.05em; }
+.caption { font-size: 12px; line-height: 16px; font-weight: 500; }
+@media (max-width: 767px) {
+  .display-lg { font-size: 32px; line-height: 40px; letter-spacing: -0.01em; }
+}
+
+/* ---------- Effets ---------- */
 .glass-panel {
   background-color: rgba(26, 26, 26, 0.8);
   backdrop-filter: blur(20px);
@@ -40,13 +59,11 @@ h1, h2, h3 {
   border: 1px solid rgba(212, 175, 55, 0.1);
 }
 
-/* Halo or au focus */
 .glow-focus:focus-within {
   box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
   border-color: rgba(212, 175, 55, 0.5);
 }
 
-/* Élévation des cartes */
 .card-hover {
   transition: all 0.3s ease;
 }
@@ -56,28 +73,37 @@ h1, h2, h3 {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
-/* Ticker bandeau d'infos */
+.movie-card {
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+.movie-card:hover {
+  border-color: rgba(212, 175, 55, 0.5);
+  transform: translateY(-2px);
+}
+
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ---------- Animations ---------- */
 @keyframes ticker-scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
+.ticker-track { animation: ticker-scroll 28s linear infinite; }
 
-.ticker-track {
-  animation: ticker-scroll 28s linear infinite;
-}
-
-/* Barre de progression kiosque */
 @keyframes progress-fill {
   from { width: 0%; }
   to { width: 100%; }
 }
+.progress-bar-animate { animation: progress-fill linear forwards; }
 
-.progress-bar-animate {
-  animation: progress-fill linear forwards;
+@keyframes fade-up {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
+.fade-up { animation: fade-up 0.7s ease forwards; }
 
 @media (prefers-reduced-motion: reduce) {
-  .ticker-track {
-    animation: none;
-  }
+  .ticker-track { animation: none; }
+  .fade-up { animation: none; }
 }

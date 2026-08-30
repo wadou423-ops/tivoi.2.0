@@ -2,131 +2,174 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Film, Tv, Clapperboard, Star } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import Banniere from "./components/Banniere";
+
+const PILIERS = [
+  {
+    icon: Film,
+    titre: "VOD Premium",
+    texte: "Films et séries exclusifs, sélectionnés pour une expérience cinématographique ultime.",
+    href: "/catalogue",
+    decalage: "",
+  },
+  {
+    icon: Clapperboard,
+    titre: "Lives en Direct",
+    texte: "Connectez-vous avec les créateurs et icônes culturelles en temps réel.",
+    href: "/lives",
+    decalage: "md:mt-8",
+  },
+  {
+    icon: Tv,
+    titre: "Chaînes TV",
+    texte: "Accès ininterrompu à vos chaînes de télévision premium favorites.",
+    href: "/guide-tv",
+    decalage: "md:mt-16",
+  },
+];
 
 export default function Home() {
-  const [connecte, setConnecte] = useState(false);
+  const [tendances, setTendances] = useState([]);
 
   useEffect(() => {
-    async function checkUser() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setConnecte(!!user);
+    async function loadTendances() {
+      const { data } = await supabase
+        .from("catalogue")
+        .select("id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces")
+        .eq("actif", true)
+        .order("note", { ascending: false, nullsFirst: false })
+        .limit(10);
+      setTendances(data || []);
     }
-
-    checkUser();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      checkUser();
-    });
-
-    return () => subscription.unsubscribe();
+    loadTendances();
   }, []);
 
-  const ticker = [
-    "🎬 À la une : Le Trône d'Abidjan",
-    "🔴 EN DIRECT — Konan Live",
-    "📺 France 24",
-    "🎬 Nouveau : Sarabah",
-    "🔴 EN DIRECT — Soirée Zouglou",
-    "📺 Al Jazeera English",
-  ];
-
   return (
-    <main className="min-h-screen">
+    <main className="flex-grow min-h-screen flex flex-col pt-20">
       {/* Hero */}
-      <section className="relative px-6 md:px-20 pt-16 pb-12 max-w-4xl overflow-hidden">
-        <div
-          className="absolute inset-0 -z-10"
-          style={{
-            background:
-              "radial-gradient(circle at 15% 20%, rgba(212, 175, 55, 0.18), transparent 45%), radial-gradient(circle at 90% 10%, rgba(242, 202, 80, 0.10), transparent 40%), repeating-linear-gradient(115deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 60px)",
-          }}
-        />
-        <p className="text-xs font-title font-semibold uppercase tracking-[0.05em] text-primary mb-4">
-          Premium — Côte d&apos;Ivoire
-        </p>
-        <h1 className="font-display font-bold text-5xl md:text-7xl leading-[0.95] tracking-[-0.02em] text-on-surface">
-          Films, lives et chaînes TV.<br />
-          <span className="text-primary">Un seul écran.</span>
-        </h1>
-        <p className="mt-6 text-lg text-on-surface-variant max-w-xl">
-          La plateforme de streaming pensée pour la Côte d&apos;Ivoire — séries et
-          films à la demande, lives de créateurs et chaînes en direct, réunis
-          au même endroit.
-        </p>
-        <div className="mt-8 flex gap-4">
-          {!connecte && (
+      <section className="relative w-full h-[819px] min-h-[600px] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <div
+            className="bg-cover bg-center w-full h-full opacity-60"
+            style={{
+              backgroundImage:
+                "url('https://lh3.googleusercontent.com/aida-public/AB6AXuA_kaIwBSBirYg1jWkjEriT9nEdkXbI3YE4GT-CGdwbplu4c_m-8BKOjg1Kf1avBtFLdEYj9GJL8aamaVHOSxyxYkbQ8rDcxTPgw5DyU6p4mCWW4hI3Wb_aPUnFa12zHcbphrxq8USx9qrjIdSAGvBI-TzI7oikIJgoDoWVDaNzZKDWk5X4xti5U0ZquWu3GdyJrPXWkAQGPLbMEEE_W1lE0lvFWFo1RlaSaVZajlnFoHp8wUsBYRf_')",
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+        </div>
+        <div className="relative z-10 text-center px-5 md:px-20 max-w-4xl mx-auto flex flex-col items-center gap-12">
+          <h1 className="display-lg text-on-surface drop-shadow-2xl">
+            Le cinéma premium ouest-africain.
+          </h1>
+          <p className="body-lg text-on-surface-variant max-w-2xl">
+            Découvrez le sommet de la narration : sélection VOD exclusive, directs
+            des meilleurs créateurs et chaînes TV en continu.
+          </p>
+          <div className="flex flex-wrap justify-center gap-6 mt-8">
             <Link
-              href="/inscription"
-              className="rounded-lg bg-primary-container text-on-primary px-6 py-3 text-sm font-title font-semibold hover:-translate-y-0.5 hover:shadow-[0_5px_15px_rgba(212,175,55,0.2)] transition-all"
+              href="/catalogue"
+              className="bg-primary text-on-primary-fixed label-md px-8 py-3 rounded hover:bg-primary-container transition-colors shadow-[0_0_15px_rgba(212,175,55,0.3)]"
             >
-              Créer un compte
+              Explorer la VOD
             </Link>
-          )}
-          <Link
-            href="/catalogue"
-            className="rounded-lg border border-primary-container px-6 py-3 text-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
-          >
-            Voir le catalogue
-          </Link>
+            <Link
+              href="/guide-tv"
+              className="border border-primary text-on-surface label-md px-8 py-3 rounded hover:bg-surface-high transition-colors"
+            >
+              Voir les chaînes TV
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Ticker style guide TV */}
-      <div className="border-y border-outline-variant/10 overflow-hidden py-3 bg-surface-lowest">
-        <div className="flex whitespace-nowrap ticker-track">
-          {[...ticker, ...ticker].map((item, i) => (
-            <span key={i} className="mx-6 text-sm text-on-surface-variant">
-              {item}
-            </span>
+      {/* Bannière 1 */}
+      <section className="px-5 md:px-20 py-6">
+        <Banniere emplacement="accueil_h1" className="h-24 md:h-32" />
+      </section>
+
+      {/* Bento 3 piliers */}
+      <section className="px-5 md:px-20 py-12">
+        <h2 className="headline-md text-on-surface mb-6">Découvrir TiVoi</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {PILIERS.map((p) => (
+            <Link
+              key={p.titre}
+              href={p.href}
+              className={`bg-surface-container border border-outline-variant/30 rounded-xl p-6 flex flex-col gap-4 relative overflow-hidden group hover:border-primary/50 transition-colors ${p.decalage}`}
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/20 transition-all" />
+              <p.icon size={36} className="text-primary" />
+              <h3 className="title-lg text-on-surface z-10">{p.titre}</h3>
+              <p className="body-md text-on-surface-variant z-10">{p.texte}</p>
+            </Link>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Features */}
-      <section className="px-6 md:px-20 py-20 grid gap-10 md:grid-cols-3">
-        <div className="rounded-xl border border-primary-container/10 bg-surface-low p-8 card-hover">
-          <p className="text-xs font-title font-semibold uppercase tracking-[0.05em] text-primary">
-            Catalogue
-          </p>
-          <h2 className="font-display font-semibold text-2xl mt-2 text-on-surface">
-            Films &amp; séries
-          </h2>
-          <p className="mt-3 text-sm text-on-surface-variant">
-            Paiement à la séance ou abonnement — accès immédiat, sans détour.
-          </p>
+      {/* Shelf Tendances */}
+      <section className="px-5 md:px-20 py-12 border-t border-surface-high">
+        <div className="flex justify-between items-end mb-6">
+          <h2 className="headline-md text-on-surface">Tendances actuelles</h2>
+          <Link href="/catalogue" className="label-md text-primary hover:text-primary-container transition-colors flex items-center gap-1">
+            Voir tout →
+          </Link>
         </div>
-        <div className="rounded-xl border border-primary-container/10 bg-surface-low p-8 card-hover">
-          <p className="text-xs font-title font-semibold uppercase tracking-[0.05em] text-primary">
-            Communauté
+        {tendances.length === 0 ? (
+          <p className="text-on-surface-variant body-md">
+            Le catalogue arrive bientôt — connectez Supabase et ajoutez du contenu depuis l&apos;admin.
           </p>
-          <h2 className="font-display font-semibold text-2xl mt-2 text-on-surface">
-            Lives de créateurs
-          </h2>
-          <p className="mt-3 text-sm text-on-surface-variant">
-            Chat en direct, cadeaux virtuels, et des créateurs à soutenir en temps réel.
-          </p>
-        </div>
-        <div className="rounded-xl border border-primary-container/10 bg-surface-low p-8 card-hover">
-          <p className="text-xs font-title font-semibold uppercase tracking-[0.05em] text-primary">
-            En continu
-          </p>
-          <h2 className="font-display font-semibold text-2xl mt-2 text-on-surface">
-            Chaînes TV
-          </h2>
-          <p className="mt-3 text-sm text-on-surface-variant">
-            France 24, Al Jazeera et bien d&apos;autres, diffusées en direct 24h/24.
-          </p>
-        </div>
+        ) : (
+          <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
+            {tendances.map((film) => (
+              <Link
+                key={film.id}
+                href={`/catalogue/${film.id}`}
+                className="flex-none w-[200px] md:w-[240px] snap-start flex flex-col gap-2"
+              >
+                <div className="relative w-full aspect-[2/3] rounded-lg overflow-hidden border border-outline-variant/10 movie-card cursor-pointer bg-surface-high">
+                  <img src={film.image_url} alt={film.titre} className="w-full h-full object-cover" />
+                  {film.note && (
+                    <div className="absolute top-2 right-2 bg-surface-lowest/80 backdrop-blur-md px-2 py-1 rounded caption text-primary border border-primary/20 flex items-center gap-1">
+                      <Star size={14} fill="currentColor" /> {film.note}
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent flex items-end p-4 opacity-0 hover:opacity-100 transition-opacity">
+                    <span className="bg-primary text-on-primary-fixed w-full py-2 rounded label-md text-center flex items-center justify-center gap-2">
+                      ▶ Regarder
+                    </span>
+                  </div>
+                </div>
+                <h3 className="title-lg text-on-surface truncate">{film.titre}</h3>
+                <div className="flex justify-between items-center">
+                  <span className="caption text-on-surface-variant">{film.categorie}</span>
+                  <span className={`label-md ${film.type_acces === "gratuit" ? "text-secondary" : "text-primary"}`}>
+                    {film.type_acces === "gratuit"
+                      ? "Gratuit"
+                      : film.type_acces === "abonnement"
+                        ? "Abonnement"
+                        : `${(film.prix_fcfa || 0).toLocaleString("fr-FR")} FCFA`}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Bannière 2 */}
+      <section className="px-5 md:px-20 py-6">
+        <Banniere emplacement="accueil_h2" className="h-24 md:h-32" />
       </section>
 
       {/* Footer */}
-      <footer className="px-6 md:px-20 py-8 border-t border-outline-variant/10 text-xs text-outline">
-        © {new Date().getFullYear()} TiVoi — Tous droits réservés.
+      <footer className="mt-auto px-5 md:px-20 py-8 border-t border-outline-variant/10 text-xs text-outline flex flex-wrap gap-4 justify-between">
+        <span>© {new Date().getFullYear()} TiVoi — Tous droits réservés.</span>
+        <Link href="/legales" className="hover:text-primary transition-colors">
+          Mentions légales · Confidentialité
+        </Link>
       </footer>
     </main>
   );
