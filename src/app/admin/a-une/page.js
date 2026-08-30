@@ -8,6 +8,7 @@ export default function AdminAUne() {
   const [slides, setSlides] = useState([]);
   const [contenus, setContenus] = useState([]);
   const [choix, setChoix] = useState("");
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     load();
@@ -73,6 +74,8 @@ export default function AdminAUne() {
   return (
     <main className="px-6 md:px-12 py-12">
       <h1 className="font-display font-bold text-3xl text-primary mb-8">Contenus à la une</h1>
+
+      {message && <p className="caption text-error mb-4">{message}</p>}
 
       <form onSubmit={ajouter} className="glass-panel rounded-xl p-6 mb-8 flex flex-col sm:flex-row gap-4 items-end">
         <div className="flex-1 w-full">
