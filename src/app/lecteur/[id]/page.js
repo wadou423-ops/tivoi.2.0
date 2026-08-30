@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../../components/LoaderCentered";
+import CustomVideoPlayer from "../../components/CustomVideoPlayer";
 
 export default function Lecteur() {
   const { id } = useParams();
@@ -41,6 +42,7 @@ export default function Lecteur() {
   const idYoutube = url
     ? url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|live\/|embed\/))([a-zA-Z0-9_-]{11})/)
     : null;
+  const estMp4 = url && /\.(mp4|webm|mov)(\?|#|$)/i.test(url);
 
   return (
     <main className="relative min-h-screen bg-surface-lowest flex items-center justify-center overflow-hidden select-none">
@@ -51,8 +53,10 @@ export default function Lecteur() {
           allowFullScreen
           className="w-full h-screen"
         />
-      ) : url && /\.(mp4|webm|mov)(\?|#|$)/i.test(url) ? (
-        <video src={url} controls autoPlay className="w-full h-screen object-contain" />
+      ) : estMp4 ? (
+        <div className="w-full h-screen">
+          <CustomVideoPlayer src={url} contenuId={film.id} />
+        </div>
       ) : (
         <div className="relative w-full h-screen">
           <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${film.image_url || ""}')` }} />

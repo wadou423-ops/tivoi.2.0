@@ -7,6 +7,14 @@ import { supabase } from "@/lib/supabaseClient";
 import Banniere from "../../components/Banniere";
 import LoaderCentered from "../../components/LoaderCentered";
 
+function nouvelId() {
+  return Date.now() + Math.random();
+}
+
+function clePresence() {
+  return Math.random().toString(36).slice(2, 9);
+}
+
 export default function LiveEnDirect() {
   const { id } = useParams();
   const router = useRouter();
@@ -16,6 +24,9 @@ export default function LiveEnDirect() {
   const [cadeaux, setCadeaux] = useState([]);
   const [solde, setSolde] = useState(null);
   const [toast, setToast] = useState("");
+  const [spectateurs, setSpectateurs] = useState(0);
+  const [reactions, setReactions] = useState([]);
+  const [cadeauxVolants, setCadeauxVolants] = useState([]);
   const chatRef = useRef(null);
 
   useEffect(() => {
@@ -58,10 +69,30 @@ export default function LiveEnDirect() {
     load();
   }, [id]);
 
-  // Chat temps réel
+  function ajouterReaction(emoji) {
+    const item = { id: nouvelId(), emoji, left: 5 + Math.random() * 80 };
+    setReactions((r) => [...r, item]);
+    setTimeout(() => setReactions((r) => r.filter((x) => x.id !== item.id)), 3000);
+  }
+
+  function ajouterCadeauVolant(emoji) {
+    const item = { id: nouvelId(), emoji };
+    setCadeauxVolants((c) => [...c, item]);
+    setTimeout(() => setCadeauxVolants((c) => c.filter((x) => x.id !== item.id)), 4200);
+  }
+
+  async function envoyerReaction(emoji) {
+    ajouterReaction(emoji);
+    const channel = supabase.getChannels().find((c) => c.topic === `live-${id}`);
+    if (channel) {
+      await channel.send({ type: "broadcast", event: "reaction", payload: { emoji } });
+    }
+  }
+
+  // Chat temps réel + présence + réactions + cadeaux animés
   useEffect(() => {
     const channel = supabase
-      .channel(`live-${id}`)
+      .channel(`live-${id}`, { config: { presence: { key: clePresence() } } })
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "messages_live", filter: `live_id=eq.${id}` },
@@ -87,14 +118,32 @@ export default function LiveEnDirect() {
           });
         }
       )
+      .on("broadcast", { event: "reaction" }, ({ payload }) => {
+        ajouterReaction(payload.emoji);
+      })
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "cadeaux_envoyes", filter: `createur_id=eq.${live?.createur_id || "x"}` },
-        () => {}
+        { event: "INSERT", schema: "public", table: "cadeaux_envoyes", filter: `live_id=eq.${id}` },
+        async (payload) => {
+          const { data: c } = await supabase
+            .from("cadeaux")
+            .select("emoji, nom")
+            .eq("id", payload.new.cadeau_id)
+            .single();
+          if (c) ajouterCadeauVolant(c.emoji);
+        }
       )
-      .subscribe();
+      .on("presence", { event: "sync" }, () => {
+        setSpectateurs(Object.keys(channel.presenceState()).length);
+      })
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          await channel.track({ at: Date.now() });
+        }
+      });
+
     return () => supabase.removeChannel(channel);
-  }, [id, live?.createur_id]);
+  }, [id]);
 
   useEffect(() => {
     if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
@@ -144,6 +193,7 @@ export default function LiveEnDirect() {
       setToast(error.message);
     } else {
       setToast(`${cadeau.emoji} ${cadeau.nom} envoyé à @${live?.profiles?.pseudo || "créateur"} !`);
+      ajouterCadeauVolant(cadeau.emoji);
       setSolde((s) => s - cadeau.cout_tokens);
     }
     setTimeout(() => setToast(""), 3000);
@@ -160,6 +210,8 @@ export default function LiveEnDirect() {
   const idYoutube = live.url_lecture
     ? live.url_lecture.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|live\/|embed\/))([a-zA-Z0-9_-]{11})/)
     : null;
+
+  const EMOJIS_REACTION = ["❤️", "🔥", "👏", "😮", "😂"];
 
   return (
     <main className="pt-24 pb-10 px-5 md:px-20">
@@ -189,10 +241,52 @@ export default function LiveEnDirect() {
               </div>
             )}
             {live.statut === "en_direct" && (
-              <span className="absolute top-3 left-3 bg-error text-on-error caption font-bold px-2 py-1 rounded">
+              <span className="absolute top-3 left-3 bg-error text-on-error caption font-bold px-2 py-1 rounded pulse-live">
                 ● EN DIRECT
               </span>
             )}
+            {/* Compteur spectateurs */}
+            <span className="absolute top-3 right-3 bg-surface-lowest/70 backdrop-blur-md caption text-on-surface px-2.5 py-1 rounded flex items-center gap-1.5">
+              <Users size={12} className="text-primary" /> {spectateurs}
+            </span>
+
+            {/* Cadeaux qui traversent l'écran */}
+            {cadeauxVolants.map((c) => (
+              <span
+                key={c.id}
+                className="absolute top-1/3 text-5xl gift-fly pointer-events-none"
+                style={{ left: "-15vw" }}
+              >
+                {c.emoji}
+              </span>
+            ))}
+
+            {/* Réactions flottantes */}
+            {reactions.map((r) => (
+              <span
+                key={r.id}
+                className="absolute bottom-16 text-3xl reaction-float pointer-events-none"
+                style={{ left: `${r.left}%` }}
+              >
+                {r.emoji}
+              </span>
+            ))}
+          </div>
+
+          {/* Barre de réactions */}
+          <div className="flex items-center gap-2">
+            {EMOJIS_REACTION.map((e) => (
+              <button
+                key={e}
+                onClick={() => envoyerReaction(e)}
+                className="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-lg hover:scale-110 active:scale-95 transition-transform"
+              >
+                {e}
+              </button>
+            ))}
+            <span className="caption text-on-surface-variant ml-2">
+              Réagis en direct — tout le monde voit tes emojis
+            </span>
           </div>
 
           <div>

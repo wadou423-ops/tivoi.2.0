@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { Search, Bell, Menu, User } from "lucide-react";
+import { Search, Bell, Menu, X } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function Header() {
@@ -13,6 +13,7 @@ export default function Header() {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -154,11 +155,91 @@ export default function Header() {
               </Link>
             )}
           </div>
-          <button className="md:hidden text-on-surface">
+          <button className="md:hidden text-on-surface" onClick={() => setDrawerOpen(true)}>
             <Menu size={22} />
           </button>
         </div>
       </div>
+
+      {/* Drawer mobile */}
+      {drawerOpen && (
+        <div className="md:hidden fixed inset-0 z-[60]" onClick={() => setDrawerOpen(false)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div
+            className="absolute right-0 top-0 h-full w-72 bg-surface border-l border-outline-variant/20 p-6 flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-8">
+              <span className="font-display font-bold text-xl text-primary">TiVoi</span>
+              <button onClick={() => setDrawerOpen(false)} className="text-on-surface-variant hover:text-primary">
+                <X size={22} />
+              </button>
+            </div>
+
+            <nav className="flex flex-col gap-1">
+              {navLinks.map((l) => (
+                <Link
+                  key={l.label}
+                  href={l.href}
+                  onClick={() => setDrawerOpen(false)}
+                  className={`px-4 py-3 rounded-lg text-sm font-title font-semibold transition-colors ${
+                    pathname === l.href
+                      ? "text-primary bg-primary/10"
+                      : "text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50"
+                  }`}
+                >
+                  {l.label}
+                </Link>
+              ))}
+              <Link
+                href="/portefeuille"
+                onClick={() => setDrawerOpen(false)}
+                className="px-4 py-3 rounded-lg text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50"
+              >
+                Portefeuille
+              </Link>
+              <Link
+                href="/notifications"
+                onClick={() => setDrawerOpen(false)}
+                className="px-4 py-3 rounded-lg text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50"
+              >
+                Notifications
+              </Link>
+            </nav>
+
+            <div className="mt-auto border-t border-outline-variant/20 pt-4">
+              {loading ? null : pseudo ? (
+                <>
+                  <Link
+                    href="/profil"
+                    onClick={() => setDrawerOpen(false)}
+                    className="block px-4 py-3 rounded-lg text-sm text-on-surface hover:bg-surface-variant/50"
+                  >
+                    @{pseudo}
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setDrawerOpen(false);
+                      handleLogout();
+                    }}
+                    className="w-full text-left px-4 py-3 rounded-lg text-sm text-error hover:bg-error/10"
+                  >
+                    Déconnexion
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/connexion"
+                  onClick={() => setDrawerOpen(false)}
+                  className="block text-center bg-primary-container text-on-primary label-md px-4 py-3 rounded-lg"
+                >
+                  Connexion
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

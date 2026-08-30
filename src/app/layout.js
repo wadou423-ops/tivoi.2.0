@@ -1,6 +1,7 @@
 import { Montserrat, Archivo_Narrow } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
+import ToastHost from "./components/ToastHost";
 
 const montserrat = Montserrat({
   weight: ["400", "600", "700", "900"],
@@ -28,6 +29,7 @@ export default function RootLayout({ children }) {
       >
         <Header />
         {children}
+        <ToastHost />
       </body>
     </html>
   );

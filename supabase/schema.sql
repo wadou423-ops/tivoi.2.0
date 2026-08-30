@@ -572,6 +572,42 @@ grant execute on function public.banniere_impression(bigint) to anon, authentica
 grant execute on function public.banniere_clic(bigint) to anon, authenticated;
 grant execute on function public.demander_retrait(integer) to authenticated;
 
+-- ---------- PROGRESSION DE VISIONNAGE ----------
+create table if not exists progressions (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references profiles(id) on delete cascade,
+  contenu_id bigint not null references catalogue(id) on delete cascade,
+  position_secondes integer not null default 0,
+  duree_secondes integer not null default 0,
+  termine boolean not null default false,
+  unique (user_id, contenu_id),
+  updated_at timestamptz not null default now()
+);
+alter table progressions enable row level security;
+
+drop policy if exists "lire ses progressions" on progressions;
+create policy "lire ses progressions" on progressions for select using (auth.uid() = user_id);
+
+drop policy if exists "ecrire ses progressions" on progressions;
+create policy "ecrire ses progressions" on progressions for insert with check (auth.uid() = user_id);
+
+drop policy if exists "maj ses progressions" on progressions;
+create policy "maj ses progressions" on progressions for update using (auth.uid() = user_id);
+
+create or replace function public.enregistrer_progression(p_contenu_id bigint, p_position int, p_duree int)
+returns void language plpgsql security definer as $$
+begin
+  insert into progressions (user_id, contenu_id, position_secondes, duree_secondes, termine)
+  values (auth.uid(), p_contenu_id, p_position, p_duree, p_duree > 0 and p_position >= p_duree - 5)
+  on conflict (user_id, contenu_id) do update set
+    position_secondes = excluded.position_secondes,
+    duree_secondes = excluded.duree_secondes,
+    termine = excluded.termine,
+    updated_at = now();
+end;
+$$;
+grant execute on function public.enregistrer_progression(bigint, int, int) to authenticated;
+
 -- Onboarding vu une fois par compte
 alter table profiles add column if not exists onboarding_vu boolean not null default false;
 

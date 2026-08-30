@@ -3,11 +3,13 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Film, Tv, Clapperboard, Star, Filter } from "lucide-react";
+import { Film, Tv, Clapperboard, Filter } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRealtimeReload } from "@/lib/useRealtime";
 import Banniere from "./components/Banniere";
 import LoaderCentered from "./components/LoaderCentered";
+import CarteFilm from "./components/CarteFilm";
+import FicheRapide from "./components/FicheRapide";
 
 const PILIERS = [
   {
@@ -33,52 +35,49 @@ const PILIERS = [
   },
 ];
 
-function CarteFilm({ film }) {
-  return (
-    <Link href={`/catalogue/${film.id}`} className="flex-none w-[200px] md:w-[240px] snap-start flex flex-col gap-2">
-      <div className="relative w-full aspect-[2/3] rounded-lg overflow-hidden border border-outline-variant/10 movie-card cursor-pointer bg-surface-high">
-        {film.image_url && (
-          <img src={film.image_url} alt={film.titre || "Contenu"} className="w-full h-full object-cover" />
-        )}
-        {film.note && (
-          <div className="absolute top-2 right-2 bg-surface-lowest/80 backdrop-blur-md px-2 py-1 rounded caption text-primary border border-primary/20 flex items-center gap-1">
-            <Star size={14} fill="currentColor" /> {film.note}
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent flex items-end p-4 opacity-0 hover:opacity-100 transition-opacity">
-          <span className="bg-primary text-on-primary-fixed w-full py-2 rounded label-md text-center flex items-center justify-center gap-2">
-            ▶ Regarder
-          </span>
-        </div>
-      </div>
-      <h3 className="title-lg text-on-surface truncate">{film.titre}</h3>
-      <div className="flex justify-between items-center">
-        <span className="caption text-on-surface-variant">{film.categorie}</span>
-        <span className={`label-md ${film.type_acces === "gratuit" ? "text-secondary" : "text-primary"}`}>
-          {film.type_acces === "gratuit"
-            ? "Gratuit"
-            : film.type_acces === "abonnement"
-              ? "Abonnement"
-              : `${(film.prix_fcfa || 0).toLocaleString("fr-FR")} FCFA`}
-        </span>
-      </div>
-    </Link>
-  );
-}
-
-function Etagere({ titre, films, lien }) {
+function Etagere({ titre, films, progressionMap = {}, onOpen }) {
   if (!films || films.length === 0) return null;
   return (
     <section className="px-5 md:px-20 py-6">
       <div className="flex justify-between items-end mb-4">
         <h2 className="headline-md text-on-surface">{titre}</h2>
-        <Link href={lien || "/catalogue"} className="caption text-primary hover:text-primary-container transition-colors">
+        <Link href="/catalogue" className="caption text-primary hover:text-primary-container transition-colors">
           Tout voir →
         </Link>
       </div>
       <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
         {films.map((film) => (
-          <CarteFilm key={film.id} film={film} />
+          <CarteFilm
+            key={film.id}
+            film={film}
+            progressionPct={progressionMap[film.id] || 0}
+            onOpen={onOpen}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// Top 10 avec grands numéros
+function EtagereTop10({ films, onOpen }) {
+  if (!films || films.length === 0) return null;
+  return (
+    <section className="px-5 md:px-20 py-6 overflow-hidden">
+      <h2 className="headline-md text-on-surface mb-4">Top 10 aujourd&apos;hui</h2>
+      <div className="flex overflow-x-auto gap-10 pb-4 snap-x snap-mandatory hide-scrollbar">
+        {films.map((film, i) => (
+          <div key={film.id} className="flex-none relative">
+            <span
+              className="absolute -left-2 bottom-0 text-[120px] leading-[0.8] font-black text-primary/25 select-none pointer-events-none"
+              style={{ WebkitTextStroke: "2px rgba(242,202,80,0.4)" }}
+            >
+              {i + 1}
+            </span>
+            <div className="relative pl-12 pb-1">
+              <CarteFilm film={film} onOpen={onOpen} />
+            </div>
+          </div>
         ))}
       </div>
     </section>
@@ -89,16 +88,19 @@ export default function Home() {
   const router = useRouter();
   const [catalogue, setCatalogue] = useState([]);
   const [aLaUne, setALaUne] = useState([]);
+  const [reprendre, setReprendre] = useState([]);
+  const [progressionMap, setProgressionMap] = useState({});
   const [connecte, setConnecte] = useState(false);
   const [chargement, setChargement] = useState(true);
   const [filtre, setFiltre] = useState("Tous");
   const [menuFiltre, setMenuFiltre] = useState(false);
+  const [filmModale, setFilmModale] = useState(null);
   const menuRef = useRef(null);
 
   const loadCatalogue = useCallback(async () => {
     const { data } = await supabase
       .from("catalogue")
-      .select("id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces")
+      .select("id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces, bande_annonce_url")
       .eq("actif", true)
       .order("ordre", { ascending: true });
     setCatalogue(data || []);
@@ -107,7 +109,9 @@ export default function Home() {
   const loadALaUne = useCallback(async () => {
     const { data } = await supabase
       .from("a_une")
-      .select("id, contenu_id, ordre, catalogue(id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces)")
+      .select(
+        "id, contenu_id, ordre, catalogue(id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces, bande_annonce_url)"
+      )
       .eq("actif", true)
       .order("ordre", { ascending: true });
     setALaUne(
@@ -117,14 +121,43 @@ export default function Home() {
     );
   }, []);
 
+  const loadProgressions = useCallback(async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      setReprendre([]);
+      setProgressionMap({});
+      return;
+    }
+    const { data } = await supabase
+      .from("progressions")
+      .select("contenu_id, position_secondes, duree_secondes, termine, catalogue(id, titre, image_url, categorie, badge, prix_fcfa, type_acces, bande_annonce_url)")
+      .eq("user_id", user.id)
+      .eq("termine", false)
+      .gt("position_secondes", 5)
+      .order("updated_at", { ascending: false })
+      .limit(10);
+    const items = (data || []).filter((p) => p.catalogue).map((p) => ({
+      ...p.catalogue,
+      pct: p.duree_secondes > 0 ? Math.round((p.position_secondes / p.duree_secondes) * 100) : 0,
+    }));
+    setReprendre(items);
+    const map = {};
+    (data || []).forEach((p) => {
+      if (p.duree_secondes > 0) map[p.contenu_id] = Math.round((p.position_secondes / p.duree_secondes) * 100);
+    });
+    setProgressionMap(map);
+  }, []);
+
   useEffect(() => {
-    // Différé d'une frame pour éviter un setState synchrone pendant l'effet
     const t = setTimeout(() => {
       loadCatalogue();
       loadALaUne();
+      loadProgressions();
     }, 0);
     return () => clearTimeout(t);
-  }, [loadCatalogue, loadALaUne]);
+  }, [loadCatalogue, loadALaUne, loadProgressions]);
 
   // Mises à jour automatiques : plus besoin de rafraîchir
   useRealtimeReload(["catalogue", "a_une"], loadCatalogue, [loadCatalogue]);
@@ -160,6 +193,10 @@ export default function Home() {
     .slice(0, 10);
 
   const categories = [...new Set(catalogue.map((f) => f.categorie).filter(Boolean))];
+
+  function ouvrirFiche(film) {
+    setFilmModale(film.id);
+  }
 
   // Tant que la session n'est pas vérifiée : spinner (pas de flash version visiteur)
   if (chargement) {
@@ -228,12 +265,22 @@ export default function Home() {
           </div>
         </section>
 
-        <Etagere titre="À la une" films={aLaUne} />
+        {reprendre.length > 0 && (
+          <Etagere titre="Reprendre le visionnage" films={reprendre} progressionMap={progressionMap} onOpen={ouvrirFiche} />
+        )}
 
-        <Etagere titre="Tendances actuelles" films={tendances} />
+        <Etagere titre="À la une" films={aLaUne} onOpen={ouvrirFiche} />
+
+        <EtagereTop10 films={tendances} onOpen={ouvrirFiche} />
 
         {catsAffichees.map((cat) => (
-          <Etagere key={cat} titre={cat} films={catalogue.filter((f) => f.categorie === cat)} />
+          <Etagere
+            key={cat}
+            titre={cat}
+            films={catalogue.filter((f) => f.categorie === cat)}
+            progressionMap={progressionMap}
+            onOpen={ouvrirFiche}
+          />
         ))}
 
         {catsAffichees.length === 0 && (
@@ -250,6 +297,8 @@ export default function Home() {
             Mentions légales · Confidentialité
           </Link>
         </footer>
+
+        {filmModale && <FicheRapide filmId={filmModale} onClose={() => setFilmModale(null)} />}
       </main>
     );
   }
@@ -310,7 +359,6 @@ export default function Home() {
       </section>
 
       <Etagere titre="À la une" films={aLaUne} />
-
       <Etagere titre="Tendances actuelles" films={tendances} />
 
       {/* Bannière */}
