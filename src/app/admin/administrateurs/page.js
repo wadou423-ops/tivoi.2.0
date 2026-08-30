@@ -74,10 +74,7 @@ export default function AdminAdministrateurs() {
 
   return (
     <main className="px-6 md:px-12 py-12 max-w-3xl">
-      <h1 className="font-display font-bold text-3xl text-primary mb-2">Administrateurs</h1>
-      <p className="text-sm text-on-surface-variant mb-10">
-        Gestion des accès au portail d&apos;administration.
-      </p>
+      <h1 className="font-display font-bold text-3xl text-primary mb-10">Administrateurs</h1>
 
       {/* Créer un admin */}
       <form onSubmit={creerAdmin} className="glass-panel rounded-xl p-6 mb-10 flex flex-col gap-4">

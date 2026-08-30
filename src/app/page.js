@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { Film, Tv, Clapperboard, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Banniere from "./components/Banniere";
@@ -32,18 +31,54 @@ const PILIERS = [
   },
 ];
 
+function CarteFilm({ film }) {
+  return (
+    <Link href={`/catalogue/${film.id}`} className="flex-none w-[200px] md:w-[240px] snap-start flex flex-col gap-2">
+      <div className="relative w-full aspect-[2/3] rounded-lg overflow-hidden border border-outline-variant/10 movie-card cursor-pointer bg-surface-high">
+        {film.image_url && (
+          <img src={film.image_url} alt={film.titre} className="w-full h-full object-cover" />
+        )}
+        {film.note && (
+          <div className="absolute top-2 right-2 bg-surface-lowest/80 backdrop-blur-md px-2 py-1 rounded caption text-primary border border-primary/20 flex items-center gap-1">
+            <Star size={14} fill="currentColor" /> {film.note}
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent flex items-end p-4 opacity-0 hover:opacity-100 transition-opacity">
+          <span className="bg-primary text-on-primary-fixed w-full py-2 rounded label-md text-center flex items-center justify-center gap-2">
+            ▶ Regarder
+          </span>
+        </div>
+      </div>
+      <h3 className="title-lg text-on-surface truncate">{film.titre}</h3>
+      <div className="flex justify-between items-center">
+        <span className="caption text-on-surface-variant">{film.categorie}</span>
+        <span className={`label-md ${film.type_acces === "gratuit" ? "text-secondary" : "text-primary"}`}>
+          {film.type_acces === "gratuit"
+            ? "Gratuit"
+            : film.type_acces === "abonnement"
+              ? "Abonnement"
+              : `${(film.prix_fcfa || 0).toLocaleString("fr-FR")} FCFA`}
+        </span>
+      </div>
+    </Link>
+  );
+}
+
 export default function Home() {
   const router = useRouter();
-  const [tendances, setTendances] = useState([]);
+  const [catalogue, setCatalogue] = useState([]);
   const [slides, setSlides] = useState([]);
   const [slide, setSlide] = useState(0);
+  const [connecte, setConnecte] = useState(false);
+  const [chargement, setChargement] = useState(true);
 
   useEffect(() => {
-    async function checkOnboarding() {
+    async function check() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
+        setConnecte(true);
         const { data: profile } = await supabase
           .from("profiles")
           .select("onboarding_vu")
@@ -51,23 +86,25 @@ export default function Home() {
           .single();
         if (profile && !profile.onboarding_vu) {
           router.replace("/bienvenue");
+          return;
         }
       } else if (!localStorage.getItem("tivoi_onboarding_vu")) {
         router.replace("/bienvenue");
+        return;
       }
+      setChargement(false);
     }
-    checkOnboarding();
+    check();
   }, [router]);
 
   useEffect(() => {
-    async function loadTendances() {
+    async function loadCatalogue() {
       const { data } = await supabase
         .from("catalogue")
         .select("id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces")
         .eq("actif", true)
-        .order("note", { ascending: false, nullsFirst: false })
-        .limit(10);
-      setTendances(data || []);
+        .order("ordre", { ascending: true });
+      setCatalogue(data || []);
     }
     async function loadSlides() {
       const { data } = await supabase
@@ -82,7 +119,7 @@ export default function Home() {
         }))
       );
     }
-    loadTendances();
+    loadCatalogue();
     loadSlides();
   }, []);
 
@@ -92,6 +129,114 @@ export default function Home() {
     return () => clearInterval(t);
   }, [slides.length]);
 
+  const tendances = [...catalogue]
+    .sort((a, b) => (b.note || 0) - (a.note || 0))
+    .slice(0, 10);
+
+  // Étagères par catégorie (le reste du catalogue)
+  const categories = [...new Set(catalogue.map((f) => f.categorie).filter(Boolean))];
+
+  const carrousel = slides.length > 0 && (
+    <section className="relative w-full h-[420px] md:h-[480px] overflow-hidden">
+      {slides.map((s, i) => (
+        <div
+          key={s.id}
+          className={`absolute inset-0 transition-opacity duration-1000 ${i === slide ? "opacity-100 z-10" : "opacity-0 z-0"}`}
+        >
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url('${s.image_url || ""}')` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+          <div className="absolute bottom-0 left-0 w-full px-5 md:px-20 pb-10">
+            <h2 className="display-lg text-on-surface mb-2">{s.titre}</h2>
+            {s.accroche && <p className="body-lg text-on-surface-variant max-w-xl mb-4">{s.accroche}</p>}
+            <Link
+              href={`/catalogue/${s.contenu_id}`}
+              className="inline-block bg-primary text-on-primary-fixed label-md uppercase px-8 py-3 rounded hover:bg-primary-container transition-colors shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+            >
+              Regarder
+            </Link>
+          </div>
+        </div>
+      ))}
+      <button
+        onClick={() => setSlide((s) => (s - 1 + slides.length) % slides.length)}
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass-panel flex items-center justify-center text-on-surface hover:text-primary transition-colors"
+      >
+        <ChevronLeft size={20} />
+      </button>
+      <button
+        onClick={() => setSlide((s) => (s + 1) % slides.length)}
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass-panel flex items-center justify-center text-on-surface hover:text-primary transition-colors"
+      >
+        <ChevronRight size={20} />
+      </button>
+      <div className="absolute bottom-4 right-5 md:right-20 z-20 flex items-center gap-2">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setSlide(i)}
+            className={`h-1.5 rounded-full transition-all duration-500 ${i === slide ? "bg-primary w-8" : "bg-surface-variant w-2"}`}
+          />
+        ))}
+      </div>
+    </section>
+  );
+
+  // ---------- Mode connecté : expérience Netflix ----------
+  if (connecte && !chargement) {
+    return (
+      <main className="flex-grow min-h-screen flex flex-col pt-20">
+        {carrousel}
+
+        <section className="px-5 md:px-20 pt-10 pb-4">
+          <div className="flex justify-between items-end mb-6">
+            <h2 className="headline-md text-on-surface">Tendances actuelles</h2>
+            <Link href="/catalogue" className="label-md text-primary hover:text-primary-container transition-colors">
+              Voir tout →
+            </Link>
+          </div>
+          {tendances.length > 0 ? (
+            <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
+              {tendances.map((film) => (
+                <CarteFilm key={film.id} film={film} />
+              ))}
+            </div>
+          ) : (
+            <p className="body-md text-on-surface-variant">Chargement du catalogue...</p>
+          )}
+        </section>
+
+        {categories.map((cat) => (
+          <section key={cat} className="px-5 md:px-20 py-6">
+            <div className="flex justify-between items-end mb-4">
+              <h2 className="headline-md text-on-surface">{cat}</h2>
+              <Link href="/catalogue" className="caption text-primary hover:text-primary-container transition-colors">
+                Tout voir →
+              </Link>
+            </div>
+            <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
+              {catalogue
+                .filter((f) => f.categorie === cat)
+                .map((film) => (
+                  <CarteFilm key={film.id} film={film} />
+                ))}
+            </div>
+          </section>
+        ))}
+
+        <footer className="mt-auto px-5 md:px-20 py-8 border-t border-outline-variant/10 text-xs text-outline flex flex-wrap gap-4 justify-between">
+          <span>© {new Date().getFullYear()} TiVoi — Tous droits réservés.</span>
+          <Link href="/legales" className="hover:text-primary transition-colors">
+            Mentions légales · Confidentialité
+          </Link>
+        </footer>
+      </main>
+    );
+  }
+
+  // ---------- Mode visiteur : page marketing ----------
   return (
     <main className="flex-grow min-h-screen flex flex-col pt-20">
       {/* Hero */}
@@ -127,61 +272,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Carrousel À la une */}
-      {slides.length > 0 && (
-        <section className="relative w-full h-[420px] md:h-[480px] overflow-hidden">
-          {slides.map((s, i) => (
-            <div
-              key={s.id}
-              className={`absolute inset-0 transition-opacity duration-1000 ${i === slide ? "opacity-100 z-10" : "opacity-0 z-0"}`}
-            >
-              <div
-                className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url('${s.image_url || ""}')` }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-              <div className="absolute bottom-0 left-0 w-full px-5 md:px-20 pb-10">
-                <h2 className="display-lg text-on-surface mb-2">{s.titre}</h2>
-                <p className="body-lg text-on-surface-variant max-w-xl mb-4">{s.accroche}</p>
-                <Link
-                  href={`/catalogue/${s.contenu_id}`}
-                  className="inline-block bg-primary text-on-primary-fixed label-md uppercase px-8 py-3 rounded hover:bg-primary-container transition-colors shadow-[0_0_15px_rgba(212,175,55,0.3)]"
-                >
-                  Regarder
-                </Link>
-              </div>
-            </div>
-          ))}
-          {/* Flèches */}
-          <button
-            onClick={() => setSlide((s) => (s - 1 + slides.length) % slides.length)}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass-panel flex items-center justify-center text-on-surface hover:text-primary transition-colors"
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <button
-            onClick={() => setSlide((s) => (s + 1) % slides.length)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass-panel flex items-center justify-center text-on-surface hover:text-primary transition-colors"
-          >
-            <ChevronRight size={20} />
-          </button>
-          {/* Points */}
-          <div className="absolute bottom-4 right-5 md:right-20 z-20 flex items-center gap-2">
-            {slides.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setSlide(i)}
-                className={`h-1.5 rounded-full transition-all duration-500 ${i === slide ? "bg-primary w-8" : "bg-surface-variant w-2"}`}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Bannière 1 */}
-      <section className="px-5 md:px-20 py-6">
-        <Banniere emplacement="accueil_h1" className="h-24 md:h-32" />
-      </section>
+      {carrousel}
 
       {/* Bento 3 piliers */}
       <section className="px-5 md:px-20 py-12">
@@ -217,50 +308,13 @@ export default function Home() {
         ) : (
           <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
             {tendances.map((film) => (
-              <Link
-                key={film.id}
-                href={`/catalogue/${film.id}`}
-                className="flex-none w-[200px] md:w-[240px] snap-start flex flex-col gap-2"
-              >
-                <div className="relative w-full aspect-[2/3] rounded-lg overflow-hidden border border-outline-variant/10 movie-card cursor-pointer bg-surface-high">
-                  {film.image_url && (
-                    <Image
-                      src={film.image_url}
-                      alt={film.titre}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 240px"
-                      className="object-cover"
-                    />
-                  )}
-                  {film.note && (
-                    <div className="absolute top-2 right-2 bg-surface-lowest/80 backdrop-blur-md px-2 py-1 rounded caption text-primary border border-primary/20 flex items-center gap-1">
-                      <Star size={14} fill="currentColor" /> {film.note}
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent flex items-end p-4 opacity-0 hover:opacity-100 transition-opacity">
-                    <span className="bg-primary text-on-primary-fixed w-full py-2 rounded label-md text-center flex items-center justify-center gap-2">
-                      ▶ Regarder
-                    </span>
-                  </div>
-                </div>
-                <h3 className="title-lg text-on-surface truncate">{film.titre}</h3>
-                <div className="flex justify-between items-center">
-                  <span className="caption text-on-surface-variant">{film.categorie}</span>
-                  <span className={`label-md ${film.type_acces === "gratuit" ? "text-secondary" : "text-primary"}`}>
-                    {film.type_acces === "gratuit"
-                      ? "Gratuit"
-                      : film.type_acces === "abonnement"
-                        ? "Abonnement"
-                        : `${(film.prix_fcfa || 0).toLocaleString("fr-FR")} FCFA`}
-                  </span>
-                </div>
-              </Link>
+              <CarteFilm key={film.id} film={film} />
             ))}
           </div>
         )}
       </section>
 
-      {/* Bannière 2 */}
+      {/* Bannière */}
       <section className="px-5 md:px-20 py-6">
         <Banniere emplacement="accueil_h2" className="h-24 md:h-32" />
       </section>

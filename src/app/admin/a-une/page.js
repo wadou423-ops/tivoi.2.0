@@ -26,15 +26,20 @@ export default function AdminAUne() {
     e.preventDefault();
     if (!choix) return;
     const contenu = contenus.find((c) => c.id === parseInt(choix, 10));
-    await supabase.from("a_une").insert({
+    const { error } = await supabase.from("a_une").insert({
       contenu_id: parseInt(choix, 10),
       titre: contenu?.titre,
       image_url: contenu?.image_url || null,
       ordre: slides.length,
       actif: true,
     });
-    setChoix("");
-    load();
+    if (error) {
+      setMessage(`Erreur : ${error.message}`);
+    } else {
+      setMessage("");
+      setChoix("");
+      load();
+    }
   }
 
   async function supprimer(id) {
@@ -67,10 +72,7 @@ export default function AdminAUne() {
 
   return (
     <main className="px-6 md:px-12 py-12">
-      <h1 className="font-display font-bold text-3xl text-primary mb-2">Contenus à la une</h1>
-      <p className="text-sm text-on-surface-variant mb-8">
-        Gestion du carrousel de la page d&apos;accueil — ajout, réordonnancement, retrait.
-      </p>
+      <h1 className="font-display font-bold text-3xl text-primary mb-8">Contenus à la une</h1>
 
       <form onSubmit={ajouter} className="glass-panel rounded-xl p-6 mb-8 flex flex-col sm:flex-row gap-4 items-end">
         <div className="flex-1 w-full">

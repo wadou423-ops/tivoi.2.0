@@ -59,10 +59,7 @@ export default function AdminBannieres() {
 
   return (
     <main className="px-6 md:px-12 py-12">
-      <h1 className="font-display font-bold text-3xl text-primary mb-2">Bannières publicitaires</h1>
-      <p className="text-sm text-on-surface-variant mb-8">
-        Cinq emplacements image cliquables — impressions et clics suivis automatiquement.
-      </p>
+      <h1 className="font-display font-bold text-3xl text-primary mb-8">Bannières publicitaires</h1>
 
       <form onSubmit={ajouter} className="glass-panel rounded-xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>

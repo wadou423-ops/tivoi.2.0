@@ -55,10 +55,7 @@ export default function AdminUtilisateurs() {
 
   return (
     <main className="px-6 md:px-12 py-12">
-      <h1 className="font-display font-bold text-3xl text-primary mb-2">Utilisateurs</h1>
-      <p className="text-sm text-on-surface-variant mb-8">
-        {profils.length} comptes inscrits — gestion des rôles et suspensions.
-      </p>
+      <h1 className="font-display font-bold text-3xl text-primary mb-8">Utilisateurs</h1>
 
       <div className="mb-6 max-w-xs">
         <input

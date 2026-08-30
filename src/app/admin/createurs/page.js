@@ -71,12 +71,9 @@ export default function AdminCreateurs() {
 
   return (
     <main className="px-6 md:px-12 py-12">
-      <h1 className="font-display font-bold text-3xl text-primary mb-2">
+      <h1 className="font-display font-bold text-3xl text-primary mb-8">
         Validation des créateurs
       </h1>
-      <p className="text-sm text-on-surface-variant mb-8">
-        Examen des demandes de compte créateur (KYC).
-      </p>
 
       {message && <p className="caption text-error mb-4">{message}</p>}
 

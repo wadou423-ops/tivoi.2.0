@@ -60,10 +60,7 @@ export default function AdminOverview() {
 
   return (
     <main className="px-6 md:px-12 py-12">
-      <h1 className="font-display font-bold text-3xl text-primary mb-2">Vue d&apos;ensemble</h1>
-      <p className="text-sm text-on-surface-variant mb-10">
-        Pilotage opérationnel de la plateforme TiVoi.
-      </p>
+      <h1 className="font-display font-bold text-3xl text-primary mb-10">Vue d&apos;ensemble</h1>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-12">
         {CARDS.map((c) => {
