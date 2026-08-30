@@ -70,5 +70,3 @@ export default function Lecteur() {
     </main>
   );
 }
-
-import { supabase } from "@/lib/supabaseClient";
