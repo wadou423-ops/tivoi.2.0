@@ -1,19 +1,62 @@
 @import "tailwindcss";
 
-:root {
-  --font-display: "Space Grotesk", sans-serif;
-  --font-body: "Manrope", sans-serif;
+@theme {
+  /* Palette TiVoi — Premium West African Cinema */
+  --color-background: #131313;
+  --color-surface-lowest: #0e0e0e;
+  --color-surface-low: #1c1b1b;
+  --color-surface-container: #201f1f;
+  --color-surface-high: #2a2a2a;
+  --color-surface-variant: #353534;
+  --color-surface-bright: #3a3939;
+  --color-on-surface: #e5e2e1;
+  --color-on-surface-variant: #d0c5af;
+  --color-outline: #99907c;
+  --color-outline-variant: #4d4635;
+  --color-primary: #f2ca50;
+  --color-primary-container: #d4af37;
+  --color-on-primary: #3c2f00;
+  --color-secondary: #c6c7c2;
+  --color-error: #ffb4ab;
+  --font-display: var(--font-montserrat), sans-serif;
+  --font-body: var(--font-archivo-narrow), sans-serif;
 }
 
 body {
   font-family: var(--font-body);
+  background-color: #131313;
+  color: #e5e2e1;
 }
 
-h1, h2, h3, .font-display {
+h1, h2, h3 {
   font-family: var(--font-display);
-  letter-spacing: -0.01em;
 }
 
+/* Panneau vitré — superpositions nav / contrôleurs */
+.glass-panel {
+  background-color: rgba(26, 26, 26, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+/* Halo or au focus */
+.glow-focus:focus-within {
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+  border-color: rgba(212, 175, 55, 0.5);
+}
+
+/* Élévation des cartes */
+.card-hover {
+  transition: all 0.3s ease;
+}
+.card-hover:hover {
+  border-color: rgba(212, 175, 55, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Ticker bandeau d'infos */
 @keyframes ticker-scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
@@ -21,6 +64,16 @@ h1, h2, h3, .font-display {
 
 .ticker-track {
   animation: ticker-scroll 28s linear infinite;
+}
+
+/* Barre de progression kiosque */
+@keyframes progress-fill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.progress-bar-animate {
+  animation: progress-fill linear forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

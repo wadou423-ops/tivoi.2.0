@@ -50,22 +50,22 @@ export default function VTC() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-black">
-        <p className="text-[#9AA0AC]">Chargement...</p>
+      <main className="min-h-screen flex items-center justify-center bg-surface-lowest">
+        <p className="text-on-surface-variant">Chargement...</p>
       </main>
     );
   }
 
   if (playlist.length === 0) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-black">
-        <p className="text-[#9AA0AC]">Aucun contenu programmé pour l&apos;instant.</p>
+      <main className="min-h-screen flex items-center justify-center bg-surface-lowest">
+        <p className="text-on-surface-variant">Aucun contenu programmé pour l&apos;instant.</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden">
+    <main className="min-h-screen bg-surface-lowest flex items-center justify-center relative overflow-hidden select-none">
       {idYoutube ? (
         <iframe
           key={current.id}
@@ -87,13 +87,32 @@ export default function VTC() {
         <img src={current.media_url} alt={current.titre} className="max-w-full max-h-screen object-contain" />
       )}
 
-      {current.type === "publicite" && (
-        <span className="absolute top-4 left-4 rounded-full bg-[#E8A33D] px-3 py-1 text-xs font-semibold text-[#0B0E14]">
-          Publicité
-        </span>
-      )}
+      {/* Vignette pour la profondeur */}
+      <div
+        className="absolute inset-0 z-10 pointer-events-none"
+        style={{ boxShadow: "inset 0 0 100px rgba(10, 10, 10, 0.8)" }}
+      />
 
-      <span className="absolute bottom-4 right-4 font-display text-lg text-white/60">TiVoi</span>
+      {/* Filigrane TiVoi */}
+      <h1 className="absolute top-6 left-6 z-20 pointer-events-none font-display font-bold text-2xl text-primary opacity-50 tracking-tight [text-shadow:0_4px_12px_rgba(10,10,10,0.5)]">
+        TiVoi
+      </h1>
+
+      {current.type === "publicite" && (
+        <div className="absolute top-6 right-6 z-20 flex flex-col items-end gap-2">
+          <div className="bg-primary/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-[0_0_15px_rgba(212,175,55,0.3)]">
+            <span className="text-xs font-title font-bold uppercase tracking-widest text-on-primary">
+              Publicité
+            </span>
+          </div>
+          <div className="w-32 h-1 bg-surface-high/50 rounded-full overflow-hidden mt-1 backdrop-blur-sm">
+            <div
+              className="h-full bg-primary rounded-full progress-bar-animate"
+              style={{ animationDuration: `${current.duree_secondes || 8}s` }}
+            />
+          </div>
+        </div>
+      )}
     </main>
   );
 }

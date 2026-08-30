@@ -31,10 +31,12 @@ export default function CatalogueVOD() {
     categorie === "Tous les genres" ? films : films.filter((f) => f.categorie === categorie);
 
   return (
-    <main className="px-6 md:px-12 py-12">
+    <main className="px-6 md:px-20 py-12">
       <div className="mb-12">
-        <h1 className="font-heading text-5xl md:text-6xl text-[#E5E2E1] mb-3">Catalogue VOD</h1>
-        <p className="font-narrow text-lg text-[#D0C5AF] mb-6 max-w-2xl">
+        <h1 className="font-display font-bold text-5xl md:text-6xl text-on-surface tracking-[-0.02em] mb-3">
+          Catalogue VOD
+        </h1>
+        <p className="text-lg text-on-surface-variant mb-6 max-w-2xl">
           Découvrez le meilleur du cinéma ouest-africain. Des productions premium, des histoires
           captivantes, en exclusivité sur TiVoi.
         </p>
@@ -44,10 +46,10 @@ export default function CatalogueVOD() {
             <button
               key={g}
               onClick={() => setCategorie(g)}
-              className={`px-4 py-2 rounded-lg text-sm font-heading whitespace-nowrap transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm font-title font-semibold whitespace-nowrap transition-colors ${
                 categorie === g
-                  ? "bg-[#D4AF37]/20 border border-[#F2CA50] text-[#F2CA50]"
-                  : "bg-transparent border border-[#4D4635] text-[#D0C5AF] hover:border-[#F2CA50]/50 hover:text-[#E5E2E1]"
+                  ? "bg-primary-container/20 border border-primary text-primary"
+                  : "bg-transparent border border-outline-variant text-on-surface-variant hover:border-primary/50 hover:text-on-surface"
               }`}
             >
               {g}
@@ -57,40 +59,42 @@ export default function CatalogueVOD() {
       </div>
 
       {loading ? (
-        <p className="text-[#D0C5AF] font-narrow">Chargement...</p>
+        <p className="text-on-surface-variant">Chargement...</p>
       ) : filmsAffiches.length === 0 ? (
-        <p className="text-[#D0C5AF] font-narrow">Aucun contenu pour l&apos;instant dans cette catégorie.</p>
+        <p className="text-on-surface-variant">
+          Aucun contenu pour l&apos;instant dans cette catégorie.
+        </p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-10">
           {filmsAffiches.map((film) => (
             <div key={film.id} className="group cursor-pointer flex flex-col gap-2">
-              <div className="relative aspect-[2/3] w-full bg-[#2A2A2A] rounded-lg overflow-hidden border border-transparent group-hover:border-[#D4AF37] transition-all">
+              <div className="relative aspect-[2/3] w-full bg-surface-high rounded-lg overflow-hidden border border-transparent group-hover:border-primary-container transition-all">
                 <img
                   src={film.image_url}
                   alt={film.titre}
                   className="w-full h-full object-cover"
                 />
                 {film.note && (
-                  <div className="absolute top-2 right-2 bg-[#0E0E0E]/80 backdrop-blur-md px-2 py-1 rounded text-xs text-[#F2CA50] border border-[#D4AF37]/20 flex items-center gap-1">
+                  <div className="absolute top-2 right-2 bg-surface-lowest/80 backdrop-blur-md px-2 py-1 rounded text-xs text-primary border border-primary-container/20 flex items-center gap-1">
                     <Star size={12} fill="currentColor" /> {film.note}
                   </div>
                 )}
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <button className="w-12 h-12 rounded-full bg-[#F2CA50] flex items-center justify-center text-[#131313] hover:scale-110 transition-transform">
+                  <button className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary hover:scale-110 transition-transform">
                     <Play size={20} fill="currentColor" />
                   </button>
                 </div>
               </div>
               <div>
-                <h3 className="font-heading text-[#E5E2E1] truncate">{film.titre}</h3>
+                <h3 className="font-title font-semibold text-on-surface truncate">{film.titre}</h3>
                 <div className="flex justify-between items-center mt-1">
-                  <span className="font-narrow text-xs text-[#D0C5AF]">
+                  <span className="text-xs text-on-surface-variant">
                     {film.categorie}
                     {film.annee ? ` • ${film.annee}` : ""}
                   </span>
                   <span
-                    className={`text-sm font-heading ${
-                      film.badge === "GRATUIT" ? "text-[#C6C7C2]" : "text-[#F2CA50]"
+                    className={`text-sm font-title font-semibold ${
+                      film.badge === "GRATUIT" ? "text-secondary" : "text-primary"
                     }`}
                   >
                     {film.badge === "GRATUIT" ? "Gratuit" : film.badge}
@@ -102,7 +106,7 @@ export default function CatalogueVOD() {
         </div>
       )}
 
-      <footer className="mt-16 px-0 py-8 border-t border-[#1C2029] text-xs text-[#5C6270]">
+      <footer className="mt-16 py-8 border-t border-outline-variant/10 text-xs text-outline">
         © {new Date().getFullYear()} TiVoi — Tous droits réservés.
       </footer>
     </main>

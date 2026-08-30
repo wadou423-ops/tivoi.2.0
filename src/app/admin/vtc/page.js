@@ -65,64 +65,75 @@ export default function AdminVTC() {
     loadItems();
   }
 
+  const inputClass =
+    "w-full rounded-lg bg-surface-variant/50 border-0 border-b-2 border-outline-variant text-on-surface px-4 py-2.5 outline-none focus:border-primary-container transition-colors";
+
   return (
     <main className="px-6 md:px-12 py-12 max-w-3xl">
-      <h1 className="font-display text-3xl text-[#E8A33D] mb-8">
+      <h1 className="font-display font-bold text-3xl text-primary mb-8">
         Gestion de la playlist VTC
       </h1>
 
       <form
         onSubmit={handleAdd}
-        className="bg-[#0F131B] border border-[#1C2029] rounded-2xl p-6 mb-10"
+        className="rounded-xl border border-primary-container/10 bg-surface-low p-6 mb-10 glow-focus"
       >
-        <h2 className="font-display text-xl text-[#F4F1EA] mb-4">Ajouter un élément</h2>
+        <h2 className="font-display font-semibold text-xl text-on-surface mb-4">
+          Ajouter un élément
+        </h2>
 
-        <label className="block text-sm text-[#9AA0AC] mb-2">Type</label>
+        <label className="block text-xs font-title font-semibold uppercase tracking-[0.05em] text-on-surface-variant mb-2">
+          Type
+        </label>
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
-          className="w-full mb-4 rounded-lg bg-[#0B0E14] border border-[#2A2E38] px-4 py-2 text-[#F4F1EA]"
+          className={`${inputClass} mb-4`}
         >
           <option value="publicite">Publicité</option>
           <option value="contenu">Contenu</option>
         </select>
 
-        <label className="block text-sm text-[#9AA0AC] mb-2">Titre</label>
+        <label className="block text-sm text-on-surface-variant mb-2">Titre</label>
         <input
           type="text"
           required
           value={titre}
           onChange={(e) => setTitre(e.target.value)}
-          className="w-full mb-4 rounded-lg bg-[#0B0E14] border border-[#2A2E38] px-4 py-2 text-[#F4F1EA]"
+          className={`${inputClass} mb-4`}
         />
 
-        <label className="block text-sm text-[#9AA0AC] mb-2">URL de l&apos;image/vidéo</label>
+        <label className="block text-sm text-on-surface-variant mb-2">
+          URL de l&apos;image/vidéo
+        </label>
         <input
           type="url"
           required
           value={mediaUrl}
           onChange={(e) => setMediaUrl(e.target.value)}
-          className="w-full mb-4 rounded-lg bg-[#0B0E14] border border-[#2A2E38] px-4 py-2 text-[#F4F1EA]"
+          className={`${inputClass} mb-4`}
         />
 
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-sm text-[#9AA0AC] mb-2">Durée (secondes)</label>
+            <label className="block text-sm text-on-surface-variant mb-2">
+              Durée (secondes)
+            </label>
             <input
               type="number"
               min="1"
               value={duree}
               onChange={(e) => setDuree(e.target.value)}
-              className="w-full rounded-lg bg-[#0B0E14] border border-[#2A2E38] px-4 py-2 text-[#F4F1EA]"
+              className={inputClass}
             />
           </div>
           <div>
-            <label className="block text-sm text-[#9AA0AC] mb-2">Ordre</label>
+            <label className="block text-sm text-on-surface-variant mb-2">Ordre</label>
             <input
               type="number"
               value={ordre}
               onChange={(e) => setOrdre(e.target.value)}
-              className="w-full rounded-lg bg-[#0B0E14] border border-[#2A2E38] px-4 py-2 text-[#F4F1EA]"
+              className={inputClass}
             />
           </div>
         </div>
@@ -130,46 +141,48 @@ export default function AdminVTC() {
         <button
           type="submit"
           disabled={saving}
-          className="rounded-full bg-[#E8A33D] px-6 py-3 text-sm font-semibold text-[#0B0E14] hover:brightness-110 transition disabled:opacity-50"
+          className="mt-2 rounded-lg bg-primary-container text-on-primary px-6 py-3 text-sm font-title font-semibold hover:-translate-y-0.5 hover:shadow-[0_5px_15px_rgba(212,175,55,0.2)] transition-all disabled:opacity-50"
         >
           {saving ? "Ajout..." : "Ajouter"}
         </button>
 
-        {message && <p className="mt-4 text-sm text-[#9AA0AC]">{message}</p>}
+        {message && <p className="mt-4 text-sm text-on-surface-variant">{message}</p>}
       </form>
 
-      <h2 className="font-display text-xl text-[#F4F1EA] mb-4">Éléments actuels</h2>
+      <h2 className="font-display font-semibold text-xl text-on-surface mb-4">
+        Éléments actuels
+      </h2>
       <div className="space-y-3">
         {items.map((item) => (
           <div
             key={item.id}
-            className="flex items-center justify-between bg-[#0F131B] border border-[#1C2029] rounded-xl px-4 py-3"
+            className="flex items-center justify-between rounded-xl border border-outline-variant/20 bg-surface-low px-4 py-3 card-hover"
           >
             <div>
-              <p className="text-sm text-[#F4F1EA]">
+              <p className="text-sm text-on-surface">
                 {item.titre}{" "}
-                <span className="text-xs text-[#E8A33D] ml-2">
+                <span className="text-xs text-primary ml-2">
                   {item.type === "publicite" ? "Publicité" : "Contenu"}
                 </span>
               </p>
-              <p className="text-xs text-[#9AA0AC]">
+              <p className="text-xs text-on-surface-variant">
                 {item.duree_secondes}s — ordre {item.ordre}
               </p>
             </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => toggleActif(item)}
-                className={`text-xs px-3 py-1 rounded-full border transition ${
+                className={`text-xs px-3 py-1 rounded border transition ${
                   item.actif
-                    ? "border-[#E8A33D] text-[#E8A33D]"
-                    : "border-[#2A2E38] text-[#9AA0AC]"
+                    ? "border-primary text-primary bg-primary/10"
+                    : "border-outline-variant text-on-surface-variant"
                 }`}
               >
                 {item.actif ? "Actif" : "Désactivé"}
               </button>
               <button
                 onClick={() => handleDelete(item.id)}
-                className="text-xs px-3 py-1 rounded-full border border-[#2A2E38] text-[#9AA0AC] hover:border-red-400 hover:text-red-400 transition"
+                className="text-xs px-3 py-1 rounded-lg border border-outline-variant text-on-surface-variant hover:border-error hover:text-error transition"
               >
                 Supprimer
               </button>

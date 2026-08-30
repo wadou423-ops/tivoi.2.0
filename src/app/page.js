@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function Home() {
@@ -37,40 +38,49 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Hero */}
-      <section className="relative px-6 md:px-12 pt-16 pb-12 max-w-3xl overflow-hidden">
+      <section className="relative px-6 md:px-20 pt-16 pb-12 max-w-4xl overflow-hidden">
         <div
           className="absolute inset-0 -z-10"
           style={{
             background:
-              "radial-gradient(circle at 15% 20%, rgba(232,163,61,0.18), transparent 45%), radial-gradient(circle at 90% 10%, rgba(232,163,61,0.10), transparent 40%), repeating-linear-gradient(115deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 60px)",
+              "radial-gradient(circle at 15% 20%, rgba(212, 175, 55, 0.18), transparent 45%), radial-gradient(circle at 90% 10%, rgba(242, 202, 80, 0.10), transparent 40%), repeating-linear-gradient(115deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 60px)",
           }}
         />
-        <h1 className="font-display text-5xl md:text-7xl leading-[0.95] text-[#F4F1EA]">
+        <p className="text-xs font-title font-semibold uppercase tracking-[0.05em] text-primary mb-4">
+          Premium — Côte d&apos;Ivoire
+        </p>
+        <h1 className="font-display font-bold text-5xl md:text-7xl leading-[0.95] tracking-[-0.02em] text-on-surface">
           Films, lives et chaînes TV.<br />
-          <span className="text-[#E8A33D]">Un seul écran.</span>
+          <span className="text-primary">Un seul écran.</span>
         </h1>
-        <p className="mt-6 text-lg text-[#9AA0AC] max-w-xl">
+        <p className="mt-6 text-lg text-on-surface-variant max-w-xl">
           La plateforme de streaming pensée pour la Côte d&apos;Ivoire — séries et
           films à la demande, lives de créateurs et chaînes en direct, réunis
           au même endroit.
         </p>
         <div className="mt-8 flex gap-4">
           {!connecte && (
-            <button className="rounded-full bg-[#E8A33D] px-6 py-3 text-sm font-semibold text-[#0B0E14] hover:brightness-110 transition">
+            <Link
+              href="/inscription"
+              className="rounded-lg bg-primary-container text-on-primary px-6 py-3 text-sm font-title font-semibold hover:-translate-y-0.5 hover:shadow-[0_5px_15px_rgba(212,175,55,0.2)] transition-all"
+            >
               Créer un compte
-            </button>
+            </Link>
           )}
-          <button className="rounded-full border border-[#2A2E38] px-6 py-3 text-sm text-[#F4F1EA] hover:border-[#E8A33D] transition">
+          <Link
+            href="/catalogue"
+            className="rounded-lg border border-primary-container px-6 py-3 text-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
+          >
             Voir le catalogue
-          </button>
+          </Link>
         </div>
       </section>
 
       {/* Ticker style guide TV */}
-      <div className="border-y border-[#1C2029] overflow-hidden py-3 bg-[#0F131B]">
+      <div className="border-y border-outline-variant/10 overflow-hidden py-3 bg-surface-lowest">
         <div className="flex whitespace-nowrap ticker-track">
           {[...ticker, ...ticker].map((item, i) => (
-            <span key={i} className="mx-6 text-sm text-[#9AA0AC]">
+            <span key={i} className="mx-6 text-sm text-on-surface-variant">
               {item}
             </span>
           ))}
@@ -78,32 +88,44 @@ export default function Home() {
       </div>
 
       {/* Features */}
-      <section className="px-6 md:px-12 py-20 grid gap-10 md:grid-cols-3">
-        <div>
-          <p className="text-xs uppercase tracking-widest text-[#E8A33D]">Catalogue</p>
-          <h2 className="font-display text-2xl mt-2 text-[#F4F1EA]">Films & séries</h2>
-          <p className="mt-3 text-sm text-[#9AA0AC]">
+      <section className="px-6 md:px-20 py-20 grid gap-10 md:grid-cols-3">
+        <div className="rounded-xl border border-primary-container/10 bg-surface-low p-8 card-hover">
+          <p className="text-xs font-title font-semibold uppercase tracking-[0.05em] text-primary">
+            Catalogue
+          </p>
+          <h2 className="font-display font-semibold text-2xl mt-2 text-on-surface">
+            Films &amp; séries
+          </h2>
+          <p className="mt-3 text-sm text-on-surface-variant">
             Paiement à la séance ou abonnement — accès immédiat, sans détour.
           </p>
         </div>
-        <div>
-          <p className="text-xs uppercase tracking-widest text-[#E8A33D]">Communauté</p>
-          <h2 className="font-display text-2xl mt-2 text-[#F4F1EA]">Lives de créateurs</h2>
-          <p className="mt-3 text-sm text-[#9AA0AC]">
+        <div className="rounded-xl border border-primary-container/10 bg-surface-low p-8 card-hover">
+          <p className="text-xs font-title font-semibold uppercase tracking-[0.05em] text-primary">
+            Communauté
+          </p>
+          <h2 className="font-display font-semibold text-2xl mt-2 text-on-surface">
+            Lives de créateurs
+          </h2>
+          <p className="mt-3 text-sm text-on-surface-variant">
             Chat en direct, cadeaux virtuels, et des créateurs à soutenir en temps réel.
           </p>
         </div>
-        <div>
-          <p className="text-xs uppercase tracking-widest text-[#E8A33D]">En continu</p>
-          <h2 className="font-display text-2xl mt-2 text-[#F4F1EA]">Chaînes TV</h2>
-          <p className="mt-3 text-sm text-[#9AA0AC]">
+        <div className="rounded-xl border border-primary-container/10 bg-surface-low p-8 card-hover">
+          <p className="text-xs font-title font-semibold uppercase tracking-[0.05em] text-primary">
+            En continu
+          </p>
+          <h2 className="font-display font-semibold text-2xl mt-2 text-on-surface">
+            Chaînes TV
+          </h2>
+          <p className="mt-3 text-sm text-on-surface-variant">
             France 24, Al Jazeera et bien d&apos;autres, diffusées en direct 24h/24.
           </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="px-6 md:px-12 py-8 border-t border-[#1C2029] text-xs text-[#5C6270]">
+      <footer className="px-6 md:px-20 py-8 border-t border-outline-variant/10 text-xs text-outline">
         © {new Date().getFullYear()} TiVoi — Tous droits réservés.
       </footer>
     </main>

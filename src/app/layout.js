@@ -1,17 +1,17 @@
-import { Space_Grotesk, Manrope } from "next/font/google";
+import { Montserrat, Archivo_Narrow } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
 
-const spaceGrotesk = Space_Grotesk({
-  weight: ["500", "700"],
+const montserrat = Montserrat({
+  weight: ["400", "600", "700", "900"],
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-montserrat",
 });
 
-const manrope = Manrope({
-  weight: ["400", "600"],
+const archivoNarrow = Archivo_Narrow({
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
-  variable: "--font-body",
+  variable: "--font-archivo-narrow",
 });
 
 export const metadata = {
@@ -24,7 +24,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="fr">
       <body
-        className={`${spaceGrotesk.variable} ${manrope.variable} antialiased bg-[#0B0E14] text-[#F4F1EA]`}
+        className={`${montserrat.variable} ${archivoNarrow.variable} antialiased bg-background text-on-surface font-body`}
       >
         <Header />
         {children}
