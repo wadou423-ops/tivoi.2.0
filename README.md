@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# TiVoi — Plateforme de streaming premium
 
-## Getting Started
+Plateforme de streaming pour la Côte d'Ivoire et l'Afrique de l'Ouest : VOD (films, séries), lives de créateurs monétisés (tokens, cadeaux virtuels), chaînes TV en direct et écrans embarqués VTC / Smart TV.
 
-First, run the development server:
+## Stack
+
+- **Frontend** : Next.js 16 (App Router), React 19, Tailwind CSS 4
+- **Backend** : Supabase (PostgreSQL + Auth + Realtime + RLS)
+- **Design** : système TiVoi « Premium West African Cinema » — or `#D4AF37` / obsidienne `#131313`, Montserrat + Archivo Narrow
+
+## Installation
+
+```bash
+npm install
+```
+
+Configurer `.env.local` :
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=xxx
+```
+
+Puis exécuter dans le **SQL Editor Supabase** :
+
+1. `supabase/schema.sql` — 21 tables, politiques RLS, fonctions métier (RPC), seed de base
+2. `supabase/seed-demo.sql` — catalogue de démonstration + carrousel « à la une » (optionnel)
+
+Lancer le serveur :
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Pages
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+| Route | Description |
+|---|---|
+| `/bienvenue` | Onboarding 3 slides (une fois par compte) |
+| `/` | Accueil premium : carrousel à la une, bento, tendances, bannières |
+| `/catalogue` | Catalogue VOD avec filtres par genre |
+| `/catalogue/[id]` | Fiche contenu : synopsis, notation, commentaires, achat |
+| `/lecteur/[id]` | Lecteur plein écran |
+| `/abonnements` | Formules Basic / Premium / VIP |
+| `/paiement/[type]/[id]` | Tunnel de paiement multi-fournisseurs (Mobile Money, carte) |
+| `/confirmation/[ref]` | Confirmation d'achat |
+| `/jetons` · `/portefeuille` | Packs de jetons, solde, historique |
+| `/lives` · `/live/[id]` | Lives avec chat temps réel + cadeaux virtuels |
+| `/live/programmer` | Programmer un live |
+| `/studio` | Dashboard créateur : revenus, graphique, export CSV, retrait |
+| `/devenir-createur` | Demande KYC créateur + statut |
+| `/guide-tv` | Chaînes en direct + guide des programmes (EPG) |
+| `/tv` | Écran Smart TV (code d'appairage 6 chiffres) |
+| `/recherche` · `/notifications` · `/profil` · `/parametres` | Compte |
+| `/admin/*` | Back-office : KPIs, catalogue, à la une, chaînes, bannières, créateurs, retraits, utilisateurs, VTC |
+| `/annonceur` | Espace annonceur (impressions, clics, CTR) |
+| `/vtc` | Mode kiosque embarqué VTC |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Rôles
 
-## Learn More
+- **utilisateur** : visionnage, achats, jetons
+- **créateur** (après validation KYC) : lives, studio, retraits
+- **admin** : back-office complet
 
-To learn more about Next.js, take a look at the following resources:
+## Paiements
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Le tunnel est branché sur une couche d'abstraction (`paiements` + RPC `confirmer_paiement`). Mode démo : confirmation automatique simulée après 3 s. Pour la production : brancher les webhooks réels des fournisseurs (Wave, Orange Money, MTN MoMo, Moov, Stripe, PayPal) sur `confirmer_paiement` via une Edge Function avec la service key.
