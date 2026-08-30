@@ -1,18 +1,43 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Spinner from "../components/Spinner";
 
 export default function Connexion() {
+  return (
+    <Suspense fallback={null}>
+      <ConnexionContent />
+    </Suspense>
+  );
+}
+
+function ConnexionContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [verification, setVerification] = useState(true);
+
+  // Déjà connecté ? On redirige directement (pas de demande de connexion inutile)
+  useEffect(() => {
+    async function check() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        router.replace(searchParams.get("redirect") || "/");
+        return;
+      }
+      setVerification(false);
+    }
+    check();
+  }, [router, searchParams]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -35,12 +60,21 @@ export default function Connexion() {
 
     setLoading(false);
 
+    const destination = searchParams.get("redirect") || "/";
     if (!profile?.pseudo) {
       router.push("/choisir-pseudo");
     } else {
-      router.push("/");
+      router.push(destination);
     }
     router.refresh();
+  }
+
+  if (verification) {
+    return (
+      <main className="relative min-h-[calc(100vh-73px)] flex items-center justify-center">
+        <Spinner size={36} />
+      </main>
+    );
   }
 
   return (
