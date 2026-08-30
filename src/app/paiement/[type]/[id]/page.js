@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Lock, ReceiptLong, ArrowLeft } from "lucide-react";
+import { Lock, FileText, ArrowLeft } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 const FOURNISSEURS = [
@@ -163,7 +163,7 @@ export default function Paiement() {
         <div className="lg:col-span-4 mt-8 lg:mt-0">
           <div className="glass-panel rounded-xl p-6 flex flex-col h-full">
             <h2 className="title-lg text-primary mb-6 flex items-center gap-2">
-              <ReceiptLong size={20} /> Récapitulatif
+              <FileText size={20} /> Récapitulatif
             </h2>
 
             <div className="flex gap-4 items-start pb-4 border-b border-outline-variant/20">
