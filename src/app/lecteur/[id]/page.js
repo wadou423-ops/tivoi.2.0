@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../../components/LoaderCentered";
 
@@ -63,6 +65,14 @@ export default function Lecteur() {
           </div>
         </div>
       )}
+
+      {/* Bouton retour */}
+      <Link
+        href={`/catalogue/${id}`}
+        className="absolute top-6 right-6 z-30 flex items-center gap-2 rounded-lg glass-panel px-4 py-2.5 text-on-surface hover:text-primary transition-colors"
+      >
+        <ArrowLeft size={18} /> <span className="text-sm">Retour</span>
+      </Link>
 
       {/* Filigrane */}
       <span className="absolute top-6 left-6 z-20 font-display font-bold text-xl text-primary/50 pointer-events-none">

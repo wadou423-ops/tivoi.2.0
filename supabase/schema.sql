@@ -555,6 +555,18 @@ grant execute on function public.demander_retrait(integer) to authenticated;
 -- Onboarding vu une fois par compte
 alter table profiles add column if not exists onboarding_vu boolean not null default false;
 
+-- ---------- PERMISSIONS ADMIN ----------
+alter table profiles add column if not exists permissions text[] not null
+  default '{utilisateurs,createurs,catalogue,a_une,chaines,bannieres,retraits,vtc,administrateurs}';
+
+create or replace function public.definir_permissions(p_user_id uuid, p_permissions text[])
+returns void language plpgsql security definer as $$
+begin
+  if not public.est_admin() then raise exception 'Acces refuse'; end if;
+  update profiles set permissions = p_permissions where id = p_user_id and role = 'admin';
+end;
+$$;
+
 -- ---------- TELEPHONE (inscription + connexion OTP) ----------
 alter table profiles add column if not exists telephone text;
 

@@ -30,12 +30,6 @@ export default function AdminUtilisateurs() {
       (p.prenom || "").toLowerCase().includes(recherche.toLowerCase())
   );
 
-  async function changerRole(id, role) {
-    const { error } = await supabase.from("profiles").update({ role }).eq("id", id);
-    if (error) setMessage(error.message);
-    else setProfils((ps) => ps.map((p) => (p.id === id ? { ...p, role } : p)));
-  }
-
   async function toggleSuspendre(p) {
     const { error } = await supabase
       .from("profiles")
@@ -94,15 +88,15 @@ export default function AdminUtilisateurs() {
                   {(p.solde_tokens || 0).toLocaleString("fr-FR")}
                 </td>
                 <td className="px-4 py-3">
-                  <select
-                    value={p.role}
-                    onChange={(e) => changerRole(p.id, e.target.value)}
-                    className="bg-transparent border border-outline-variant/50 rounded text-xs text-on-surface px-2 py-1 outline-none focus:border-primary"
+                  <span
+                    className={`text-xs px-2 py-1 rounded border ${
+                      p.role === "admin"
+                        ? "border-primary text-primary bg-primary/10"
+                        : "border-outline-variant text-on-surface-variant"
+                    }`}
                   >
-                    <option value="utilisateur">utilisateur</option>
-                    <option value="createur">créateur</option>
-                    <option value="admin">admin</option>
-                  </select>
+                    {p.role}
+                  </span>
                 </td>
                 <td className="px-4 py-3">
                   <button
