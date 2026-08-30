@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Film, Tv, Clapperboard, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Film, Tv, Clapperboard, Star } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Banniere from "./components/Banniere";
 
@@ -36,7 +36,7 @@ function CarteFilm({ film }) {
     <Link href={`/catalogue/${film.id}`} className="flex-none w-[200px] md:w-[240px] snap-start flex flex-col gap-2">
       <div className="relative w-full aspect-[2/3] rounded-lg overflow-hidden border border-outline-variant/10 movie-card cursor-pointer bg-surface-high">
         {film.image_url && (
-          <img src={film.image_url} alt={film.titre} className="w-full h-full object-cover" />
+          <img src={film.image_url} alt={film.titre || "Contenu"} className="w-full h-full object-cover" />
         )}
         {film.note && (
           <div className="absolute top-2 right-2 bg-surface-lowest/80 backdrop-blur-md px-2 py-1 rounded caption text-primary border border-primary/20 flex items-center gap-1">
@@ -67,8 +67,7 @@ function CarteFilm({ film }) {
 export default function Home() {
   const router = useRouter();
   const [catalogue, setCatalogue] = useState([]);
-  const [slides, setSlides] = useState([]);
-  const [slide, setSlide] = useState(0);
+  const [aLaUne, setALaUne] = useState([]);
   const [connecte, setConnecte] = useState(false);
   const [chargement, setChargement] = useState(true);
   const [filtre, setFiltre] = useState("Tous");
@@ -107,86 +106,47 @@ export default function Home() {
         .order("ordre", { ascending: true });
       setCatalogue(data || []);
     }
-    async function loadSlides() {
+    async function loadALaUne() {
       const { data } = await supabase
         .from("a_une")
-        .select("id, contenu_id, titre, accroche, image_url, catalogue(image_url)")
+        .select("id, contenu_id, ordre, catalogue(id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces)")
         .eq("actif", true)
         .order("ordre", { ascending: true });
-      setSlides(
-        (data || []).map((s) => ({
-          ...s,
-          image_url: s.image_url || s.catalogue?.image_url || "",
-        }))
+      // Transformer chaque entrée en carte comme celles du catalogue
+      setALaUne(
+        (data || [])
+          .filter((s) => s.catalogue)
+          .map((s) => ({ ...s.catalogue }))
       );
     }
     loadCatalogue();
-    loadSlides();
+    loadALaUne();
   }, []);
-
-  useEffect(() => {
-    if (slides.length === 0) return;
-    const t = setInterval(() => setSlide((s) => (s + 1) % slides.length), 6000);
-    return () => clearInterval(t);
-  }, [slides.length]);
 
   const tendances = [...catalogue]
     .sort((a, b) => (b.note || 0) - (a.note || 0))
     .slice(0, 10);
 
-  // Étagères par catégorie (le reste du catalogue)
   const categories = [...new Set(catalogue.map((f) => f.categorie).filter(Boolean))];
 
-  const carrousel = slides.length > 0 && (
-    <section className="relative w-full h-[420px] md:h-[480px] overflow-hidden">
-      <span className="absolute top-6 left-5 md:left-20 z-20 label-md text-on-surface uppercase tracking-widest drop-shadow-lg">
-        À la une
-      </span>
-      {slides.map((s, i) => (
-        <div
-          key={s.id}
-          className={`absolute inset-0 transition-opacity duration-1000 ${i === slide ? "opacity-100 z-10" : "opacity-0 z-0"}`}
-        >
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url('${s.image_url || ""}')` }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-          <div className="absolute bottom-0 left-0 w-full px-5 md:px-20 pb-10">
-            <h2 className="display-lg text-on-surface mb-2">{s.titre}</h2>
-            {s.accroche && <p className="body-lg text-on-surface-variant max-w-xl mb-4">{s.accroche}</p>}
-            <Link
-              href={`/catalogue/${s.contenu_id}`}
-              className="inline-block bg-primary text-on-primary-fixed label-md uppercase px-8 py-3 rounded hover:bg-primary-container transition-colors shadow-[0_0_15px_rgba(212,175,55,0.3)]"
-            >
-              Regarder
-            </Link>
-          </div>
+  function Etagere({ titre, films, lien }) {
+    if (!films || films.length === 0) return null;
+    return (
+      <section className="px-5 md:px-20 py-6">
+        <div className="flex justify-between items-end mb-4">
+          <h2 className="headline-md text-on-surface">{titre}</h2>
+          <Link href={lien || "/catalogue"} className="caption text-primary hover:text-primary-container transition-colors">
+            Tout voir →
+          </Link>
         </div>
-      ))}
-      <button
-        onClick={() => setSlide((s) => (s - 1 + slides.length) % slides.length)}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass-panel flex items-center justify-center text-on-surface hover:text-primary transition-colors"
-      >
-        <ChevronLeft size={20} />
-      </button>
-      <button
-        onClick={() => setSlide((s) => (s + 1) % slides.length)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass-panel flex items-center justify-center text-on-surface hover:text-primary transition-colors"
-      >
-        <ChevronRight size={20} />
-      </button>
-      <div className="absolute bottom-4 right-5 md:right-20 z-20 flex items-center gap-2">
-        {slides.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setSlide(i)}
-            className={`h-1.5 rounded-full transition-all duration-500 ${i === slide ? "bg-primary w-8" : "bg-surface-variant w-2"}`}
-          />
-        ))}
-      </div>
-    </section>
-  );
+        <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
+          {films.map((film) => (
+            <CarteFilm key={film.id} film={film} />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   // ---------- Mode connecté : expérience Netflix ----------
   if (connecte && !chargement) {
@@ -194,10 +154,8 @@ export default function Home() {
 
     return (
       <main className="flex-grow min-h-screen flex flex-col pt-20">
-        {carrousel}
-
         {/* Filtres par catégorie */}
-        <section className="px-5 md:px-20 pt-8 pb-2">
+        <section className="px-5 md:px-20 pt-10 pb-2">
           <div className="flex items-center gap-3 overflow-x-auto pb-2 hide-scrollbar">
             {["Tous", ...categories].map((c) => (
               <button
@@ -215,49 +173,21 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="px-5 md:px-20 pt-6 pb-4">
-          <div className="flex justify-between items-end mb-6">
-            <h2 className="headline-md text-on-surface">Tendances actuelles</h2>
-            <Link href="/catalogue" className="label-md text-primary hover:text-primary-container transition-colors">
-              Voir tout →
-            </Link>
-          </div>
-          {tendances.length > 0 ? (
-            <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
-              {tendances.map((film) => (
-                <CarteFilm key={film.id} film={film} />
-              ))}
-            </div>
-          ) : (
-            <p className="body-md text-on-surface-variant">Chargement du catalogue...</p>
-          )}
-        </section>
+        <Etagere titre="À la une" films={aLaUne} />
 
-        {catsAffichees.map((cat) => {
-          const films = catalogue.filter((f) => f.categorie === cat);
-          if (films.length === 0) return null;
-          return (
-            <section key={cat} className="px-5 md:px-20 py-6">
-              <div className="flex justify-between items-end mb-4">
-                <h2 className="headline-md text-on-surface">{cat}</h2>
-                <Link href="/catalogue" className="caption text-primary hover:text-primary-container transition-colors">
-                  Tout voir →
-                </Link>
-              </div>
-              <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
-                {films.map((film) => (
-                  <CarteFilm key={film.id} film={film} />
-                ))}
-              </div>
-            </section>
-          );
-        })}
+        <Etagere titre="Tendances actuelles" films={tendances} />
+
+        {catsAffichees.map((cat) => (
+          <Etagere key={cat} titre={cat} films={catalogue.filter((f) => f.categorie === cat)} />
+        ))}
 
         {catsAffichees.length === 0 && (
           <p className="px-5 md:px-20 py-10 body-md text-on-surface-variant">
             Aucun contenu dans cette catégorie pour le moment.
           </p>
         )}
+
+        <Banniere emplacement="accueil_h2" className="mx-5 md:mx-20 my-6 h-24 md:h-32" />
 
         <footer className="mt-auto px-5 md:px-20 py-8 border-t border-outline-variant/10 text-xs text-outline flex flex-wrap gap-4 justify-between">
           <span>© {new Date().getFullYear()} TiVoi — Tous droits réservés.</span>
@@ -305,8 +235,6 @@ export default function Home() {
         </div>
       </section>
 
-      {carrousel}
-
       {/* Bento 3 piliers */}
       <section className="px-5 md:px-20 py-12">
         <h2 className="headline-md text-on-surface mb-6">Découvrir TiVoi</h2>
@@ -326,26 +254,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Shelf Tendances */}
-      <section className="px-5 md:px-20 py-12 border-t border-surface-high">
-        <div className="flex justify-between items-end mb-6">
-          <h2 className="headline-md text-on-surface">Tendances actuelles</h2>
-          <Link href="/catalogue" className="label-md text-primary hover:text-primary-container transition-colors flex items-center gap-1">
-            Voir tout →
-          </Link>
-        </div>
-        {tendances.length === 0 ? (
-          <p className="text-on-surface-variant body-md">
-            Le catalogue arrive bientôt — connectez Supabase et ajoutez du contenu depuis l&apos;admin.
-          </p>
-        ) : (
-          <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
-            {tendances.map((film) => (
-              <CarteFilm key={film.id} film={film} />
-            ))}
-          </div>
-        )}
-      </section>
+      <Etagere titre="À la une" films={aLaUne} />
+
+      <Etagere titre="Tendances actuelles" films={tendances} />
 
       {/* Bannière */}
       <section className="px-5 md:px-20 py-6">
