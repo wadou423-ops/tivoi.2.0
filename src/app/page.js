@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Film, Tv, Clapperboard, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Banniere from "./components/Banniere";
@@ -221,7 +222,15 @@ export default function Home() {
                 className="flex-none w-[200px] md:w-[240px] snap-start flex flex-col gap-2"
               >
                 <div className="relative w-full aspect-[2/3] rounded-lg overflow-hidden border border-outline-variant/10 movie-card cursor-pointer bg-surface-high">
-                  <img src={film.image_url} alt={film.titre} className="w-full h-full object-cover" />
+                  {film.image_url && (
+                    <Image
+                      src={film.image_url}
+                      alt={film.titre}
+                      fill
+                      sizes="(max-width: 768px) 50vw, 240px"
+                      className="object-cover"
+                    />
+                  )}
                   {film.note && (
                     <div className="absolute top-2 right-2 bg-surface-lowest/80 backdrop-blur-md px-2 py-1 rounded caption text-primary border border-primary/20 flex items-center gap-1">
                       <Star size={14} fill="currentColor" /> {film.note}

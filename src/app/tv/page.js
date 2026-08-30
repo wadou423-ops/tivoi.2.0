@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 
 // Page appareil TV : génère un code à 6 chiffres, attend l'appairage, puis joue le contenu
@@ -20,7 +21,9 @@ export default function TV() {
   }, []);
 
   useEffect(() => {
-    genererCode();
+    // Différé d'une frame pour éviter un setState synchrone pendant l'effet
+    const t = setTimeout(genererCode, 0);
+    return () => clearTimeout(t);
   }, [genererCode]);
 
   // Polling de l'appairage
@@ -42,9 +45,9 @@ export default function TV() {
       <main className="min-h-screen bg-surface-lowest flex flex-col items-center justify-center gap-6">
         <span className="display-lg text-primary tracking-tighter">TiVoi</span>
         <p className="body-lg text-on-surface-variant">Appareil appairé ! Chargement du catalogue...</p>
-        <a href="/catalogue" className="bg-primary text-on-primary-fixed label-md px-8 py-3 rounded">
+        <Link href="/catalogue" className="bg-primary text-on-primary-fixed label-md px-8 py-3 rounded">
           Accéder au catalogue
-        </a>
+        </Link>
       </main>
     );
   }

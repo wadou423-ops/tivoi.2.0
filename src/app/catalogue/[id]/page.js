@@ -20,45 +20,43 @@ export default function FicheContenu() {
 
   useEffect(() => {
     async function load() {
-      const { data: f } = await supabase.from("catalogue").select("*").eq("id", id).single();
-      setFilm(f);
-
-      const { data: notes } = await supabase.from("notes").select("note").eq("contenu_id", id);
-      if (notes && notes.length > 0) {
-        setMoyenne(notes.reduce((s, n) => s + n.note, 0) / notes.length);
-        setNbNotes(notes.length);
-      }
-
-      const { data: coms } = await supabase
-        .from("commentaires")
-        .select("id, pseudo, texte, created_at")
-        .eq("contenu_id", id)
-        .order("created_at", { ascending: false });
-      setCommentaires(coms || []);
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        const { data: mn } = await supabase
-          .from("notes")
-          .select("note")
+      const [f, notes, coms, session] = await Promise.all([
+        supabase.from("catalogue").select("*").eq("id", id).single(),
+        supabase.from("notes").select("note").eq("contenu_id", id),
+        supabase
+          .from("commentaires")
+          .select("id, pseudo, texte, created_at")
           .eq("contenu_id", id)
-          .eq("user_id", user.id)
-          .maybeSingle();
-        setMaNote(mn?.note || 0);
+          .order("created_at", { ascending: false }),
+        supabase.auth.getUser(),
+      ]);
+      setFilm(f.data);
+      if (notes.data?.length) {
+        setMoyenne(notes.data.reduce((s, n) => s + n.note, 0) / notes.data.length);
+        setNbNotes(notes.data.length);
+      }
+      setCommentaires(coms.data || []);
 
-        if (f?.type_acces !== "gratuit") {
-          const { data: a } = await supabase
-            .from("acces_contenus")
-            .select("id, expire_le")
+      const user = session.data.user;
+      if (user) {
+        const [mn, a] = await Promise.all([
+          supabase
+            .from("notes")
+            .select("note")
             .eq("contenu_id", id)
             .eq("user_id", user.id)
-            .maybeSingle();
-          setAcces(a);
-        } else {
-          setAcces(true);
-        }
+            .maybeSingle(),
+          f.data?.type_acces !== "gratuit"
+            ? supabase
+                .from("acces_contenus")
+                .select("id, expire_le")
+                .eq("contenu_id", id)
+                .eq("user_id", user.id)
+                .maybeSingle()
+            : Promise.resolve({ data: true }),
+        ]);
+        setMaNote(mn.data?.note || 0);
+        setAcces(a.data);
       }
     }
     load();

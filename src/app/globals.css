@@ -103,7 +103,26 @@ h1, h2, h3 {
 }
 .fade-up { animation: fade-up 0.7s ease forwards; }
 
+/* Squelettes de chargement */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #201f1f 25%, #2a2a2a 50%, #201f1f 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 8px;
+}
+
+/* Sections hors écran non rendues = scroll plus fluide */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ticker-track { animation: none; }
   .fade-up { animation: none; }
+  .skeleton { animation: none; }
 }

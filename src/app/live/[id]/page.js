@@ -65,7 +65,25 @@ export default function LiveEnDirect() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "messages_live", filter: `live_id=eq.${id}` },
         (payload) => {
-          setMessages((prev) => [...prev.slice(-100), payload.new]);
+          // Déduplique avec l'affichage optimiste
+          setMessages((prev) => {
+            const doublon = prev.some(
+              (m) =>
+                String(m.id).startsWith("optimiste-") &&
+                m.pseudo === payload.new.pseudo &&
+                m.texte === payload.new.texte
+            );
+            if (doublon) {
+              return prev.map((m) =>
+                String(m.id).startsWith("optimiste-") &&
+                m.pseudo === payload.new.pseudo &&
+                m.texte === payload.new.texte
+                  ? payload.new
+                  : m
+              );
+            }
+            return [...prev.slice(-100), payload.new];
+          });
         }
       )
       .on(
@@ -94,13 +112,20 @@ export default function LiveEnDirect() {
       .eq("id", user.id)
       .single();
 
+    // Affichage optimiste : le message apparaît instantanément
+    const tempId = `optimiste-${Date.now()}`;
+    setMessages((prev) => [
+      ...prev,
+      { id: tempId, pseudo: profile?.pseudo, texte: texte.trim() },
+    ]);
+    setTexte("");
+
     await supabase.from("messages_live").insert({
       live_id: id,
       user_id: user.id,
       pseudo: profile?.pseudo,
       texte: texte.trim(),
     });
-    setTexte("");
   }
 
   async function offrirCadeau(cadeau) {

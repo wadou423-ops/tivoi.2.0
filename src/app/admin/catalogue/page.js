@@ -117,7 +117,7 @@ export default function AdminCatalogue() {
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="caption text-on-surface-variant block mb-1">Type d'accès</label>
+              <label className="caption text-on-surface-variant block mb-1">Type d&apos;accès</label>
               <select value={edition.type_acces} onChange={(e) => setEdition({ ...edition, type_acces: e.target.value })} className={inputClass}>
                 <option value="gratuit">Gratuit</option>
                 <option value="seance">Paiement à la séance</option>

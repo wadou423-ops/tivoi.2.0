@@ -107,7 +107,9 @@ export default function Header() {
           </Link>
           <div className="hidden md:flex items-center gap-4">
             <span className="label-md text-on-surface-variant hover:text-primary transition-colors cursor-default">FR/EN</span>
-            {loading ? null : pseudo ? (
+            {loading ? (
+              <div className="w-9 h-9 rounded-full skeleton" />
+            ) : pseudo ? (
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setMenuOpen((open) => !open)}
