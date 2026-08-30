@@ -43,6 +43,7 @@ export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const [autorise, setAutorise] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [adminPseudo, setAdminPseudo] = useState("");
 
   const estPageConnexion = pathname === "/admin/connexion";
 
@@ -61,7 +62,7 @@ export default function AdminLayout({ children }) {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("role")
+        .select("role, pseudo")
         .eq("id", user.id)
         .single();
 
@@ -72,6 +73,7 @@ export default function AdminLayout({ children }) {
         return;
       }
 
+      setAdminPseudo(profile.pseudo || user.email);
       setAutorise(true);
       setChecking(false);
     }
@@ -109,7 +111,7 @@ export default function AdminLayout({ children }) {
           </div>
           <div>
             <h1 className="font-display font-bold text-lg text-primary">TiVoi Admin</h1>
-            <p className="text-xs text-on-surface-variant">Gestion Premium</p>
+            <p className="text-xs text-on-surface-variant">Connecté : @{adminPseudo}</p>
           </div>
         </div>
 
