@@ -75,26 +75,27 @@ export default function Header() {
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-outline-variant/10 shadow-md shadow-primary/5">
-      <div className="flex justify-between items-center px-5 md:px-20 h-20 w-full">
+      <div className="flex justify-between items-center px-5 md:px-20 h-20 w-full relative">
         <div className="flex items-center gap-8">
           <Link href="/" className="display-lg text-primary tracking-tighter !text-2xl !leading-none">
             TiVoi
           </Link>
-          <div className="hidden md:flex gap-6 items-center">
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className={`label-md pb-1 transition-colors ${
-                  pathname === link.href
-                    ? "text-primary border-b-2 border-primary"
-                    : "text-on-surface-variant hover:text-primary"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
+        </div>
+
+        <div className="hidden md:flex gap-6 items-center absolute left-1/2 -translate-x-1/2">
+          {navLinks.map((link) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              className={`label-md pb-1 transition-colors ${
+                pathname === link.href
+                  ? "text-primary border-b-2 border-primary"
+                  : "text-on-surface-variant hover:text-primary"
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
         </div>
 
         <div className="flex items-center gap-4">
@@ -122,6 +123,15 @@ export default function Header() {
                       {role === "admin" && (
                         <Link href="/admin" className="block px-0 py-1 text-sm text-primary hover:text-primary-container transition-colors">
                           Dashboard admin
+                        </Link>
+                      )}
+                      {role === "createur" ? (
+                        <Link href="/studio" className="block px-0 py-1 text-sm text-primary hover:text-primary-container transition-colors">
+                          Studio créateur
+                        </Link>
+                      ) : (
+                        <Link href="/devenir-createur" className="block px-0 py-1 text-sm text-primary hover:text-primary-container transition-colors">
+                          Devenir créateur
                         </Link>
                       )}
                       <Link href="/profil" className="block py-1 text-sm text-on-surface-variant hover:text-primary transition-colors">
