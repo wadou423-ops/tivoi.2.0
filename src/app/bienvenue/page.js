@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const SLIDES = [
   {
@@ -28,6 +28,7 @@ const SLIDES = [
 ];
 
 export default function Bienvenue() {
+  const router = useRouter();
   const [slide, setSlide] = useState(0);
 
   const suivant = useCallback(() => {
@@ -38,6 +39,11 @@ export default function Bienvenue() {
     const t = setInterval(suivant, 6000);
     return () => clearInterval(t);
   }, [suivant]);
+
+  function terminer(destination) {
+    localStorage.setItem("tivoi_onboarding_vu", "1");
+    router.push(destination);
+  }
 
   return (
     <main className="relative w-full h-screen flex flex-col justify-end overflow-hidden">
@@ -67,15 +73,15 @@ export default function Bienvenue() {
 
       {/* Marque + Passer */}
       <div className="absolute top-0 left-0 w-full px-5 md:px-20 py-6 z-20 flex justify-between items-center">
-        <Link href="/" className="display-lg text-primary tracking-tighter !text-2xl !leading-none">
+        <button onClick={() => terminer("/")} className="display-lg text-primary tracking-tighter !text-2xl !leading-none">
           TiVoi
-        </Link>
-        <Link
-          href="/catalogue"
+        </button>
+        <button
+          onClick={() => terminer("/catalogue")}
           className="label-md text-on-surface-variant hover:text-primary transition-colors uppercase"
         >
           Passer
-        </Link>
+        </button>
       </div>
 
       {/* Barre de contrôle */}
@@ -91,12 +97,12 @@ export default function Bienvenue() {
             />
           ))}
         </div>
-        <Link
-          href="/inscription"
+        <button
+          onClick={() => terminer("/inscription")}
           className="bg-primary text-on-primary label-md uppercase px-8 py-3 rounded hover:bg-primary-container transition-all duration-300 shadow-[0_0_15px_rgba(212,175,55,0.3)]"
         >
           Commencer
-        </Link>
+        </button>
       </div>
     </main>
   );

@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Film, Tv, Clapperboard, Star } from "lucide-react";
+import { Film, Tv, Clapperboard, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Banniere from "./components/Banniere";
 
@@ -31,7 +32,16 @@ const PILIERS = [
 ];
 
 export default function Home() {
+  const router = useRouter();
   const [tendances, setTendances] = useState([]);
+  const [slides, setSlides] = useState([]);
+  const [slide, setSlide] = useState(0);
+
+  useEffect(() => {
+    if (!localStorage.getItem("tivoi_onboarding_vu")) {
+      router.replace("/bienvenue");
+    }
+  }, [router]);
 
   useEffect(() => {
     async function loadTendances() {
@@ -43,8 +53,23 @@ export default function Home() {
         .limit(10);
       setTendances(data || []);
     }
+    async function loadSlides() {
+      const { data } = await supabase
+        .from("a_une")
+        .select("id, contenu_id, titre, accroche, image_url")
+        .eq("actif", true)
+        .order("ordre", { ascending: true });
+      setSlides(data || []);
+    }
     loadTendances();
+    loadSlides();
   }, []);
+
+  useEffect(() => {
+    if (slides.length === 0) return;
+    const t = setInterval(() => setSlide((s) => (s + 1) % slides.length), 6000);
+    return () => clearInterval(t);
+  }, [slides.length]);
 
   return (
     <main className="flex-grow min-h-screen flex flex-col pt-20">
@@ -84,6 +109,57 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Carrousel À la une */}
+      {slides.length > 0 && (
+        <section className="relative w-full h-[420px] md:h-[480px] overflow-hidden">
+          {slides.map((s, i) => (
+            <div
+              key={s.id}
+              className={`absolute inset-0 transition-opacity duration-1000 ${i === slide ? "opacity-100 z-10" : "opacity-0 z-0"}`}
+            >
+              <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: `url('${s.image_url || ""}')` }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+              <div className="absolute bottom-0 left-0 w-full px-5 md:px-20 pb-10">
+                <h2 className="display-lg text-on-surface mb-2">{s.titre}</h2>
+                <p className="body-lg text-on-surface-variant max-w-xl mb-4">{s.accroche}</p>
+                <Link
+                  href={`/catalogue/${s.contenu_id}`}
+                  className="inline-block bg-primary text-on-primary-fixed label-md uppercase px-8 py-3 rounded hover:bg-primary-container transition-colors shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                >
+                  Regarder
+                </Link>
+              </div>
+            </div>
+          ))}
+          {/* Flèches */}
+          <button
+            onClick={() => setSlide((s) => (s - 1 + slides.length) % slides.length)}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass-panel flex items-center justify-center text-on-surface hover:text-primary transition-colors"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <button
+            onClick={() => setSlide((s) => (s + 1) % slides.length)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass-panel flex items-center justify-center text-on-surface hover:text-primary transition-colors"
+          >
+            <ChevronRight size={20} />
+          </button>
+          {/* Points */}
+          <div className="absolute bottom-4 right-5 md:right-20 z-20 flex items-center gap-2">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setSlide(i)}
+                className={`h-1.5 rounded-full transition-all duration-500 ${i === slide ? "bg-primary w-8" : "bg-surface-variant w-2"}`}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Bannière 1 */}
       <section className="px-5 md:px-20 py-6">
