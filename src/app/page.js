@@ -214,13 +214,14 @@ export default function Home() {
           <FiltreCategories categories={categories} filtre={filtre} setFiltre={setFiltre} />
         </section>
 
-        {reprendre.length > 0 && (
+        {/* « Tous » : tout s'affiche. Un filtre précis : uniquement sa catégorie */}
+        {filtre === "Tous" && reprendre.length > 0 && (
           <Etagere titre="Reprendre le visionnage" films={reprendre} progressionMap={progressionMap} onOpen={ouvrirFiche} />
         )}
 
-        <Etagere titre="À la une" films={aLaUne} onOpen={ouvrirFiche} />
+        {filtre === "Tous" && <Etagere titre="À la une" films={aLaUne} onOpen={ouvrirFiche} />}
 
-        <EtagereTop10 films={tendances} onOpen={ouvrirFiche} />
+        {filtre === "Tous" && <EtagereTop10 films={tendances} onOpen={ouvrirFiche} />}
 
         {catsAffichees.map((cat) => (
           <Etagere
