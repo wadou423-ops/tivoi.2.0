@@ -168,7 +168,10 @@ export default function CustomVideoPlayer({ src, contenuId, onEnded }) {
         playsInline
         onClick={basculerLecture}
         onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
+        onPause={() => {
+          setPlaying(false);
+          setMontre(true);
+        }}
         onTimeUpdate={onTimeUpdate}
         onLoadedMetadata={(e) => setDuration(e.target.duration)}
         onEnded={onEnded}
@@ -187,10 +190,10 @@ export default function CustomVideoPlayer({ src, contenuId, onEnded }) {
         </div>
       )}
 
-      {/* Contrôles */}
+      {/* Contrôles — toujours visibles en pause */}
       <div
         className={`absolute bottom-0 left-0 right-0 z-30 px-5 pb-4 pt-10 bg-gradient-to-t from-background/90 to-transparent transition-opacity duration-300 ${
-          montre ? "opacity-100" : "opacity-0 pointer-events-none"
+          montre || !playing ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
         {/* Barre de progression */}

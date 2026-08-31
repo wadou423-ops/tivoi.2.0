@@ -59,25 +59,15 @@ function Etagere({ titre, films, progressionMap = {}, onOpen }) {
   );
 }
 
-// Top 10 avec grands numéros
+// Top 10 — même format d'étagère
 function EtagereTop10({ films, onOpen }) {
   if (!films || films.length === 0) return null;
   return (
-    <section className="px-5 md:px-20 py-6 overflow-hidden">
+    <section className="px-5 md:px-20 py-6">
       <h2 className="headline-md text-on-surface mb-4">Top 10 aujourd&apos;hui</h2>
-      <div className="flex overflow-x-auto gap-10 pb-4 snap-x snap-mandatory hide-scrollbar">
-        {films.map((film, i) => (
-          <div key={film.id} className="flex-none relative">
-            <span
-              className="absolute -left-2 bottom-0 text-[120px] leading-[0.8] font-black text-primary/25 select-none pointer-events-none"
-              style={{ WebkitTextStroke: "2px rgba(242,202,80,0.4)" }}
-            >
-              {i + 1}
-            </span>
-            <div className="relative pl-12 pb-1">
-              <CarteFilm film={film} onOpen={onOpen} />
-            </div>
-          </div>
+      <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
+        {films.map((film) => (
+          <CarteFilm key={film.id} film={film} onOpen={onOpen} />
         ))}
       </div>
     </section>
