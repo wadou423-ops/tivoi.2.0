@@ -68,6 +68,7 @@ export default function YouTubePlayerProgress({ videoId, contenuId, restart = fa
           rel: 0,
           modestbranding: 1,
           playsinline: 1,
+          origin: window.location.origin,
         },
         events: {
           onReady: (e) => {
