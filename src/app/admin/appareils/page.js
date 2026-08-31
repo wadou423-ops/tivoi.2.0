@@ -11,15 +11,16 @@ export default function AdminAppareils() {
   const [code, setCode] = useState("");
   const [message, setMessage] = useState("");
 
+  async function load() {
+    const { data } = await supabase
+      .from("appareils")
+      .select("*")
+      .order("created_at", { ascending: false });
+    setAppareils(data || []);
+    setChargement(false);
+  }
+
   useEffect(() => {
-    async function load() {
-      const { data } = await supabase
-        .from("appareils")
-        .select("*")
-        .order("created_at", { ascending: false });
-      setAppareils(data || []);
-      setChargement(false);
-    }
     const t = setTimeout(load, 0);
     return () => clearTimeout(t);
   }, []);
