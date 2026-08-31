@@ -306,9 +306,22 @@ export default function Home() {
           ))}
         </div>
       </section>
+        {/* À la une — un peu plus d'air sous le header */}
+        <section className="px-5 md:px-20 pt-8 pb-6">
+          <div className="flex justify-between items-end mb-4">
+            <h2 className="headline-md text-on-surface">À la une</h2>
+            <Link href="/catalogue" className="caption text-primary hover:text-primary-container transition-colors">
+              Tout voir →
+            </Link>
+          </div>
+          <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
+            {aLaUne.map((film) => (
+              <CarteFilm key={film.id} film={film} onOpen={ouvrirFiche} />
+            ))}
+          </div>
+        </section>
 
-      <Etagere titre="À la une" films={aLaUne} />
-      <Etagere titre="Tendances actuelles" films={tendances} />
+        <Etagere titre="Tendances actuelles" films={tendances} />
 
       {/* Bannière */}
       <section className="px-5 md:px-20 py-6">
