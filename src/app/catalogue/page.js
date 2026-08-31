@@ -5,6 +5,23 @@ import { Star, Play } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../components/LoaderCentered";
 import FiltreCategories from "../components/FiltreCategories";
+import CarteFilm from "../components/CarteFilm";
+
+function Etagere({ titre, films, progressionMap = {} }) {
+  if (!films || films.length === 0) return null;
+  return (
+    <section className="pt-10 pb-4">
+      <div className="flex justify-between items-end mb-5">
+        <h2 className="headline-md text-on-surface">{titre}</h2>
+      </div>
+      <div className="flex overflow-x-auto gap-6 pt-2 pb-4 snap-x snap-mandatory hide-scrollbar">
+        {films.map((film) => (
+          <CarteFilm key={film.id} film={film} progressionPct={progressionMap[film.id] || 0} />
+        ))}
+      </div>
+    </section>
+  );
+}
 
 export default function CatalogueVOD() {
   const [films, setFilms] = useState([]);
@@ -12,6 +29,7 @@ export default function CatalogueVOD() {
   const [loading, setLoading] = useState(true);
   const [categorie, setCategorie] = useState("Tous les genres");
   const [connecte, setConnecte] = useState(false);
+  const [progressionMap, setProgressionMap] = useState({});
 
   useEffect(() => {
     async function loadCatalogue() {
@@ -23,7 +41,7 @@ export default function CatalogueVOD() {
           .order("ordre", { ascending: true }),
         supabase
           .from("a_une")
-          .select("ordre, catalogue(id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces)")
+          .select("ordre, catalogue(id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces, bande_annonce_url)")
           .eq("actif", true)
           .order("ordre", { ascending: true }),
         supabase.auth.getUser(),
@@ -32,6 +50,23 @@ export default function CatalogueVOD() {
       if (data) setFilms(data);
       if (une) setALaUne(une.filter((s) => s.catalogue).map((s) => ({ ...s.catalogue })));
       setConnecte(!!user);
+
+      if (user) {
+        const { data: progs } = await supabase
+          .from("progressions")
+          .select("contenu_id, position_secondes, duree_secondes")
+          .eq("user_id", user.id)
+          .eq("termine", false)
+          .gt("position_secondes", 5);
+        const map = {};
+        (progs || []).forEach((p) => {
+          if (p.duree_secondes > 0) {
+            map[p.contenu_id] = Math.round((p.position_secondes / p.duree_secondes) * 100);
+          }
+        });
+        setProgressionMap(map);
+      }
+
       setLoading(false);
     }
 
@@ -42,15 +77,10 @@ export default function CatalogueVOD() {
   const genres = ["Tous les genres", ...new Set(films.map((f) => f.categorie))];
   const filmsAffiches =
     categorie === "Tous les genres" ? films : films.filter((f) => f.categorie === categorie);
-
-  // Pas de rendu tant que la session et les données ne sont pas chargées (évite le flash visiteur)
-  if (loading) {
-    return (
-      <main className="px-6 md:px-20 pt-28 pb-12">
-        <LoaderCentered />
-      </main>
-    );
-  }
+  const categories = [...new Set(films.map((f) => f.categorie).filter(Boolean))];
+  const tendances = [...films]
+    .sort((a, b) => (b.note || 0) - (a.note || 0))
+    .slice(0, 10);
 
   return (
     <main className="px-6 md:px-20 pt-28 pb-12">
@@ -63,10 +93,9 @@ export default function CatalogueVOD() {
           captivantes, en exclusivité sur TiVoi.
         </p>
 
-      <div className="mb-10">
         {connecte ? (
           <FiltreCategories
-            categories={genres.filter((g) => g !== "Tous les genres")}
+            categories={categories}
             filtre={categorie}
             setFiltre={setCategorie}
           />
@@ -89,86 +118,79 @@ export default function CatalogueVOD() {
         )}
       </div>
 
-      {/* À la une (connecté uniquement) */}
-      {connecte && aLaUne.length > 0 && (
-        <section className="mb-10">
-          <div className="flex justify-between items-end mb-4">
-            <h2 className="headline-md text-on-surface">À la une</h2>
-          </div>
-          <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
-            {aLaUne.map((film) => (
-              <a key={film.id} href={`/catalogue/${film.id}`} className="flex-none w-[200px] md:w-[240px] snap-start flex flex-col gap-2">
-                <div className="relative w-full aspect-[2/3] rounded-lg overflow-hidden border border-outline-variant/10 movie-card bg-surface-high">
-                  {film.image_url && (
-                    <img src={film.image_url} alt={film.titre} className="w-full h-full object-cover" />
-                  )}
-                  {film.note && (
-                    <div className="absolute top-2 right-2 bg-surface-lowest/80 backdrop-blur-md px-2 py-1 rounded text-xs text-primary border border-primary/20 flex items-center gap-1">
-                      <Star size={14} fill="currentColor" /> {film.note}
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary">
-                      <Play size={20} fill="currentColor" />
-                    </span>
-                  </div>
-                </div>
-                <h3 className="font-title font-semibold text-on-surface truncate">{film.titre}</h3>
-                <span className="text-xs text-on-surface-variant">{film.categorie}</span>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
-
       {loading ? (
         <LoaderCentered />
-      ) : filmsAffiches.length === 0 ? (
-        <p className="text-on-surface-variant">
-          Aucun contenu pour l&apos;instant dans cette catégorie.
-        </p>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-10">
-          {filmsAffiches.map((film) => (
-            <div key={film.id} className="group cursor-pointer flex flex-col gap-2">
-              <div className="relative aspect-[2/3] w-full bg-surface-high rounded-lg overflow-hidden border border-transparent group-hover:border-primary-container transition-all">
-                {film.image_url && (
-                  <img
-                    src={film.image_url}
-                    alt={film.titre}
-                    className="w-full h-full object-cover"
-                  />
-                )}
-                {film.note && (
-                  <div className="absolute top-2 right-2 bg-surface-lowest/80 backdrop-blur-md px-2 py-1 rounded text-xs text-primary border border-primary-container/20 flex items-center gap-1">
-                    <Star size={12} fill="currentColor" /> {film.note}
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <button className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary hover:scale-110 transition-transform">
-                    <Play size={20} fill="currentColor" />
-                  </button>
-                </div>
-              </div>
-              <div>
-                <h3 className="font-title font-semibold text-on-surface truncate">{film.titre}</h3>
-                <div className="flex justify-between items-center mt-1">
-                  <span className="text-xs text-on-surface-variant">
-                    {film.categorie}
-                    {film.annee ? ` • ${film.annee}` : ""}
-                  </span>
-                  <span
-                    className={`text-sm font-title font-semibold ${
-                      film.badge === "GRATUIT" ? "text-secondary" : "text-primary"
-                    }`}
-                  >
-                    {film.badge === "GRATUIT" ? "Gratuit" : film.badge}
-                  </span>
-                </div>
-              </div>
-            </div>
+      ) : connecte ? (
+        /* Connecté : étagères comme l'accueil */
+        <>
+          <Etagere titre="À la une" films={aLaUne} progressionMap={progressionMap} />
+          <Etagere titre="Tendances actuelles" films={tendances} progressionMap={progressionMap} />
+          {(categorie === "Tous les genres" ? categories : [categorie]).map((cat) => (
+            <Etagere
+              key={cat}
+              titre={cat}
+              films={films.filter((f) => f.categorie === cat)}
+              progressionMap={progressionMap}
+            />
           ))}
-        </div>
+          {categorie !== "Tous les genres" &&
+            !films.some((f) => f.categorie === categorie) && (
+              <p className="text-on-surface-variant">
+                Aucun contenu dans cette catégorie pour l&apos;instant.
+              </p>
+            )}
+        </>
+      ) : (
+        /* Visiteur : grille complète */
+        <>
+          {filmsAffiches.length === 0 ? (
+            <p className="text-on-surface-variant">
+              Aucun contenu pour l&apos;instant dans cette catégorie.
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-10">
+              {filmsAffiches.map((film) => (
+                <div key={film.id} className="group cursor-pointer flex flex-col gap-2">
+                  <div className="relative aspect-[2/3] w-full bg-surface-high rounded-lg overflow-hidden border border-transparent group-hover:border-primary-container transition-all">
+                    {film.image_url && (
+                      <img
+                        src={film.image_url}
+                        alt={film.titre}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                    {film.note && (
+                      <div className="absolute top-2 right-2 bg-surface-lowest/80 backdrop-blur-md px-2 py-1 rounded text-xs text-primary border border-primary-container/20 flex items-center gap-1">
+                        <Star size={12} fill="currentColor" /> {film.note}
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <button className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary hover:scale-110 transition-transform">
+                        <Play size={20} fill="currentColor" />
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-title font-semibold text-on-surface truncate">{film.titre}</h3>
+                    <div className="flex justify-between items-center mt-1">
+                      <span className="text-xs text-on-surface-variant">
+                        {film.categorie}
+                        {film.annee ? ` • ${film.annee}` : ""}
+                      </span>
+                      <span
+                        className={`text-sm font-title font-semibold ${
+                          film.badge === "GRATUIT" ? "text-secondary" : "text-primary"
+                        }`}
+                      >
+                        {film.badge === "GRATUIT" ? "Gratuit" : film.badge}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       <footer className="mt-16 py-8 border-t border-outline-variant/10 text-xs text-outline">
