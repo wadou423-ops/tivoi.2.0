@@ -2,6 +2,34 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import FiltreCategories from "../components/FiltreCategories";
+
+const TRADUCTIONS = {
+  fr: {
+    recherche: "Rechercher...",
+    une: "À la une",
+    top: "Top 10 aujourd'hui",
+    connecte: "Connecté à",
+    tous: "Tous",
+    filtres: "Filtres",
+    filtrerPar: "Filtrer par catégorie",
+    resultats: "Résultats",
+    telecommande: "Naviguez avec les flèches de votre télécommande · Les contenus VIP se débloquent sur votre téléphone",
+    aucun: "Aucun résultat",
+  },
+  en: {
+    recherche: "Search...",
+    une: "Featured",
+    top: "Top 10 today",
+    connecte: "Signed in as",
+    tous: "All",
+    filtres: "Filters",
+    filtrerPar: "Filter by category",
+    resultats: "Results",
+    telecommande: "Navigate with your remote control arrows · VIP content unlocks on your phone",
+    aucun: "No results",
+  },
+};
 
 function SpinnerKiosque() {
   return (
@@ -53,6 +81,10 @@ export default function TV() {
   const [films, setFilms] = useState([]);
   const [aLaUne, setALaUne] = useState([]);
   const [qrFilm, setQrFilm] = useState(null);
+  const [langue, setLangue] = useState("fr");
+  const [recherche, setRecherche] = useState("");
+  const [filtre, setFiltre] = useState("Tous");
+  const t = TRADUCTIONS[langue];
 
   const zoneRef = useRef(null);
 
@@ -234,27 +266,71 @@ export default function TV() {
     .sort((a, b) => (b.note || 0) - (a.note || 0))
     .slice(0, 10);
 
+  const q = recherche.trim().toLowerCase();
+  const filmsFiltres = q
+    ? films.filter(
+        (f) =>
+          f.titre?.toLowerCase().includes(q) ||
+          f.categorie?.toLowerCase().includes(q)
+      )
+    : filtre === t.tous
+      ? films
+      : films.filter((f) => f.categorie === filtre);
+
   return (
     <main className="min-h-screen bg-surface-lowest pb-10">
-      <header className="flex justify-between items-center px-16 py-6 border-b border-outline-variant/10">
+      <header className="flex flex-wrap justify-between items-center gap-4 px-16 py-6 border-b border-outline-variant/10">
         <h1 className="font-display font-bold text-3xl text-primary tracking-tight">TiVoi</h1>
-        <p className="body-md text-on-surface-variant">
-          Connecté à <span className="text-primary font-semibold">@{proprietaire || "—"}</span>
-        </p>
+        <div className="flex items-center gap-5">
+          <input
+            data-tv
+            type="text"
+            value={recherche}
+            onChange={(e) => setRecherche(e.target.value)}
+            placeholder={t.recherche}
+            className="w-56 bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-2 outline-none focus:border-primary transition-colors text-sm"
+          />
+          <button
+            data-tv
+            onClick={() => setLangue((l) => (l === "fr" ? "en" : "fr"))}
+            className="label-md text-on-surface-variant hover:text-primary transition-colors border border-outline-variant rounded-lg px-3 py-2"
+          >
+            {langue === "fr" ? "EN" : "FR"}
+          </button>
+          <p className="body-md text-on-surface-variant">
+            {t.connecte} <span className="text-primary font-semibold">@{proprietaire || "—"}</span>
+          </p>
+        </div>
       </header>
 
-      <div ref={zoneRef}>
-        <Rangée titre="À la une" liste={aLaUne} onPayant={setQrFilm} />
-        <Rangée titre="Top 10 aujourd'hui" liste={tendances} onPayant={setQrFilm} />
-        {categories.map((cat) => (
-          <Rangée key={cat} titre={cat} liste={films.filter((f) => f.categorie === cat)} onPayant={setQrFilm} />
-        ))}
+      <div className="px-16 pt-6 pb-2">
+        <FiltreCategories
+          categories={categories}
+          filtre={filtre}
+          setFiltre={setFiltre}
+          dataTv
+          labels={{ tous: t.tous, filtres: t.filtres, filtrerPar: t.filtrerPar }}
+        />
       </div>
 
-      <p className="px-16 caption text-outline mt-6">
-        Naviguez avec les flèches de votre télécommande · Les contenus VIP se débloquent sur
-        votre téléphone
-      </p>
+      <div ref={zoneRef}>
+        {q ? (
+          <Rangée titre={t.resultats} liste={filmsFiltres} onPayant={setQrFilm} />
+        ) : (
+          <>
+            <Rangée titre={t.une} liste={aLaUne} onPayant={setQrFilm} />
+            <Rangée titre={t.top} liste={tendances} onPayant={setQrFilm} />
+            {(filtre === t.tous ? categories : [filtre]).map((cat) => (
+              <Rangée key={cat} titre={cat} liste={films.filter((f) => f.categorie === cat)} onPayant={setQrFilm} />
+            ))}
+            {filmsFiltres.length === 0 && (
+              <p className="px-16 py-10 body-md text-on-surface-variant">{t.aucun}</p>
+            )}
+          </>
+        )}
+      </div>
+
+      <p className="px-16 caption text-outline mt-6">{t.telecommande}</p>
 
       {/* QR : débloquer un contenu payant sur le téléphone du client */}
       {qrFilm && (
