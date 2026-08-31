@@ -11,6 +11,7 @@ export default function Parametres() {
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
   const [codeTv, setCodeTv] = useState("");
+  const [mesTV, setMesTV] = useState([]);
 
   useEffect(() => {
     async function load() {
@@ -24,6 +25,12 @@ export default function Parametres() {
         .eq("id", user.id)
         .single();
       setProfile(p);
+      const { data: tvs } = await supabase
+        .from("appareils")
+        .select("id, nom, code_activation")
+        .eq("proprietaire_id", user.id)
+        .eq("appaire", true);
+      setMesTV(tvs || []);
     }
     load();
   }, [router]);
@@ -43,26 +50,31 @@ export default function Parametres() {
   async function appairerTv(e) {
     e.preventDefault();
     setMessage("");
-    const { data } = await supabase
-      .from("appareils")
-      .select("id, appaire")
-      .eq("code_activation", codeTv.trim())
-      .maybeSingle();
-    if (!data) {
-      setMessage("Code invalide.");
+    const { error } = await supabase.rpc("appairer_appareil", { p_code: codeTv.trim() });
+    if (error) {
+      setMessage(
+        error.message.includes("Connectez")
+          ? "Connectez-vous d'abord avec votre compte client."
+          : `Erreur : ${error.message}`
+      );
       return;
     }
-    if (data.appaire) {
-      setMessage("Cet appareil est déjà appairé.");
-      return;
-    }
-    const { error } = await supabase
+    setCodeTv("");
+    setMessage("TV appairée à votre compte ! Revenez sur l'écran TV.");
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const { data: tvs } = await supabase
       .from("appareils")
-      .update({ appaire: true })
-      .eq("id", data.id);
-    setMessage(
-      error ? `Erreur : ${error.message}` : "TV appairée avec succès ! Revenez sur l'écran TV."
-    );
+      .select("id, nom, code_activation")
+      .eq("proprietaire_id", user.id)
+      .eq("appaire", true);
+    setMesTV(tvs || []);
+  }
+
+  async function dissocierTv(id) {
+    await supabase.rpc("dissocier_appareil", { p_appareil_id: id });
+    setMesTV((l) => l.filter((t) => t.id !== id));
   }
 
   if (!profile) {
@@ -121,7 +133,7 @@ export default function Parametres() {
       </form>
 
       <form onSubmit={appairerTv} className="glass-panel rounded-xl p-8 mb-8">
-        <h2 className="title-lg text-primary mb-2">Appareils — Smart TV</h2>
+        <h2 className="title-lg text-primary mb-2">Connecter une Smart TV</h2>
         <p className="caption text-on-surface-variant mb-4">
           Saisissez le code à 6 chiffres affiché sur votre TV pour la connecter à votre compte.
         </p>
@@ -142,6 +154,25 @@ export default function Parametres() {
             Appairer
           </button>
         </div>
+
+        {mesTV.length > 0 && (
+          <div className="mt-5 pt-5 border-t border-outline-variant/20 space-y-2">
+            <p className="caption text-on-surface-variant uppercase tracking-widest mb-2">
+              Mes TV connectées
+            </p>
+            {mesTV.map((t) => (
+              <div key={t.id} className="flex items-center justify-between">
+                <span className="body-md text-on-surface">{t.nom || `TV ${t.code_activation}`}</span>
+                <button
+                  onClick={() => dissocierTv(t.id)}
+                  className="caption text-on-surface-variant hover:text-error transition-colors"
+                >
+                  Dissocier
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </form>
 
       <div className="glass-panel rounded-xl p-8">

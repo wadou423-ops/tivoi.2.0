@@ -640,3 +640,26 @@ begin
   return new;
 end;
 $$;
+
+-- ---------- APPAIRAGE TV AU COMPTE CLIENT ----------
+create or replace function public.appairer_appareil(p_code text)
+returns void language plpgsql security definer as $$
+declare v_id bigint;
+begin
+  if auth.uid() is null then raise exception 'Connectez-vous d''abord'; end if;
+  select id into v_id from appareils where code_activation = p_code and appaire = false;
+  if not found then raise exception 'Code invalide ou deja active'; end if;
+  update appareils set appaire = true, proprietaire_id = auth.uid() where id = v_id;
+end;
+$$;
+grant execute on function public.appairer_appareil(text) to authenticated;
+
+create or replace function public.dissocier_appareil(p_appareil_id bigint)
+returns void language plpgsql security definer as $$
+begin
+  if auth.uid() is null then raise exception 'Connectez-vous'; end if;
+  update appareils set appaire = false, proprietaire_id = null
+  where id = p_appareil_id and proprietaire_id = auth.uid();
+end;
+$$;
+grant execute on function public.dissocier_appareil(bigint) to authenticated;
