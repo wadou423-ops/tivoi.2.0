@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../../components/LoaderCentered";
@@ -10,6 +9,7 @@ import CustomVideoPlayer from "../../components/CustomVideoPlayer";
 
 export default function Lecteur() {
   const { id } = useParams();
+  const router = useRouter();
   const [film, setFilm] = useState(null);
   const [chargement, setChargement] = useState(true);
 
@@ -70,13 +70,13 @@ export default function Lecteur() {
         </div>
       )}
 
-      {/* Bouton retour */}
-      <Link
-        href={`/catalogue/${id}`}
+      {/* Bouton retour : revient à l'écran précédent (fiche ou accueil) */}
+      <button
+        onClick={() => router.back()}
         className="absolute top-6 right-6 z-50 flex items-center gap-2 rounded-lg glass-panel px-4 py-2.5 text-on-surface hover:text-primary transition-colors"
       >
         <ArrowLeft size={18} /> <span className="text-sm">Retour</span>
-      </Link>
+      </button>
 
       {/* Filigrane */}
       <span className="absolute top-6 left-6 z-20 font-display font-bold text-xl text-primary/50 pointer-events-none">

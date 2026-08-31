@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Star, Play } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../components/LoaderCentered";
+import FiltreCategories from "../components/FiltreCategories";
 
 export default function CatalogueVOD() {
   const [films, setFilms] = useState([]);
@@ -57,21 +58,29 @@ export default function CatalogueVOD() {
       )}
 
       <div className="mb-10">
-        <div className="flex items-center gap-3 overflow-x-auto pb-2">
-          {genres.map((g) => (
-            <button
-              key={g}
-              onClick={() => setCategorie(g)}
-              className={`px-4 py-2 rounded-lg text-sm font-title font-semibold whitespace-nowrap transition-colors ${
-                categorie === g
-                  ? "bg-primary-container/20 border border-primary text-primary"
-                  : "bg-transparent border border-outline-variant text-on-surface-variant hover:border-primary/50 hover:text-on-surface"
-              }`}
-            >
-              {g}
-            </button>
-          ))}
-        </div>
+        {connecte ? (
+          <FiltreCategories
+            categories={genres.filter((g) => g !== "Tous les genres")}
+            filtre={categorie}
+            setFiltre={setCategorie}
+          />
+        ) : (
+          <div className="flex items-center gap-3 overflow-x-auto pb-2">
+            {genres.map((g) => (
+              <button
+                key={g}
+                onClick={() => setCategorie(g)}
+                className={`px-4 py-2 rounded-lg text-sm font-title font-semibold whitespace-nowrap transition-colors ${
+                  categorie === g
+                    ? "bg-primary-container/20 border border-primary text-primary"
+                    : "bg-transparent border border-outline-variant text-on-surface-variant hover:border-primary/50 hover:text-on-surface"
+                }`}
+              >
+                {g}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* À la une (connecté uniquement) */}

@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Film, Tv, Clapperboard, Filter } from "lucide-react";
+import { Film, Tv, Clapperboard } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRealtimeReload } from "@/lib/useRealtime";
 import Banniere from "./components/Banniere";
 import LoaderCentered from "./components/LoaderCentered";
 import CarteFilm from "./components/CarteFilm";
 import FicheRapide from "./components/FicheRapide";
+import FiltreCategories from "./components/FiltreCategories";
 
 const PILIERS = [
   {
@@ -85,7 +86,6 @@ export default function Home() {
   const [filtre, setFiltre] = useState("Tous");
   const [menuFiltre, setMenuFiltre] = useState(false);
   const [filmModale, setFilmModale] = useState(null);
-  const menuRef = useRef(null);
 
   const loadCatalogue = useCallback(async () => {
     const { data } = await supabase
@@ -159,12 +159,18 @@ export default function Home() {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
-        setConnecte(true);
         const { data: profile } = await supabase
           .from("profiles")
-          .select("onboarding_vu")
+          .select("role, onboarding_vu")
           .eq("id", user.id)
           .single();
+        // Un compte admin navigue toujours en mode visiteur sur le site client
+        if (profile?.role === "admin") {
+          setConnecte(false);
+          setChargement(false);
+          return;
+        }
+        setConnecte(true);
         if (profile && !profile.onboarding_vu) {
           router.replace("/bienvenue");
           return;
@@ -204,55 +210,8 @@ export default function Home() {
     return (
       <main className="flex-grow min-h-screen flex flex-col pt-24">
         {/* Filtre : Tous + entonnoir */}
-        <section className="px-5 md:px-20 pt-4 pb-2">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setFiltre("Tous")}
-              className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors text-sm font-title font-semibold ${
-                filtre === "Tous"
-                  ? "bg-primary-container/20 border border-primary text-primary"
-                  : "bg-transparent border border-outline-variant text-on-surface-variant hover:border-primary/50 hover:text-on-surface"
-              }`}
-            >
-              Tous
-            </button>
-
-            <div className="relative" ref={menuRef}>
-              <button
-                onClick={() => setMenuFiltre((o) => !o)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-title font-semibold transition-colors ${
-                  filtre !== "Tous"
-                    ? "bg-primary-container/20 border border-primary text-primary"
-                    : "bg-transparent border border-outline-variant text-on-surface-variant hover:border-primary/50 hover:text-on-surface"
-                }`}
-              >
-                <Filter size={15} />
-                {filtre !== "Tous" ? filtre : "Filtres"}
-              </button>
-
-              {menuFiltre && (
-                <div className="absolute left-0 mt-2 w-56 rounded-xl bg-surface-low border border-outline-variant shadow-lg py-2 z-40">
-                  <p className="caption text-on-surface-variant uppercase tracking-widest px-4 py-1.5">
-                    Filtrer par catégorie
-                  </p>
-                  {["Tous", ...categories].map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => { setFiltre(c); setMenuFiltre(false); }}
-                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between ${
-                        filtre === c
-                          ? "text-primary bg-primary/10"
-                          : "text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50"
-                      }`}
-                    >
-                      {c}
-                      {filtre === c && <span className="text-primary">●</span>}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+        <section className="px-5 md:px-20 pt-6 pb-2">
+          <FiltreCategories categories={categories} filtre={filtre} setFiltre={setFiltre} />
         </section>
 
         {reprendre.length > 0 && (
