@@ -49,7 +49,7 @@ export default function FiltreCategories({ categories, filtre, setFiltre }) {
             <p className="caption text-on-surface-variant uppercase tracking-widest px-4 py-1.5">
               Filtrer par catégorie
             </p>
-            {["Tous", ...categories].map((c) => (
+            {categories.map((c) => (
               <button
                 key={c}
                 onClick={() => {

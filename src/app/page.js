@@ -86,6 +86,7 @@ export default function Home() {
   const [filtre, setFiltre] = useState("Tous");
   const [menuFiltre, setMenuFiltre] = useState(false);
   const [filmModale, setFilmModale] = useState(null);
+  const [catalogueCharge, setCatalogueCharge] = useState(false);
 
   const loadCatalogue = useCallback(async () => {
     const { data } = await supabase
@@ -94,6 +95,7 @@ export default function Home() {
       .eq("actif", true)
       .order("ordre", { ascending: true });
     setCatalogue(data || []);
+    setCatalogueCharge(true);
   }, []);
 
   const loadALaUne = useCallback(async () => {
@@ -249,7 +251,7 @@ export default function Home() {
           />
         ))}
 
-        {catsAffichees.length === 0 && (
+        {catalogueCharge && catsAffichees.length === 0 && (
           <p className="px-5 md:px-20 py-10 body-md text-on-surface-variant">
             Aucun contenu dans cette catégorie pour le moment.
           </p>
@@ -324,19 +326,21 @@ export default function Home() {
         </div>
       </section>
         {/* À la une — un peu plus d'air sous le header */}
-        <section className="px-5 md:px-20 pt-10 pb-4">
-          <div className="flex justify-between items-end mb-5">
-            <h2 className="headline-md text-on-surface">À la une</h2>
-            <Link href="/catalogue" className="caption text-primary hover:text-primary-container transition-colors">
-              Tout voir →
-            </Link>
-          </div>
-          <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
-            {aLaUne.map((film) => (
-              <CarteFilm key={film.id} film={film} onOpen={ouvrirFiche} />
-            ))}
-          </div>
-        </section>
+        {aLaUne.length > 0 && (
+          <section className="px-5 md:px-20 pt-10 pb-4">
+            <div className="flex justify-between items-end mb-5">
+              <h2 className="headline-md text-on-surface">À la une</h2>
+              <Link href="/catalogue" className="caption text-primary hover:text-primary-container transition-colors">
+                Tout voir →
+              </Link>
+            </div>
+            <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
+              {aLaUne.map((film) => (
+                <CarteFilm key={film.id} film={film} onOpen={ouvrirFiche} />
+              ))}
+            </div>
+          </section>
+        )}
 
         <Etagere titre="Tendances actuelles" films={tendances} />
 
