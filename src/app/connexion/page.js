@@ -169,9 +169,6 @@ function ConnexionContent() {
     terminerConnexion(profile);
   }
 
-    terminerConnexion(profile);
-  }
-
   if (verification) {
     return (
       <main className="relative min-h-[calc(100vh-73px)] flex items-center justify-center">
