@@ -45,8 +45,14 @@ export default function YoutubeKiosque({ videoId, onEnded }) {
             } catch {}
           },
           onStateChange: (e) => {
-            // 0 = vidéo terminée → élément suivant de la playlist
-            if (e.data === 0 && onEnded) onEnded();
+            // 0 = vidéo terminée → on la rejoue (boucle) et on passe au suivant
+            if (e.data === 0) {
+              try {
+                playerRef.current.seekTo(0, true);
+                playerRef.current.playVideo();
+              } catch {}
+              if (onEnded) onEnded();
+            }
           },
         },
       });
