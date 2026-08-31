@@ -12,6 +12,40 @@ function SpinnerKiosque() {
   );
 }
 
+function Rangée({ titre, liste, onPayant }) {
+  if (!liste || liste.length === 0) return null;
+  return (
+    <section className="px-16 pt-8 pb-4">
+      <h2 className="headline-md text-on-surface mb-4">{titre}</h2>
+      <div className="flex gap-6 overflow-x-auto hide-scrollbar">
+        {liste.map((film) => {
+          const payant = film.type_acces !== "gratuit";
+          return (
+            <button
+              key={film.id}
+              data-tv
+              onClick={() => payant && onPayant(film)}
+              className="flex-none w-[220px] text-left rounded-lg outline-none focus:ring-4 focus:ring-primary focus:scale-105 transition-all"
+            >
+              <div className="relative w-full aspect-[2/3] rounded-lg overflow-hidden bg-surface-high border border-outline-variant/10">
+                {film.image_url && (
+                  <img src={film.image_url} alt={film.titre} className="w-full h-full object-cover" />
+                )}
+                {payant && (
+                  <span className="absolute bottom-2 right-2 caption px-2 py-0.5 rounded bg-surface-lowest/80 text-primary border border-primary/30">
+                    {film.type_acces === "abonnement" ? "VIP" : `${film.prix_fcfa} F`}
+                  </span>
+                )}
+              </div>
+              <h3 className="body-md text-on-surface truncate mt-2">{film.titre}</h3>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 export default function TV() {
   const [appareil, setAppareil] = useState(null);
   const [enroleCharge, setEnroleCharge] = useState(false);
@@ -200,40 +234,6 @@ export default function TV() {
     .sort((a, b) => (b.note || 0) - (a.note || 0))
     .slice(0, 10);
 
-  function Rangée({ titre, liste }) {
-    if (!liste || liste.length === 0) return null;
-    return (
-      <section className="px-16 pt-8 pb-4">
-        <h2 className="headline-md text-on-surface mb-4">{titre}</h2>
-        <div className="flex gap-6 overflow-x-auto hide-scrollbar">
-          {liste.map((film) => {
-            const payant = film.type_acces !== "gratuit";
-            return (
-              <button
-                key={film.id}
-                data-tv
-                onClick={() => payant && setQrFilm(film)}
-                className="flex-none w-[220px] text-left rounded-lg outline-none focus:ring-4 focus:ring-primary focus:scale-105 transition-all"
-              >
-                <div className="relative w-full aspect-[2/3] rounded-lg overflow-hidden bg-surface-high border border-outline-variant/10">
-                  {film.image_url && (
-                    <img src={film.image_url} alt={film.titre} className="w-full h-full object-cover" />
-                  )}
-                  {payant && (
-                    <span className="absolute bottom-2 right-2 caption px-2 py-0.5 rounded bg-surface-lowest/80 text-primary border border-primary/30">
-                      {film.type_acces === "abonnement" ? "VIP" : `${film.prix_fcfa} F`}
-                    </span>
-                  )}
-                </div>
-                <h3 className="body-md text-on-surface truncate mt-2">{film.titre}</h3>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-    );
-  }
-
   return (
     <main className="min-h-screen bg-surface-lowest pb-10">
       <header className="flex justify-between items-center px-16 py-6 border-b border-outline-variant/10">
@@ -244,10 +244,10 @@ export default function TV() {
       </header>
 
       <div ref={zoneRef}>
-        <Rangée titre="À la une" liste={aLaUne} />
-        <Rangée titre="Top 10 aujourd'hui" liste={tendances} />
+        <Rangée titre="À la une" liste={aLaUne} onPayant={setQrFilm} />
+        <Rangée titre="Top 10 aujourd'hui" liste={tendances} onPayant={setQrFilm} />
         {categories.map((cat) => (
-          <Rangée key={cat} titre={cat} liste={films.filter((f) => f.categorie === cat)} />
+          <Rangée key={cat} titre={cat} liste={films.filter((f) => f.categorie === cat)} onPayant={setQrFilm} />
         ))}
       </div>
 
