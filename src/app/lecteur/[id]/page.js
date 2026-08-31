@@ -73,7 +73,7 @@ export default function Lecteur() {
       {/* Bouton retour */}
       <Link
         href={`/catalogue/${id}`}
-        className="absolute top-6 right-6 z-30 flex items-center gap-2 rounded-lg glass-panel px-4 py-2.5 text-on-surface hover:text-primary transition-colors"
+        className="absolute top-6 right-6 z-50 flex items-center gap-2 rounded-lg glass-panel px-4 py-2.5 text-on-surface hover:text-primary transition-colors"
       >
         <ArrowLeft size={18} /> <span className="text-sm">Retour</span>
       </Link>

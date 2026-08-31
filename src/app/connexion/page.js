@@ -31,6 +31,17 @@ function ConnexionContent() {
   const [loading, setLoading] = useState(false);
   const [verification, setVerification] = useState(true);
 
+  // Filet de sécurité : si la vérification de session bloque, afficher le formulaire
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setVerification((v) => {
+        if (v) setMessage("Connexion au serveur lente — réessaie de te connecter ci-dessous.");
+        return false;
+      });
+    }, 8000);
+    return () => clearTimeout(t);
+  }, []);
+
   // Déjà connecté ? Si client → redirection directe. Si admin → message (sans déconnexion forcée)
   useEffect(() => {
     async function check() {
