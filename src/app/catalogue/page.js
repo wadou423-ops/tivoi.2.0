@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Star, Play } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import { useRealtimeReload } from "@/lib/useRealtime";
 import LoaderCentered from "../components/LoaderCentered";
 import FiltreCategories from "../components/FiltreCategories";
 import CarteFilm from "../components/CarteFilm";
@@ -116,6 +117,9 @@ export default function CatalogueVOD() {
     const t = setTimeout(loadCatalogue, 0);
     return () => clearTimeout(t);
   }, []);
+
+  // Mises à jour automatiques du catalogue
+  useRealtimeReload(["catalogue"], loadCatalogue, [loadCatalogue]);
 
   const genres = ["Tous les genres", ...new Set(films.map((f) => f.categorie))];
   const categories = [...new Set(films.map((f) => f.categorie).filter(Boolean))];
