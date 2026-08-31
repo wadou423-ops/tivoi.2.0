@@ -402,7 +402,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="mt-auto px-5 md:px-20 py-8 border-t border-outline-variant/10 text-xs text-outline flex flex-wrap gap-4 justify-between">
-        <span>© {new Date().getFullYear()} TiVoi — Tous droits réservés.</span>
+        <span>© {new Date().getFullYear()} TiVoi — Tous droits réservés. · v2.2</span>
         <Link href="/legales" className="hover:text-primary transition-colors">
           Mentions légales · Confidentialité
         </Link>
