@@ -116,6 +116,15 @@ export default function AdminAppareils() {
             >
               {a.appaire ? "Activé" : "En attente"}
             </span>
+            <button
+              onClick={async () => {
+                await supabase.from("appareils").delete().eq("id", a.id);
+                load();
+              }}
+              className="caption border border-outline-variant text-on-surface-variant px-3 py-1 rounded hover:border-error hover:text-error transition-colors"
+            >
+              Supprimer
+            </button>
           </div>
         ))}
         {appareils.length === 0 && (

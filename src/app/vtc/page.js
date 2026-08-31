@@ -204,10 +204,10 @@ export default function VTC() {
           muted
           playsInline
           onEnded={passerAuSuivant}
-          className="max-w-full max-h-screen object-contain"
+          className="w-full h-screen object-cover"
         />
       ) : (
-        <img src={current.media_url} alt={current.titre} className="max-w-full max-h-screen object-contain" />
+        <img src={current.media_url} alt={current.titre} className="w-full h-screen object-cover" />
       )}
 
       {/* Vignette pour la profondeur */}
