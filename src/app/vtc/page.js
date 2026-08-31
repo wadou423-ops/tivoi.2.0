@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import YoutubeKiosque from "../components/YoutubeKiosque";
 
 function SpinnerKiosque() {
   return (
@@ -13,29 +14,30 @@ function SpinnerKiosque() {
 }
 
 function extraireIdYoutube(url) {
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=|youtube\.com\/embed\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/);
   return match ? match[1] : null;
 }
 
 export default function VTC() {
+  const [appareil, setAppareil] = useState(null);
+  const [enroleCharge, setEnroleCharge] = useState(false);
   const [playlist, setPlaylist] = useState([]);
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [appareil, setAppareil] = useState(null);
-  const [montreCode, setMontreCode] = useState(true);
 
-  // Enrôlement : chaque tablette s'enregistre une seule fois (base du futur DOOH)
+  // 1. Enrôlement : la tablette s'enregistre et attend l'activation de l'admin
   useEffect(() => {
     async function enroler() {
       let id = localStorage.getItem("tivoi-appareil-id");
       if (id) {
         const { data } = await supabase
           .from("appareils")
-          .select("id, code_activation")
+          .select("id, code_activation, appaire")
           .eq("id", id)
           .maybeSingle();
         if (data) {
           setAppareil(data);
+          setEnroleCharge(true);
           return;
         }
       }
@@ -43,41 +45,37 @@ export default function VTC() {
       const { data: nouveau } = await supabase
         .from("appareils")
         .insert({ code_activation: code, type: "vtc", nom: `Écran VTC ${code}` })
-        .select("id, code_activation")
+        .select("id, code_activation, appaire")
         .single();
       if (nouveau) {
         localStorage.setItem("tivoi-appareil-id", nouveau.id);
         setAppareil(nouveau);
-        // Le code s'efface seul après 15 s (enrôlement par l'admin entre-temps)
-        setTimeout(() => setMontreCode(false), 15000);
       }
+      setEnroleCharge(true);
     }
     enroler();
   }, []);
 
-  // Wake Lock : l'écran ne se met jamais en veille pendant la diffusion
+  // 2. Si l'écran n'est pas encore activé : vérifier toutes les 3 secondes
   useEffect(() => {
-    let verrou = null;
-    async function garderAllume() {
-      try {
-        verrou = await navigator.wakeLock?.request("screen");
-      } catch {
-        /* non supporté ou refusé */
+    if (!appareil || appareil.appaire) return;
+    const t = setInterval(async () => {
+      const { data } = await supabase
+        .from("appareils")
+        .select("appaire")
+        .eq("id", appareil.id)
+        .maybeSingle();
+      if (data?.appaire) {
+        setAppareil((a) => ({ ...a, appaire: true }));
       }
-    }
-    garderAllume();
-    const onVisible = () => {
-      if (document.visibilityState === "visible") garderAllume();
-    };
-    document.addEventListener("visibilitychange", onVisible);
-    return () => {
-      document.removeEventListener("visibilitychange", onVisible);
-      verrou?.release?.();
-    };
-  }, []);
+    }, 3000);
+    return () => clearInterval(t);
+  }, [appareil]);
 
-  // Chargement de la playlist (rafraîchi toutes les 2 minutes)
+  // 3. La playlist ne se charge qu'une fois l'écran activé
   useEffect(() => {
+    if (!appareil?.appaire) return;
+
     async function loadPlaylist() {
       const { data, error } = await supabase
         .from("playlist_vtc")
@@ -92,10 +90,31 @@ export default function VTC() {
     }
 
     loadPlaylist();
-
     const refreshInterval = setInterval(loadPlaylist, 2 * 60 * 1000);
     return () => clearInterval(refreshInterval);
-  }, []);
+  }, [appareil?.appaire]);
+
+  // 4. Wake Lock : l'écran ne se met jamais en veille pendant la diffusion
+  useEffect(() => {
+    if (!appareil?.appaire) return;
+    let verrou = null;
+    async function garderAllume() {
+      try {
+        verrou = await navigator.wakeLock?.request("screen");
+      } catch {
+        /* non supporté */
+      }
+    }
+    garderAllume();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") garderAllume();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      verrou?.release?.();
+    };
+  }, [appareil?.appaire]);
 
   function passerAuSuivant() {
     setIndex((i) => (i + 1) % playlist.length);
@@ -105,13 +124,54 @@ export default function VTC() {
   const idYoutube = current ? extraireIdYoutube(current.media_url) : null;
   const estVideo = current && !idYoutube && /\.(mp4|webm|mov)(\?|#|$)/i.test(current.media_url);
 
+  // Rotation automatique des images
   useEffect(() => {
     if (playlist.length === 0 || estVideo || idYoutube) return;
-
     const timer = setTimeout(passerAuSuivant, (current.duree_secondes || 8) * 1000);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, playlist, estVideo]);
 
+  // ── Écran d'enrôlement : avant toute lecture ──
+  if (!enroleCharge || !appareil) {
+    return (
+      <main className="min-h-screen bg-surface-lowest flex items-center justify-center">
+        <SpinnerKiosque />
+      </main>
+    );
+  }
+
+  if (!appareil.appaire) {
+    return (
+      <main className="min-h-screen bg-surface-lowest flex flex-col items-center justify-center select-none">
+        <h1 className="font-display font-bold text-4xl text-primary mb-10 tracking-tight">TiVoi</h1>
+        <p className="label-md text-on-surface-variant uppercase tracking-widest mb-8">
+          Enregistrez cet écran
+        </p>
+        <div className="flex gap-3 mb-10">
+          {appareil.code_activation.split("").map((c, i) => (
+            <span
+              key={i}
+              className="w-16 h-20 md:w-20 md:h-24 rounded-xl glass-panel flex items-center justify-center text-4xl font-mono font-bold text-primary"
+            >
+              {c}
+            </span>
+          ))}
+        </div>
+        <div className="flex items-center gap-4">
+          <SpinnerKiosque />
+          <p className="body-lg text-on-surface-variant">
+            En attente d&apos;activation par l&apos;administrateur...
+          </p>
+        </div>
+        <p className="caption text-outline mt-8">
+          La diffusion démarre automatiquement dès l&apos;activation.
+        </p>
+      </main>
+    );
+  }
+
+  // ── Diffusion active ──
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-surface-lowest">
@@ -131,11 +191,10 @@ export default function VTC() {
   return (
     <main className="min-h-screen bg-surface-lowest flex items-center justify-center relative overflow-hidden select-none">
       {idYoutube ? (
-        <iframe
+        <YoutubeKiosque
           key={current.id}
-          src={`https://www.youtube.com/embed/${idYoutube}?autoplay=1&mute=1&controls=0`}
-          allow="autoplay"
-          className="w-full h-screen"
+          videoId={idYoutube}
+          onEnded={passerAuSuivant}
         />
       ) : estVideo ? (
         <video
@@ -161,14 +220,6 @@ export default function VTC() {
       <h1 className="absolute top-6 left-6 z-20 pointer-events-none font-display font-bold text-2xl text-primary opacity-50 tracking-tight [text-shadow:0_4px_12px_rgba(10,10,10,0.5)]">
         TiVoi
       </h1>
-
-      {/* Code d'enrôlement (15 premières secondes) */}
-      {appareil && montreCode && (
-        <div className="absolute bottom-6 left-6 z-20 glass-panel rounded-lg px-5 py-3 pointer-events-none">
-          <p className="caption text-on-surface-variant uppercase tracking-widest">Écran enregistré — Code</p>
-          <p className="font-mono text-xl text-primary font-bold">{appareil.code_activation}</p>
-        </div>
-      )}
 
       {current.type === "publicite" && (
         <div className="absolute top-6 right-6 z-20 flex flex-col items-end gap-2">
