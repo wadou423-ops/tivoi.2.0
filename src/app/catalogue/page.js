@@ -54,17 +54,14 @@ export default function CatalogueVOD() {
 
   return (
     <main className="px-6 md:px-20 pt-28 pb-12">
-      {!connecte && (
-        <div className="mb-10">
-          <h1 className="font-display font-bold text-5xl md:text-6xl text-on-surface tracking-[-0.02em] mb-3">
-            Catalogue VOD
-          </h1>
-          <p className="text-lg text-on-surface-variant mb-6 max-w-2xl">
-            Découvrez le meilleur du cinéma ouest-africain. Des productions premium, des histoires
-            captivantes, en exclusivité sur TiVoi.
-          </p>
-        </div>
-      )}
+      <div className="mb-10">
+        <h1 className="font-display font-bold text-5xl md:text-6xl text-on-surface tracking-[-0.02em] mb-3">
+          Catalogue VOD
+        </h1>
+        <p className="text-lg text-on-surface-variant mb-6 max-w-2xl">
+          Découvrez le meilleur du cinéma ouest-africain. Des productions premium, des histoires
+          captivantes, en exclusivité sur TiVoi.
+        </p>
 
       <div className="mb-10">
         {connecte ? (

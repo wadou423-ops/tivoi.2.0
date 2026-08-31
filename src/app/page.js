@@ -124,24 +124,45 @@ export default function Home() {
       setProgressionMap({});
       return;
     }
-    const { data } = await supabase
+    // 1. Récupérer les progressions de l'utilisateur
+    const { data: progs, error } = await supabase
       .from("progressions")
-      .select("contenu_id, position_secondes, duree_secondes, termine, catalogue(id, titre, image_url, categorie, badge, prix_fcfa, type_acces, bande_annonce_url)")
+      .select("contenu_id, position_secondes, duree_secondes, termine")
       .eq("user_id", user.id)
       .eq("termine", false)
       .gt("position_secondes", 5)
       .order("updated_at", { ascending: false })
       .limit(10);
-    const items = (data || []).filter((p) => p.catalogue).map((p) => ({
-      ...p.catalogue,
-      pct: p.duree_secondes > 0 ? Math.round((p.position_secondes / p.duree_secondes) * 100) : 0,
-    }));
-    setReprendre(items);
+    if (error) {
+      console.error("[TiVoi] Erreur progressions :", error.message);
+      return;
+    }
+    if (!progs || progs.length === 0) {
+      setReprendre([]);
+      return;
+    }
+    // 2. Récupérer les contenus correspondants
+    const ids = progs.map((p) => Number(p.contenu_id));
+    const { data: contenus } = await supabase
+      .from("catalogue")
+      .select("id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces, bande_annonce_url")
+      .in("id", ids)
+      .eq("actif", true);
+    if (!contenus) return;
+
     const map = {};
-    (data || []).forEach((p) => {
-      if (p.duree_secondes > 0) map[p.contenu_id] = Math.round((p.position_secondes / p.duree_secondes) * 100);
+    progs.forEach((p) => {
+      if (p.duree_secondes > 0) {
+        map[Number(p.contenu_id)] = Math.round((p.position_secondes / p.duree_secondes) * 100);
+      }
     });
-    setProgressionMap(map);
+    setProgressionMap((prev) => ({ ...prev, ...map }));
+
+    const items = progs
+      .map((p) => contenus.find((c) => c.id === Number(p.contenu_id)))
+      .filter(Boolean)
+      .map((c) => ({ ...c, pct: map[c.id] || 0 }));
+    setReprendre(items);
   }, []);
 
   useEffect(() => {
