@@ -119,6 +119,7 @@ export default function Home() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
+    console.log("[TiVoi] 1. Utilisateur connecté :", user ? user.id : "AUCUN");
     if (!user) {
       setReprendre([]);
       setProgressionMap({});
@@ -137,6 +138,7 @@ export default function Home() {
       console.error("[TiVoi] Erreur progressions :", error.message);
       return;
     }
+    console.log("[TiVoi] 2. Progressions trouvées en base :", progs ? progs.length : "requête vide", JSON.stringify(progs || []));
     if (!progs || progs.length === 0) {
       setReprendre([]);
       return;
@@ -162,6 +164,7 @@ export default function Home() {
       .map((p) => contenus.find((c) => c.id === Number(p.contenu_id)))
       .filter(Boolean)
       .map((c) => ({ ...c, pct: map[c.id] || 0 }));
+    console.log("[TiVoi] 3. Étagère Reprendre contiendra :", items.length, "film(s)");
     setReprendre(items);
   }, []);
 
