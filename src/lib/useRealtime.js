@@ -18,10 +18,13 @@ export function useRealtimeReload(tables, reload, deps = []) {
       if (document.visibilityState === "visible") reload();
     };
     document.addEventListener("visibilitychange", onVisible);
+    // Recharge aussi quand la fenêtre regagne le focus (retour après navigation)
+    window.addEventListener("focus", reload);
 
     return () => {
       supabase.removeChannel(channel);
       document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", reload);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
