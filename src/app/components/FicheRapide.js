@@ -100,7 +100,7 @@ export default function FicheRapide({ filmId, onClose }) {
                 href="/abonnements"
                 className="bg-primary text-on-primary-fixed label-md px-6 py-3 rounded hover:bg-primary-container transition-colors flex items-center gap-2"
               >
-                <Lock size={15} /> S'abonner pour regarder
+                <Lock size={15} />                 S&apos;abonner pour regarder
               </Link>
             ) : (
               <Link

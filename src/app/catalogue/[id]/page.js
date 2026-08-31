@@ -170,7 +170,7 @@ export default function FicheContenu() {
                 href="/abonnements"
                 className="bg-primary text-on-primary-fixed label-md px-8 py-3 rounded hover:bg-primary-container transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(212,175,55,0.3)]"
               >
-                S'abonner pour regarder
+                S&apos;abonner pour regarder
               </Link>
             ) : (
               <Link
