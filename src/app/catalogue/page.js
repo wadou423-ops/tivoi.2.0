@@ -56,70 +56,71 @@ export default function CatalogueVOD() {
   const [reprendre, setReprendre] = useState([]);
   const [choixReprise, setChoixReprise] = useState(null);
 
-  useEffect(() => {
-    async function loadCatalogue() {
-      const { data: { user } } = await supabase.auth.getUser();
-      setConnecte(!!user);
+  const chargerTout = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setConnecte(!!user);
 
-      const [{ data }, { data: une }] = await Promise.all([
-        supabase
-          .from("catalogue")
-          .select("*")
-          .eq("actif", true)
-          .order("ordre", { ascending: true }),
-        supabase
-          .from("a_une")
-          .select("ordre, catalogue(id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces, bande_annonce_url)")
-          .eq("actif", true)
-          .order("ordre", { ascending: true }),
-      ]);
+    const [{ data }, { data: une }] = await Promise.all([
+      supabase
+        .from("catalogue")
+        .select("*")
+        .eq("actif", true)
+        .order("ordre", { ascending: true }),
+      supabase
+        .from("a_une")
+        .select("ordre, catalogue(id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces, bande_annonce_url)")
+        .eq("actif", true)
+        .order("ordre", { ascending: true }),
+    ]);
 
-      if (data) setFilms(data);
-      if (une) setALaUne(une.filter((s) => s.catalogue).map((s) => ({ ...s.catalogue })));
+    if (data) setFilms(data);
+    if (une) setALaUne(une.filter((s) => s.catalogue).map((s) => ({ ...s.catalogue })));
 
-      // Progressions du compte client connecté
-      if (user) {
-        const { data: progs } = await supabase
-          .from("progressions")
-          .select("contenu_id, position_secondes, duree_secondes")
-          .eq("user_id", user.id)
-          .eq("termine", false)
-          .gt("position_secondes", 5)
-          .order("updated_at", { ascending: false })
-          .limit(10);
-        const map = {};
-        const ids = [];
-        (progs || []).forEach((p) => {
-          if (p.duree_secondes > 0) {
-            map[p.contenu_id] = Math.round((p.position_secondes / p.duree_secondes) * 100);
-          }
-          ids.push(p.contenu_id);
-        });
-        setProgressionMap(map);
-        if (ids.length > 0) {
-          const { data: contenus } = await supabase
-            .from("catalogue")
-            .select("id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces, bande_annonce_url")
-            .in("id", ids)
-            .eq("actif", true);
-          const items = (progs || [])
-            .map((p) => contenus?.find((c) => c.id === Number(p.contenu_id)))
-            .filter(Boolean);
-          setReprendre(items);
-        } else {
-          setReprendre([]);
+    // Progressions du compte client connecté
+    if (user) {
+      const { data: progs } = await supabase
+        .from("progressions")
+        .select("contenu_id, position_secondes, duree_secondes")
+        .eq("user_id", user.id)
+        .eq("termine", false)
+        .gt("position_secondes", 5)
+        .order("updated_at", { ascending: false })
+        .limit(10);
+      const map = {};
+      const ids = [];
+      (progs || []).forEach((p) => {
+        if (p.duree_secondes > 0) {
+          map[p.contenu_id] = Math.round((p.position_secondes / p.duree_secondes) * 100);
         }
+        ids.push(p.contenu_id);
+      });
+      setProgressionMap(map);
+      if (ids.length > 0) {
+        const { data: contenus } = await supabase
+          .from("catalogue")
+          .select("id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces, bande_annonce_url")
+          .in("id", ids)
+          .eq("actif", true);
+        const items = (progs || [])
+          .map((p) => contenus?.find((c) => c.id === Number(p.contenu_id)))
+          .filter(Boolean);
+        setReprendre(items);
+      } else {
+        setReprendre([]);
       }
-
-      setLoading(false);
     }
 
-    const t = setTimeout(loadCatalogue, 0);
-    return () => clearTimeout(t);
+    setLoading(false);
   }, []);
 
+  useEffect(() => {
+    // Différé d'une frame pour éviter un setState synchrone pendant l'effet
+    const t = setTimeout(chargerTout, 0);
+    return () => clearTimeout(t);
+  }, [chargerTout]);
+
   // Mises à jour automatiques du catalogue
-  useRealtimeReload(["catalogue"], loadCatalogue, [loadCatalogue]);
+  useRealtimeReload(["catalogue", "a_une"], chargerTout, [chargerTout]);
 
   const genres = ["Tous les genres", ...new Set(films.map((f) => f.categorie))];
   const categories = [...new Set(films.map((f) => f.categorie).filter(Boolean))];
