@@ -17,6 +17,7 @@ import {
   MapPin,
   Shield,
   LogOut,
+  Monitor,
 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Spinner from "../components/Spinner";
@@ -32,6 +33,7 @@ const MENU_ADMIN = [
   { label: "Bannières & pubs", href: "/admin/bannieres", icon: Megaphone, perm: "bannieres" },
   { label: "Demandes de retrait", href: "/admin/retraits", icon: Wallet, perm: "retraits" },
   { label: "Playlist VTC", href: "/admin/vtc", icon: ListVideo, perm: "vtc" },
+  { label: "Écrans & appareils", href: "/admin/appareils", icon: Monitor, perm: "vtc" },
   { label: "Administrateurs", href: "/admin/administrateurs", icon: Shield, perm: "administrateurs" },
 ];
 

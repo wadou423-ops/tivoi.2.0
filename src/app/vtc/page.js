@@ -21,7 +21,62 @@ export default function VTC() {
   const [playlist, setPlaylist] = useState([]);
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [appareil, setAppareil] = useState(null);
+  const [montreCode, setMontreCode] = useState(true);
 
+  // Enrôlement : chaque tablette s'enregistre une seule fois (base du futur DOOH)
+  useEffect(() => {
+    async function enroler() {
+      let id = localStorage.getItem("tivoi-appareil-id");
+      if (id) {
+        const { data } = await supabase
+          .from("appareils")
+          .select("id, code_activation")
+          .eq("id", id)
+          .maybeSingle();
+        if (data) {
+          setAppareil(data);
+          return;
+        }
+      }
+      const code = String(Math.floor(100000 + Math.random() * 900000));
+      const { data: nouveau } = await supabase
+        .from("appareils")
+        .insert({ code_activation: code, type: "vtc", nom: `Écran VTC ${code}` })
+        .select("id, code_activation")
+        .single();
+      if (nouveau) {
+        localStorage.setItem("tivoi-appareil-id", nouveau.id);
+        setAppareil(nouveau);
+        // Le code s'efface seul après 15 s (enrôlement par l'admin entre-temps)
+        setTimeout(() => setMontreCode(false), 15000);
+      }
+    }
+    enroler();
+  }, []);
+
+  // Wake Lock : l'écran ne se met jamais en veille pendant la diffusion
+  useEffect(() => {
+    let verrou = null;
+    async function garderAllume() {
+      try {
+        verrou = await navigator.wakeLock?.request("screen");
+      } catch {
+        /* non supporté ou refusé */
+      }
+    }
+    garderAllume();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") garderAllume();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      verrou?.release?.();
+    };
+  }, []);
+
+  // Chargement de la playlist (rafraîchi toutes les 2 minutes)
   useEffect(() => {
     async function loadPlaylist() {
       const { data, error } = await supabase
@@ -106,6 +161,14 @@ export default function VTC() {
       <h1 className="absolute top-6 left-6 z-20 pointer-events-none font-display font-bold text-2xl text-primary opacity-50 tracking-tight [text-shadow:0_4px_12px_rgba(10,10,10,0.5)]">
         TiVoi
       </h1>
+
+      {/* Code d'enrôlement (15 premières secondes) */}
+      {appareil && montreCode && (
+        <div className="absolute bottom-6 left-6 z-20 glass-panel rounded-lg px-5 py-3 pointer-events-none">
+          <p className="caption text-on-surface-variant uppercase tracking-widest">Écran enregistré — Code</p>
+          <p className="font-mono text-xl text-primary font-bold">{appareil.code_activation}</p>
+        </div>
+      )}
 
       {current.type === "publicite" && (
         <div className="absolute top-6 right-6 z-20 flex flex-col items-end gap-2">
