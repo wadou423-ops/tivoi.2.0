@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../../components/LoaderCentered";
 import CustomVideoPlayer from "../../components/CustomVideoPlayer";
+import YouTubePlayerProgress from "../../components/YouTubePlayerProgress";
 
 export default function Lecteur() {
   const { id } = useParams();
@@ -47,12 +48,9 @@ export default function Lecteur() {
   return (
     <main className="relative min-h-screen bg-surface-lowest flex items-center justify-center overflow-hidden select-none">
       {idYoutube ? (
-        <iframe
-          src={`https://www.youtube.com/embed/${idYoutube[1]}?autoplay=1&rel=0`}
-          allow="autoplay; encrypted-media; fullscreen"
-          allowFullScreen
-          className="w-full h-screen"
-        />
+        <div className="w-full h-screen">
+          <YouTubePlayerProgress videoId={idYoutube[1]} contenuId={film.id} />
+        </div>
       ) : estMp4 ? (
         <div className="w-full h-screen">
           <CustomVideoPlayer src={url} contenuId={film.id} />

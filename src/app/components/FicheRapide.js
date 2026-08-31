@@ -95,15 +95,20 @@ export default function FicheRapide({ filmId, onClose }) {
               >
                 <Play size={16} fill="currentColor" /> Regarder
               </Link>
+            ) : film.type_acces === "abonnement" ? (
+              <Link
+                href="/abonnements"
+                className="bg-primary text-on-primary-fixed label-md px-6 py-3 rounded hover:bg-primary-container transition-colors flex items-center gap-2"
+              >
+                <Lock size={15} /> S'abonner pour regarder
+              </Link>
             ) : (
               <Link
                 href={`/paiement/achat/${film.id}`}
                 className="bg-primary text-on-primary-fixed label-md px-6 py-3 rounded hover:bg-primary-container transition-colors flex items-center gap-2"
               >
                 <Lock size={15} />
-                {film.type_acces === "abonnement"
-                  ? "S'abonner"
-                  : `${(film.prix_fcfa || 0).toLocaleString("fr-FR")} FCFA`}
+                {`${(film.prix_fcfa || 0).toLocaleString("fr-FR")} FCFA`}
               </Link>
             )}
             <Link

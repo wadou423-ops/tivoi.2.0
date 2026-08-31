@@ -165,14 +165,19 @@ export default function FicheContenu() {
               >
                 <Play size={18} fill="currentColor" /> Regarder
               </Link>
+            ) : film.type_acces === "abonnement" ? (
+              <Link
+                href="/abonnements"
+                className="bg-primary text-on-primary-fixed label-md px-8 py-3 rounded hover:bg-primary-container transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+              >
+                S'abonner pour regarder
+              </Link>
             ) : (
               <Link
                 href={`/paiement/achat/${film.id}`}
                 className="bg-primary text-on-primary-fixed label-md px-8 py-3 rounded hover:bg-primary-container transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(212,175,55,0.3)]"
               >
-                {film.type_acces === "abonnement"
-                  ? "S'abonner pour regarder"
-                  : `Louer — ${(film.prix_fcfa || 0).toLocaleString("fr-FR")} FCFA`}
+                {`Louer — ${(film.prix_fcfa || 0).toLocaleString("fr-FR")} FCFA`}
               </Link>
             )}
             <Link
