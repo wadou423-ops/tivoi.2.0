@@ -28,8 +28,14 @@ export default function Header() {
           .select("pseudo, role")
           .eq("id", user.id)
           .single();
-        setPseudo(profile?.pseudo || null);
-        setRole(profile?.role || null);
+        // Un compte admin n'est jamais affiché comme connecté sur le site client
+        if (profile?.role === "admin") {
+          setPseudo(null);
+          setRole("admin");
+        } else {
+          setPseudo(profile?.pseudo || null);
+          setRole(profile?.role || null);
+        }
       } else {
         setPseudo(null);
         setRole(null);

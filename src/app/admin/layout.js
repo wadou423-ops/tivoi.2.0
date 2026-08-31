@@ -70,7 +70,7 @@ export default function AdminLayout({ children }) {
         .single();
 
       if (profile?.role !== "admin") {
-        await supabase.auth.signOut();
+        // Session client détectée : on demande de se connecter au portail (sans déconnexion forcée)
         router.replace("/admin/connexion?refuse=1");
         return;
       }

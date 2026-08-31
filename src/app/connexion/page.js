@@ -31,7 +31,7 @@ function ConnexionContent() {
   const [loading, setLoading] = useState(false);
   const [verification, setVerification] = useState(true);
 
-  // Déjà connecté ? On redirige directement (pas de demande de connexion inutile)
+  // Déjà connecté ? Si client → redirection directe. Si admin → message (sans déconnexion forcée)
   useEffect(() => {
     async function check() {
       const {
@@ -43,12 +43,10 @@ function ConnexionContent() {
           .select("role")
           .eq("id", user.id)
           .single();
-        // Les comptes admin ne se connectent pas sur le site client
         if (p?.role === "admin") {
-          await supabase.auth.signOut();
           setVerification(false);
           setMessage(
-            "Ce compte est un compte administrateur. Utilisez le portail administrateur pour vous connecter."
+            "Une session administrateur est active dans ce navigateur. Le portail admin et le site client partagent la même session — utilisez http://127.0.0.1:3000/connexion pour vous connecter en client en parallèle."
           );
           return;
         }
@@ -91,11 +89,10 @@ function ConnexionContent() {
 
     setLoading(false);
 
-    // Les comptes admin ne se connectent pas sur le site client
+    // Un compte admin ne peut pas se connecter sur le site client
     if (profile?.role === "admin") {
-      await supabase.auth.signOut();
       setMessage(
-        "Ce compte est un compte administrateur. Utilisez le portail administrateur pour vous connecter."
+        "Ce compte est un compte administrateur — la connexion côté client a été refusée. Utilisez le portail administrateur, ou créez un compte client séparé."
       );
       return;
     }
@@ -161,14 +158,16 @@ function ConnexionContent() {
 
     setLoading(false);
 
-    // Les comptes admin ne se connectent pas sur le site client
+    // Un compte admin ne peut pas se connecter sur le site client
     if (profile?.role === "admin") {
-      await supabase.auth.signOut();
       setMessage(
-        "Ce compte est un compte administrateur. Utilisez le portail administrateur pour vous connecter."
+        "Ce compte est un compte administrateur — la connexion côté client a été refusée. Utilisez le portail administrateur, ou créez un compte client séparé."
       );
       return;
     }
+
+    terminerConnexion(profile);
+  }
 
     terminerConnexion(profile);
   }
