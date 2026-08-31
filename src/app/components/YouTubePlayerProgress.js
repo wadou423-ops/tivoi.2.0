@@ -20,7 +20,7 @@ function chargerAPI() {
 }
 
 // Lecteur YouTube avec reprise + enregistrement de progression
-export default function YouTubePlayerProgress({ videoId, contenuId, onEnded }) {
+export default function YouTubePlayerProgress({ videoId, contenuId, restart = false, onEnded }) {
   const conteneurRef = useRef(null);
   const playerRef = useRef(null);
   const intervalRef = useRef(null);
@@ -29,7 +29,7 @@ export default function YouTubePlayerProgress({ videoId, contenuId, onEnded }) {
   async function sauver(position, duree) {
     if (!position || position < 3) return;
     await supabase.rpc("enregistrer_progression", {
-      p_contenu_id: contenuId,
+      p_contenu_id: Number(contenuId),
       p_position: Math.floor(position),
       p_duree: Math.floor(duree || 0),
     });
@@ -40,19 +40,21 @@ export default function YouTubePlayerProgress({ videoId, contenuId, onEnded }) {
     let positionDepart = 0;
 
     async function init() {
-      // 1. Récupérer la progression existante
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        const { data: prog } = await supabase
-          .from("progressions")
-          .select("position_secondes, termine")
-          .eq("contenu_id", contenuId)
-          .eq("user_id", user.id)
-          .maybeSingle();
-        if (prog && !prog.termine && prog.position_secondes > 5) {
-          positionDepart = prog.position_secondes;
+      // 1. Récupérer la progression existante (sauf si restart=1)
+      if (!restart) {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (user) {
+          const { data: prog } = await supabase
+            .from("progressions")
+            .select("position_secondes, termine")
+            .eq("contenu_id", contenuId)
+            .eq("user_id", user.id)
+            .maybeSingle();
+          if (prog && !prog.termine && prog.position_secondes > 5) {
+            positionDepart = prog.position_secondes;
+          }
         }
       }
 
@@ -110,7 +112,7 @@ export default function YouTubePlayerProgress({ videoId, contenuId, onEnded }) {
       if (playerRef.current?.destroy) playerRef.current.destroy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoId, contenuId]);
+  }, [videoId, contenuId, restart]);
 
   return (
     <div className="relative w-full h-full bg-black">

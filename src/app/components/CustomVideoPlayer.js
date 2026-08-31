@@ -16,7 +16,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 const VITESSES = [0.5, 1, 1.25, 1.5, 2];
 
-export default function CustomVideoPlayer({ src, contenuId, onEnded }) {
+export default function CustomVideoPlayer({ src, contenuId, restart = false, onEnded }) {
   const router = useRouter();
   const videoRef = useRef(null);
   const [playing, setPlaying] = useState(false);
@@ -30,9 +30,10 @@ export default function CustomVideoPlayer({ src, contenuId, onEnded }) {
   const [suivant, setSuivant] = useState(null);
   const cacheTimerHide = useRef(null);
 
-  // Reprise de visionnage
+  // Reprise de visionnage (sauf si restart=1)
   useEffect(() => {
     async function reprise() {
+      if (restart) return;
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -48,7 +49,7 @@ export default function CustomVideoPlayer({ src, contenuId, onEnded }) {
       }
     }
     reprise();
-  }, [contenuId]);
+  }, [contenuId, restart]);
 
   // Contenu suivant (même catégorie)
   useEffect(() => {
@@ -57,7 +58,7 @@ export default function CustomVideoPlayer({ src, contenuId, onEnded }) {
       const { data: film } = await supabase
         .from("catalogue")
         .select("id, categorie")
-        .eq("id", contenuId)
+        .eq("id", Number(contenuId))
         .single();
       if (!film?.categorie) return;
       const { data: candidats } = await supabase
@@ -65,7 +66,7 @@ export default function CustomVideoPlayer({ src, contenuId, onEnded }) {
         .select("id, titre")
         .eq("actif", true)
         .eq("categorie", film.categorie)
-        .neq("id", contenuId)
+        .neq("id", Number(contenuId))
         .order("ordre", { ascending: true })
         .limit(1);
       setSuivant(candidats?.[0] || null);
@@ -91,7 +92,7 @@ export default function CustomVideoPlayer({ src, contenuId, onEnded }) {
     const v = videoRef.current;
     if (!v || !v.duration || isNaN(v.duration)) return;
     await supabase.rpc("enregistrer_progression", {
-      p_contenu_id: contenuId,
+      p_contenu_id: Number(contenuId),
       p_position: Math.floor(v.currentTime),
       p_duree: Math.floor(v.duration),
     });

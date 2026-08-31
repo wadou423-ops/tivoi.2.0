@@ -13,9 +13,12 @@ export default function Lecteur() {
   const router = useRouter();
   const [film, setFilm] = useState(null);
   const [chargement, setChargement] = useState(true);
+  const [restart, setRestart] = useState(false);
 
   useEffect(() => {
     async function load() {
+      // ?restart=1 → l'utilisateur a choisi de recommencer du début
+      setRestart(window.location.search.includes("restart=1"));
       const { data: f } = await supabase.from("catalogue").select("*").eq("id", id).single();
       setFilm(f);
       setChargement(false);
@@ -49,11 +52,11 @@ export default function Lecteur() {
     <main className="relative min-h-screen bg-surface-lowest flex items-center justify-center overflow-hidden select-none">
       {idYoutube ? (
         <div className="w-full h-screen">
-          <YouTubePlayerProgress videoId={idYoutube[1]} contenuId={film.id} />
+          <YouTubePlayerProgress videoId={idYoutube[1]} contenuId={film.id} restart={restart} />
         </div>
       ) : estMp4 ? (
         <div className="w-full h-screen">
-          <CustomVideoPlayer src={url} contenuId={film.id} />
+          <CustomVideoPlayer src={url} contenuId={film.id} restart={restart} />
         </div>
       ) : (
         <div className="relative w-full h-screen">

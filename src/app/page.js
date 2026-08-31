@@ -46,7 +46,8 @@ function Etagere({ titre, films, progressionMap = {}, onOpen }) {
           Tout voir →
         </Link>
       </div>
-      <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
+      {/* pt-2 : évite que la bordure du haut des cartes soit rognée par le conteneur scrollable */}
+      <div className="flex overflow-x-auto gap-6 pt-2 pb-4 snap-x snap-mandatory hide-scrollbar">
         {films.map((film) => (
           <CarteFilm
             key={film.id}
@@ -66,7 +67,7 @@ function EtagereTop10({ films, onOpen }) {
   return (
     <section className="px-5 md:px-20 pt-10 pb-4">
       <h2 className="headline-md text-on-surface mb-5">Top 10 aujourd&apos;hui</h2>
-      <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
+      <div className="flex overflow-x-auto gap-6 pt-2 pb-4 snap-x snap-mandatory hide-scrollbar">
         {films.map((film) => (
           <CarteFilm key={film.id} film={film} onOpen={onOpen} />
         ))}
@@ -87,6 +88,7 @@ export default function Home() {
   const [menuFiltre, setMenuFiltre] = useState(false);
   const [filmModale, setFilmModale] = useState(null);
   const [catalogueCharge, setCatalogueCharge] = useState(false);
+  const [choixReprise, setChoixReprise] = useState(null);
 
   const loadCatalogue = useCallback(async () => {
     const { data } = await supabase
@@ -154,6 +156,7 @@ export default function Home() {
   // Mises à jour automatiques : plus besoin de rafraîchir
   useRealtimeReload(["catalogue", "a_une"], loadCatalogue, [loadCatalogue]);
   useRealtimeReload(["a_une"], loadALaUne, [loadALaUne]);
+  useRealtimeReload(["progressions"], loadProgressions, [loadProgressions]);
 
   useEffect(() => {
     async function check() {
@@ -196,6 +199,10 @@ export default function Home() {
     setFilmModale(film.id);
   }
 
+  function ouvrirChoixReprise(film) {
+    setChoixReprise(film);
+  }
+
   // Tant que la session n'est pas vérifiée : spinner (pas de flash version visiteur)
   if (chargement) {
     return (
@@ -234,7 +241,7 @@ export default function Home() {
 
         {/* « Tous » : tout s'affiche. Un filtre précis : uniquement sa catégorie */}
         {cataloguePret && filtre === "Tous" && reprendre.length > 0 && (
-          <Etagere titre="Reprendre le visionnage" films={reprendre} progressionMap={progressionMap} onOpen={ouvrirFiche} />
+          <Etagere titre="Reprendre le visionnage" films={reprendre} progressionMap={progressionMap} onOpen={ouvrirChoixReprise} />
         )}
 
         {cataloguePret && filtre === "Tous" && <Etagere titre="À la une" films={aLaUne} onOpen={ouvrirFiche} />}
@@ -267,6 +274,50 @@ export default function Home() {
         </footer>
 
         {filmModale && <FicheRapide filmId={filmModale} onClose={() => setFilmModale(null)} />}
+
+        {/* Choix : reprendre où l'on était, ou recommencer du début */}
+        {choixReprise && (
+          <div
+            className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-center justify-center p-5"
+            onClick={() => setChoixReprise(null)}
+          >
+            <div
+              className="glass-panel rounded-xl max-w-md w-full p-8 text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {choixReprise.image_url && (
+                <div
+                  className="w-20 h-28 mx-auto rounded-lg bg-cover bg-center border border-primary/20 mb-4"
+                  style={{ backgroundImage: `url('${choixReprise.image_url}')` }}
+                />
+              )}
+              <h2 className="title-lg text-on-surface mb-1">{choixReprise.titre}</h2>
+              <p className="caption text-on-surface-variant mb-6">
+                Vous aviez regardé {progressionMap[choixReprise.id] || 0} % de ce contenu
+              </p>
+              <div className="flex flex-col gap-3">
+                <Link
+                  href={`/lecteur/${choixReprise.id}`}
+                  className="bg-primary text-on-primary-fixed label-md px-6 py-3.5 rounded-lg hover:bg-primary-container transition-colors"
+                >
+                  ▶ Reprendre où j&apos;étais
+                </Link>
+                <Link
+                  href={`/lecteur/${choixReprise.id}?restart=1`}
+                  className="border border-outline-variant text-on-surface label-md px-6 py-3.5 rounded-lg hover:border-primary hover:text-primary transition-colors"
+                >
+                  Recommencer du début
+                </Link>
+                <button
+                  onClick={() => setChoixReprise(null)}
+                  className="caption text-on-surface-variant hover:text-primary transition-colors py-1"
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     );
   }
@@ -334,7 +385,7 @@ export default function Home() {
                 Tout voir →
               </Link>
             </div>
-            <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
+            <div className="flex overflow-x-auto gap-6 pt-2 pb-4 snap-x snap-mandatory hide-scrollbar">
               {aLaUne.map((film) => (
                 <CarteFilm key={film.id} film={film} onOpen={ouvrirFiche} />
               ))}
