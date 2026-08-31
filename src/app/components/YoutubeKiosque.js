@@ -59,5 +59,10 @@ export default function YoutubeKiosque({ videoId, onEnded }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoId]);
 
-  return <div ref={conteneurRef} className="w-full h-full" />;
+  // YouTube plein écran : l'iframe couvre tout l'écran (cover), clics bloqués
+  return (
+    <div className="absolute inset-0 overflow-hidden bg-black">
+      <div ref={conteneurRef} className="yt-cover" />
+    </div>
+  );
 }
