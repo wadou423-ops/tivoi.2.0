@@ -39,8 +39,8 @@ const PILIERS = [
 function Etagere({ titre, films, progressionMap = {}, onOpen }) {
   if (!films || films.length === 0) return null;
   return (
-    <section className="px-5 md:px-20 py-6">
-      <div className="flex justify-between items-end mb-4">
+    <section className="px-5 md:px-20 pt-10 pb-4">
+      <div className="flex justify-between items-end mb-5">
         <h2 className="headline-md text-on-surface">{titre}</h2>
         <Link href="/catalogue" className="caption text-primary hover:text-primary-container transition-colors">
           Tout voir →
@@ -64,8 +64,8 @@ function Etagere({ titre, films, progressionMap = {}, onOpen }) {
 function EtagereTop10({ films, onOpen }) {
   if (!films || films.length === 0) return null;
   return (
-    <section className="px-5 md:px-20 py-6">
-      <h2 className="headline-md text-on-surface mb-4">Top 10 aujourd&apos;hui</h2>
+    <section className="px-5 md:px-20 pt-10 pb-4">
+      <h2 className="headline-md text-on-surface mb-5">Top 10 aujourd&apos;hui</h2>
       <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory hide-scrollbar">
         {films.map((film) => (
           <CarteFilm key={film.id} film={film} onOpen={onOpen} />
@@ -206,6 +206,7 @@ export default function Home() {
   // ---------- Mode connecté : expérience Netflix ----------
   if (connecte) {
     const catsAffichees = filtre === "Tous" ? categories : categories.filter((c) => c === filtre);
+    const cataloguePret = catalogue.length > 0;
 
     return (
       <main className="flex-grow min-h-screen flex flex-col pt-24">
@@ -214,14 +215,29 @@ export default function Home() {
           <FiltreCategories categories={categories} filtre={filtre} setFiltre={setFiltre} />
         </section>
 
+        {/* Squelettes pendant le chargement du catalogue */}
+        {!cataloguePret && (
+          <section className="px-5 md:px-20 py-8">
+            <div className="h-6 w-56 skeleton mb-6" />
+            <div className="flex gap-6 overflow-hidden">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="flex-none w-[200px] md:w-[240px]">
+                  <div className="aspect-[2/3] skeleton mb-3" />
+                  <div className="h-4 skeleton w-3/4 mb-2" />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* « Tous » : tout s'affiche. Un filtre précis : uniquement sa catégorie */}
-        {filtre === "Tous" && reprendre.length > 0 && (
+        {cataloguePret && filtre === "Tous" && reprendre.length > 0 && (
           <Etagere titre="Reprendre le visionnage" films={reprendre} progressionMap={progressionMap} onOpen={ouvrirFiche} />
         )}
 
-        {filtre === "Tous" && <Etagere titre="À la une" films={aLaUne} onOpen={ouvrirFiche} />}
+        {cataloguePret && filtre === "Tous" && <Etagere titre="À la une" films={aLaUne} onOpen={ouvrirFiche} />}
 
-        {filtre === "Tous" && <EtagereTop10 films={tendances} onOpen={ouvrirFiche} />}
+        {cataloguePret && filtre === "Tous" && <EtagereTop10 films={tendances} onOpen={ouvrirFiche} />}
 
         {catsAffichees.map((cat) => (
           <Etagere
@@ -308,8 +324,8 @@ export default function Home() {
         </div>
       </section>
         {/* À la une — un peu plus d'air sous le header */}
-        <section className="px-5 md:px-20 pt-8 pb-6">
-          <div className="flex justify-between items-end mb-4">
+        <section className="px-5 md:px-20 pt-10 pb-4">
+          <div className="flex justify-between items-end mb-5">
             <h2 className="headline-md text-on-surface">À la une</h2>
             <Link href="/catalogue" className="caption text-primary hover:text-primary-container transition-colors">
               Tout voir →

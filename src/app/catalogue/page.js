@@ -43,6 +43,15 @@ export default function CatalogueVOD() {
   const filmsAffiches =
     categorie === "Tous les genres" ? films : films.filter((f) => f.categorie === categorie);
 
+  // Pas de rendu tant que la session et les données ne sont pas chargées (évite le flash visiteur)
+  if (loading) {
+    return (
+      <main className="px-6 md:px-20 pt-28 pb-12">
+        <LoaderCentered />
+      </main>
+    );
+  }
+
   return (
     <main className="px-6 md:px-20 pt-28 pb-12">
       {!connecte && (
