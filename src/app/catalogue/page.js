@@ -175,7 +175,7 @@ export default function CatalogueVOD() {
       )}
 
       <footer className="mt-16 py-8 border-t border-outline-variant/10 text-xs text-outline">
-        © {new Date().getFullYear()} TiVoi — Tous droits réservés.
+        © {new Date().getFullYear()} TiVoi — Tous droits réservés. · v2.2
       </footer>
     </main>
   );
