@@ -59,7 +59,17 @@ export default function CatalogueVOD() {
 
   const chargerTout = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    setConnecte(!!user);
+    // Un compte admin navigue toujours en mode visiteur sur le site client
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+      setConnecte(!!user && profile?.role !== "admin");
+    } else {
+      setConnecte(false);
+    }
 
     const [{ data }, { data: une }] = await Promise.all([
       supabase
