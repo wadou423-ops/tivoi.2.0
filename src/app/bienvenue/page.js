@@ -84,7 +84,7 @@ export default function Bienvenue() {
           TiVoi
         </button>
         <button
-          onClick={() => terminer("/catalogue")}
+          onClick={() => terminer("/")}
           className="label-md text-on-surface-variant hover:text-primary transition-colors uppercase"
         >
           Passer
