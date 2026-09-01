@@ -13,10 +13,13 @@ export default function Lives() {
     async function load() {
       const { data } = await supabase
         .from("lives")
-        .select("id, titre, description, statut, programme_a, created_at, profiles:pseudo")
-        .order("statut", { ascending: false })
+        .select("id, titre, description, statut, programme_a, created_at, profiles(pseudo)")
         .order("created_at", { ascending: false });
-      setLives(data || []);
+      // En direct en premier, puis programmés, puis terminés
+      const ordre = { en_direct: 0, programme: 1, termine: 2 };
+      setLives(
+        (data || []).sort((a, b) => (ordre[a.statut] ?? 3) - (ordre[b.statut] ?? 3))
+      );
     }
     load();
 
