@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Send, Gift, Users, Radio } from "lucide-react";
+import IconeMS from "../../components/IconeMS";
 import { supabase } from "@/lib/supabaseClient";
 import Banniere from "../../components/Banniere";
 import LoaderCentered from "../../components/LoaderCentered";
@@ -52,7 +52,7 @@ export default function LiveEnDirect() {
     v.play();
   }
 
-  // Quitter l'onglet pendant un direct MP4 : pause (le son s'arrête)
+  // Quitter l'onglet pendant un direct MP4 : pause (le son s'arrÃªte)
   useEffect(() => {
     function onVisible() {
       if (document.visibilityState !== "visible" && live?.statut === "en_direct" && videoDirectRef.current && !videoDirectRef.current.paused) {
@@ -77,7 +77,7 @@ export default function LiveEnDirect() {
         console.error("[TiVoi] Erreur chargement live :", errLive.message);
       }
       setLive(l);
-      // Identifie le créateur (pour lui permettre de gérer son direct)
+      // Identifie le crÃ©ateur (pour lui permettre de gÃ©rer son direct)
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -139,7 +139,7 @@ export default function LiveEnDirect() {
     }
   }
 
-  // Chat temps réel + présence + réactions + cadeaux animés
+  // Chat temps rÃ©el + prÃ©sence + rÃ©actions + cadeaux animÃ©s
   useEffect(() => {
     const channel = supabase
       .channel(`live-${id}`, { config: { presence: { key: clePresence() } } })
@@ -147,7 +147,7 @@ export default function LiveEnDirect() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "messages_live", filter: `live_id=eq.${id}` },
         (payload) => {
-          // Déduplique avec l'affichage optimiste
+          // DÃ©duplique avec l'affichage optimiste
           setMessages((prev) => {
             const doublon = prev.some(
               (m) =>
@@ -212,7 +212,7 @@ export default function LiveEnDirect() {
       .eq("id", user.id)
       .single();
 
-    // Affichage optimiste : le message apparaît instantanément
+    // Affichage optimiste : le message apparaÃ®t instantanÃ©ment
     const tempId = `optimiste-${Date.now()}`;
     setMessages((prev) => [
       ...prev,
@@ -242,7 +242,7 @@ export default function LiveEnDirect() {
     if (error) {
       setToast(error.message);
     } else {
-      setToast(`${cadeau.emoji} ${cadeau.nom} envoyé à @${live?.profiles?.pseudo || "créateur"} !`);
+      setToast(`${cadeau.emoji} ${cadeau.nom} envoyÃ© Ã  @${live?.profiles?.pseudo || "crÃ©ateur"} !`);
       ajouterCadeauVolant(cadeau.emoji);
       setSolde((s) => s - cadeau.cout_tokens);
     }
@@ -260,7 +260,7 @@ export default function LiveEnDirect() {
   if (!live) {
     return (
       <main className="pt-28 pb-20 px-5 md:px-20 text-center">
-        <p className="text-on-surface-variant">Ce live n&apos;existe pas ou a été supprimé.</p>
+        <p className="text-on-surface-variant">Ce live n&apos;existe pas ou a Ã©tÃ© supprimÃ©.</p>
       </main>
     );
   }
@@ -269,7 +269,7 @@ export default function LiveEnDirect() {
     ? live.url_lecture.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|live\/|embed\/))([a-zA-Z0-9_-]{11})/)
     : null;
 
-  const EMOJIS_REACTION = ["❤️", "🔥", "👏", "😮", "😂"];
+  const EMOJIS_REACTION = ["â¤ï¸", "ðŸ”¥", "ðŸ‘", "ðŸ˜®", "ðŸ˜‚"];
 
   return (
     <main className="pt-24 pb-10 px-5 md:px-20">
@@ -293,31 +293,31 @@ export default function LiveEnDirect() {
               )
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center gap-3 text-on-surface-variant">
-                <Radio size={48} className="text-primary/40" />
+                <IconeMS nom="live_tv" taille={52} rempli={false} className="text-primary/40" />
                 <p className="body-lg">
                   {live.statut === "programme"
-                    ? "Live programmé — le direct démarre bientôt."
-                    : "Ce live est terminé."}
+                    ? "Live programmÃ© â€” le direct dÃ©marre bientÃ´t."
+                    : "Ce live est terminÃ©."}
                 </p>
               </div>
             )}
             {live.statut === "en_direct" && (
               <span className="absolute top-3 left-3 bg-error text-on-error caption font-bold px-2 py-1 rounded pulse-live">
-                ● EN DIRECT
+                â— EN DIRECT
               </span>
             )}
             {/* Compteur spectateurs + quitter le direct */}
             <span className="absolute top-3 right-3 bg-surface-lowest/70 backdrop-blur-md caption text-on-surface px-2.5 py-1 rounded flex items-center gap-1.5">
-              <Users size={12} className="text-primary" /> {spectateurs}
+              <IconeMS nom="visibility" taille={13} rempli={false} className="text-primary" /> {spectateurs}
             </span>
             <button
               onClick={() => router.push("/lives")}
               className="absolute top-12 right-3 bg-surface-lowest/70 backdrop-blur-md caption text-on-surface px-2.5 py-1 rounded flex items-center gap-1.5 hover:text-primary transition-colors"
             >
-              ← Quitter le direct
+              â† Quitter le direct
             </button>
 
-            {/* Cadeaux qui traversent l'écran */}
+            {/* Cadeaux qui traversent l'Ã©cran */}
             {cadeauxVolants.map((c) => (
               <span
                 key={c.id}
@@ -328,7 +328,7 @@ export default function LiveEnDirect() {
               </span>
             ))}
 
-            {/* Réactions flottantes */}
+            {/* RÃ©actions flottantes */}
             {reactions.map((r) => (
               <span
                 key={r.id}
@@ -340,7 +340,7 @@ export default function LiveEnDirect() {
             ))}
           </div>
 
-          {/* Barre de réactions */}
+          {/* Barre de rÃ©actions */}
           <div className="flex items-center gap-2">
             {EMOJIS_REACTION.map((e) => (
               <button
@@ -352,22 +352,22 @@ export default function LiveEnDirect() {
               </button>
             ))}
             <span className="caption text-on-surface-variant ml-2">
-              Réagis en direct — tout le monde voit tes emojis
+              RÃ©agis en direct â€” tout le monde voit tes emojis
             </span>
           </div>
 
           <div>
             <h1 className="headline-md text-on-surface">{live.titre}</h1>
             <p className="body-md text-on-surface-variant mt-1">
-              par @{live.profiles?.pseudo || "créateur"} {live.description ? `— ${live.description}` : ""}
+              par @{live.profiles?.pseudo || "crÃ©ateur"} {live.description ? `â€” ${live.description}` : ""}
             </p>
           </div>
 
-          {/* Panneau du créateur : URL du flux + démarrage/arrêt du direct */}
+          {/* Panneau du crÃ©ateur : URL du flux + dÃ©marrage/arrÃªt du direct */}
           {(estCreateur || estAdmin) && (
             <div className="glass-panel rounded-xl p-5">
               <h2 className="label-md text-primary uppercase mb-3 flex items-center gap-2">
-                <Radio size={16} /> Réglages du direct (visible par le créateur)
+                <IconeMS nom="settings_input_antenna" taille={18} rempli={false} /> RÃ©glages du direct (visible par le crÃ©ateur)
               </h2>
               <div className="flex flex-col sm:flex-row gap-3 items-start">
                 <input
@@ -386,7 +386,7 @@ export default function LiveEnDirect() {
                     setLive((l) => ({ ...l, url_lecture: urlEdit || l.url_lecture }));
                     setUrlEdit("");
                     setSavingStream(false);
-                    setToast("URL du flux enregistrée.");
+                    setToast("URL du flux enregistrÃ©e.");
                     setTimeout(() => setToast(""), 3000);
                   }}
                   disabled={savingStream}
@@ -402,7 +402,7 @@ export default function LiveEnDirect() {
                     }}
                     className="border border-error text-error label-md px-5 py-3 rounded-lg hover:bg-error/10 transition-colors whitespace-nowrap"
                   >
-                    Arrêter le direct
+                    ArrÃªter le direct
                   </button>
                 ) : (
                   <button
@@ -412,11 +412,11 @@ export default function LiveEnDirect() {
                     }}
                     className="bg-primary text-on-primary-fixed label-md px-5 py-3 rounded-lg hover:bg-primary-container transition-colors whitespace-nowrap"
                   >
-                    Démarrer le direct
+                    DÃ©marrer le direct
                   </button>
                 )}
                 <p className="caption text-on-surface-variant w-full sm:w-auto">
-                  Clé de stream : <span className="font-mono text-primary">{live.cle_stream}</span>
+                  ClÃ© de stream : <span className="font-mono text-primary">{live.cle_stream}</span>
                 </p>
               </div>
             </div>
@@ -426,10 +426,10 @@ export default function LiveEnDirect() {
           <div className="glass-panel rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <h2 className="label-md text-primary uppercase flex items-center gap-2">
-                <Gift size={16} /> Offrir un cadeau
+                <IconeMS nom="redeem" taille={18} /> Offrir un cadeau
               </h2>
               <span className="caption text-on-surface-variant">
-                Solde : <span className="text-primary font-bold">{solde ?? "—"} jetons</span>
+                Solde : <span className="text-primary font-bold">{solde ?? "â€”"} jetons</span>
               </span>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-1 hide-scrollbar">
@@ -441,7 +441,7 @@ export default function LiveEnDirect() {
                 >
                   <span className="text-2xl">{c.emoji}</span>
                   <span className="caption text-on-surface">{c.nom}</span>
-                  <span className="caption text-primary font-bold">{c.cout_tokens} 🪙</span>
+                  <span className="caption text-primary font-bold">{c.cout_tokens} ðŸª™</span>
                 </button>
               ))}
             </div>
@@ -452,7 +452,7 @@ export default function LiveEnDirect() {
         <div className="lg:col-span-4 flex flex-col">
           <div className="glass-panel rounded-xl flex flex-col h-[600px]">
             <div className="px-4 py-3 border-b border-outline-variant/20 flex items-center gap-2">
-              <Users size={16} className="text-primary" />
+              <IconeMS nom="visibility" taille={16} rempli={false} className="text-primary" />
               <span className="label-md text-on-surface">Chat en direct</span>
             </div>
             <div ref={chatRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
@@ -463,7 +463,7 @@ export default function LiveEnDirect() {
                 </div>
               ))}
               {messages.length === 0 && (
-                <p className="caption text-on-surface-variant">Aucun message — lancez la conversation !</p>
+                <p className="caption text-on-surface-variant">Aucun message â€” lancez la conversation !</p>
               )}
             </div>
             <form onSubmit={envoyer} className="p-3 border-t border-outline-variant/20 flex gap-2">
@@ -477,7 +477,7 @@ export default function LiveEnDirect() {
                 type="submit"
                 className="bg-primary text-on-primary-fixed rounded-lg px-3 flex items-center justify-center hover:bg-primary-container transition-colors"
               >
-                <Send size={16} />
+                <IconeMS nom="send" taille={18} rempli={false} />
               </button>
             </form>
           </div>

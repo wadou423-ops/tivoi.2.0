@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Film, Tv, Clapperboard } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRealtimeReload } from "@/lib/useRealtime";
 import Banniere from "./components/Banniere";
@@ -12,24 +11,25 @@ import CarteFilm from "./components/CarteFilm";
 import FicheRapide from "./components/FicheRapide";
 import FiltreCategories from "./components/FiltreCategories";
 import ModaleConnexion from "./components/ModaleConnexion";
+import IconeMS from "./components/IconeMS";
 
 const PILIERS = [
   {
-    icon: Film,
+    icone: "movie",
     titre: "VOD Premium",
     texte: "Films et séries exclusifs, sélectionnés pour une expérience cinématographique ultime.",
     href: "/catalogue",
     decalage: "",
   },
   {
-    icon: Clapperboard,
+    icone: "live_tv",
     titre: "Lives en Direct",
     texte: "Connectez-vous avec les créateurs et icônes culturelles en temps réel.",
     href: "/lives",
     decalage: "md:mt-8",
   },
   {
-    icon: Tv,
+    icone: "tv",
     titre: "Chaînes TV",
     texte: "Accès ininterrompu à vos chaînes de télévision premium favorites.",
     href: "/guide-tv",
@@ -391,31 +391,18 @@ export default function Home() {
       <section className="px-5 md:px-20 py-12">
         <h2 className="headline-md text-on-surface mb-6">Découvrir TiVoi</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {PILIERS.map((p) =>
-            connecte ? (
-              <Link
-                key={p.titre}
-                href={p.href}
-                className={`bg-surface-container border border-outline-variant/30 rounded-xl p-6 flex flex-col gap-4 relative overflow-hidden group hover:border-primary/50 transition-colors ${p.decalage}`}
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/20 transition-all" />
-                <p.icon size={36} className="text-primary" />
-                <h3 className="title-lg text-on-surface z-10">{p.titre}</h3>
-                <p className="body-md text-on-surface-variant z-10">{p.texte}</p>
-              </Link>
-            ) : (
-              <button
-                key={p.titre}
-                onClick={() => setModaleConnexion(true)}
-                className={`text-left bg-surface-container border border-outline-variant/30 rounded-xl p-6 flex flex-col gap-4 relative overflow-hidden group hover:border-primary/50 transition-colors ${p.decalage}`}
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/20 transition-all" />
-                <p.icon size={36} className="text-primary" />
-                <h3 className="title-lg text-on-surface z-10">{p.titre}</h3>
-                <p className="body-md text-on-surface-variant z-10">{p.texte}</p>
-              </button>
-            )
-          )}
+          {PILIERS.map((p) => (
+            <button
+              key={p.titre}
+              onClick={() => setModaleConnexion(true)}
+              className={`text-left bg-surface-container border border-outline-variant/30 rounded-xl p-6 flex flex-col gap-4 relative overflow-hidden group hover:border-primary/50 transition-colors ${p.decalage}`}
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/20 transition-all" />
+              <IconeMS nom={p.icone} taille={38} className="text-primary" />
+              <h3 className="title-lg text-on-surface z-10">{p.titre}</h3>
+              <p className="body-md text-on-surface-variant z-10">{p.texte}</p>
+            </button>
+          ))}
         </div>
       </section>
 

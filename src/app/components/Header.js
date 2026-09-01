@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { Search, Bell, Menu, X } from "lucide-react";
+import { X } from "lucide-react";
+import IconeMS from "./IconeMS";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function Header() {
@@ -148,10 +149,10 @@ export default function Header() {
 
         <div className="flex items-center gap-4">
           <Link href="/recherche" className="text-on-surface hover:text-primary transition-colors">
-            <Search size={20} />
+            <IconeMS nom="search" taille={22} rempli={false} />
           </Link>
           <Link href="/notifications" className="relative hidden md:block text-on-surface hover:text-primary transition-colors">
-            <Bell size={20} />
+            <IconeMS nom="notifications" taille={22} rempli={false} />
             {nonLues > 0 && (
               <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-error text-on-error caption font-bold flex items-center justify-center">
                 {nonLues > 9 ? "9+" : nonLues}
@@ -213,7 +214,7 @@ export default function Header() {
             )}
           </div>
           <button className="md:hidden text-on-surface" onClick={() => setDrawerOpen(true)}>
-            <Menu size={22} />
+            <IconeMS nom="menu" taille={24} rempli={false} />
           </button>
         </div>
       </div>
@@ -229,7 +230,7 @@ export default function Header() {
             <div className="flex justify-between items-center mb-8">
               <span className="font-display font-bold text-xl text-primary">TiVoi</span>
               <button onClick={() => setDrawerOpen(false)} className="text-on-surface-variant hover:text-primary">
-                <X size={22} />
+                <IconeMS nom="close" taille={24} rempli={false} />
               </button>
             </div>
 

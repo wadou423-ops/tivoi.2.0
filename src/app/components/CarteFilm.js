@@ -1,12 +1,12 @@
-"use client";
+﻿"use client";
 
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { Star, Play } from "lucide-react";
 import ImgBlur from "./ImgBlur";
+import IconeMS from "./IconeMS";
 import { prefetchFiche } from "@/lib/cache";
 
-// Carte film vivante : aperçu vidéo au survol, flou de chargement,
+// Carte film vivante : aperÃ§u vidÃ©o au survol, flou de chargement,
 // barre de progression du visionnage, ouverture en fiche rapide.
 export default function CarteFilm({ film, progressionPct = 0, onOpen }) {
   const timerRef = useRef(null);
@@ -58,7 +58,7 @@ export default function CarteFilm({ film, progressionPct = 0, onOpen }) {
 
         {film.note && (
           <div className="absolute top-2 right-2 bg-surface-lowest/80 backdrop-blur-md px-2 py-1 rounded caption text-primary border border-primary/20 flex items-center gap-1">
-            <Star size={14} fill="currentColor" /> {film.note}
+            <IconeMS nom="star" taille={14} /> {film.note}
           </div>
         )}
 
@@ -71,7 +71,7 @@ export default function CarteFilm({ film, progressionPct = 0, onOpen }) {
 
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent flex items-end p-4 opacity-0 hover:opacity-100 transition-opacity">
           <span className="bg-primary text-on-primary-fixed w-full py-2 rounded label-md text-center flex items-center justify-center gap-2">
-            <Play size={14} fill="currentColor" /> Regarder
+            <IconeMS nom="play_arrow" taille={16} /> Regarder
           </span>
         </div>
       </div>

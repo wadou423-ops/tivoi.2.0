@@ -1,17 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
-  Maximize,
-  PictureInPicture2,
-  Gauge,
-  SkipForward,
-} from "lucide-react";
+import IconeMS from "./IconeMS";
 import { supabase } from "@/lib/supabaseClient";
 
 const VITESSES = [0.5, 1, 1.25, 1.5, 2];
@@ -51,7 +42,7 @@ export default function CustomVideoPlayer({ src, contenuId, restart = false, onE
     reprise();
   }, [contenuId, restart]);
 
-  // Contenu suivant (même catégorie)
+  // Contenu suivant (mÃªme catÃ©gorie)
   useEffect(() => {
     async function next() {
       if (!contenuId) return;
@@ -137,7 +128,7 @@ export default function CustomVideoPlayer({ src, contenuId, restart = false, onE
       if (document.pictureInPictureElement) await document.exitPictureInPicture();
       else await v.requestPictureInPicture();
     } catch {
-      /* non supporté */
+      /* non supportÃ© */
     }
   }
 
@@ -179,19 +170,19 @@ export default function CustomVideoPlayer({ src, contenuId, restart = false, onE
         className="w-full h-full object-contain bg-black"
       />
 
-      {/* Bouton Suivant en fin de vidéo */}
+      {/* Bouton Suivant en fin de vidÃ©o */}
       {!playing && duration > 0 && current >= duration - 1 && suivant && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/70">
           <button
             onClick={() => router.push(`/lecteur/${suivant.id}`)}
             className="flex items-center gap-3 bg-primary text-on-primary-fixed label-md px-8 py-4 rounded-lg hover:bg-primary-container transition-colors"
           >
-            <SkipForward size={18} /> Suivant : {suivant.titre}
+            <IconeMS nom="skip_next" taille={20} /> Suivant : {suivant.titre}
           </button>
         </div>
       )}
 
-      {/* Contrôles — toujours visibles en pause */}
+      {/* ContrÃ´les â€” toujours visibles en pause */}
       <div
         className={`absolute bottom-0 left-0 right-0 z-30 px-5 pb-4 pt-10 bg-gradient-to-t from-background/90 to-transparent transition-opacity duration-300 ${
           montre || !playing ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -210,7 +201,7 @@ export default function CustomVideoPlayer({ src, contenuId, restart = false, onE
 
         <div className="flex items-center gap-4">
           <button onClick={basculerLecture} className="text-on-surface hover:text-primary transition-colors">
-            {playing ? <Pause size={22} /> : <Play size={22} fill="currentColor" />}
+            {playing ? <IconeMS nom="pause" taille={26} /> : <IconeMS nom="play_arrow" taille={26} />}
           </button>
           <button
             onClick={() => {
@@ -222,7 +213,7 @@ export default function CustomVideoPlayer({ src, contenuId, restart = false, onE
             }}
             className="text-on-surface hover:text-primary transition-colors"
           >
-            {muted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+            {muted ? <IconeMS nom="volume_off" taille={24} /> : <IconeMS nom="volume_up" taille={24} />}
           </button>
           <span className="text-xs text-on-surface-variant font-mono">
             {formater(current)} / {formater(duration)}
@@ -234,7 +225,7 @@ export default function CustomVideoPlayer({ src, contenuId, restart = false, onE
                 onClick={() => setSpeedOpen((o) => !o)}
                 className="flex items-center gap-1 text-xs text-on-surface hover:text-primary transition-colors font-mono"
               >
-                <Gauge size={18} /> {speed}x
+                <IconeMS nom="speed" taille={20} rempli={false} /> {speed}x
               </button>
               {speedOpen && (
                 <div className="absolute bottom-8 right-0 glass-panel rounded-lg py-1 w-20">
@@ -253,10 +244,10 @@ export default function CustomVideoPlayer({ src, contenuId, restart = false, onE
               )}
             </div>
             <button onClick={pip} className="text-on-surface hover:text-primary transition-colors">
-              <PictureInPicture2 size={20} />
+              <IconeMS nom="picture_in_picture_alt" taille={22} rempli={false} />
             </button>
             <button onClick={pleinEcran} className="text-on-surface hover:text-primary transition-colors">
-              <Maximize size={20} />
+              <IconeMS nom="fullscreen" taille={22} rempli={false} />
             </button>
           </div>
         </div>
