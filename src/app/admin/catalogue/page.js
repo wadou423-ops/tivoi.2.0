@@ -42,10 +42,10 @@ export default function AdminCatalogue() {
   async function enregistrer(e) {
     e.preventDefault();
     setMessage("");
-    const f = { ...edition, badge: edition.badge || null };
+    const { id, created_at, ...champs } = { ...edition, badge: edition.badge || null };
     const { error } = edition.id
-      ? await supabase.from("catalogue").update(f).eq("id", edition.id)
-      : await supabase.from("catalogue").insert(f);
+      ? await supabase.from("catalogue").update(champs).eq("id", edition.id)
+      : await supabase.from("catalogue").insert(champs);
     if (error) {
       setMessage(`Erreur : ${error.message}`);
     } else {
