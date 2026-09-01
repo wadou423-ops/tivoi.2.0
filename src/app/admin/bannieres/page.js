@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import UploadFichier from "../../components/UploadFichier";
+import { useRealtimeReload } from "@/lib/useRealtime";
 
 const EMPLACEMENTS = [
   { id: "accueil_h1", label: "Accueil — horizontale 1" },
@@ -26,6 +27,8 @@ export default function AdminBannieres() {
   useEffect(() => {
     load();
   }, []);
+
+  useRealtimeReload(["bannieres"], load, []);
 
   async function load() {
     const { data } = await supabase

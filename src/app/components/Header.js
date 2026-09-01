@@ -14,7 +14,43 @@ export default function Header() {
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [nonLues, setNonLues] = useState(0);
+  const [userId, setUserId] = useState(null);
   const menuRef = useRef(null);
+
+  // Notifications non lues en temps réel (cloche)
+  useEffect(() => {
+    if (!userId) {
+      const t = setTimeout(() => setNonLues(0), 0);
+      return () => clearTimeout(t);
+    }
+    async function charger() {
+      const { count } = await supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .eq("lu", false);
+      setNonLues(count || 0);
+    }
+    charger();
+
+    const channel = supabase
+      .channel(`notifs-${userId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${userId}` },
+        () => charger()
+      )
+      .subscribe();
+
+    const onFocus = () => charger();
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      supabase.removeChannel(channel);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [userId]);
 
   useEffect(() => {
     async function loadUser() {
@@ -23,6 +59,7 @@ export default function Header() {
       } = await supabase.auth.getUser();
 
       if (user) {
+        setUserId(user.id);
         const { data: profile } = await supabase
           .from("profiles")
           .select("pseudo, role")
@@ -37,6 +74,7 @@ export default function Header() {
           setRole(profile?.role || null);
         }
       } else {
+        setUserId(null);
         setPseudo(null);
         setRole(null);
       }
@@ -111,8 +149,13 @@ export default function Header() {
           <Link href="/recherche" className="text-on-surface hover:text-primary transition-colors">
             <Search size={20} />
           </Link>
-          <Link href="/notifications" className="hidden md:block text-on-surface hover:text-primary transition-colors">
+          <Link href="/notifications" className="relative hidden md:block text-on-surface hover:text-primary transition-colors">
             <Bell size={20} />
+            {nonLues > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-error text-on-error caption font-bold flex items-center justify-center">
+                {nonLues > 9 ? "9+" : nonLues}
+              </span>
+            )}
           </Link>
           <div className="hidden md:flex items-center gap-4">
             <span className="label-md text-on-surface-variant hover:text-primary transition-colors cursor-default">FR/EN</span>

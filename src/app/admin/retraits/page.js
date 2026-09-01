@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Check, X } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import { useRealtimeReload } from "@/lib/useRealtime";
 
 export default function AdminRetraits() {
   const [retraits, setRetraits] = useState([]);
@@ -11,6 +12,8 @@ export default function AdminRetraits() {
   useEffect(() => {
     load();
   }, []);
+
+  useRealtimeReload(["retraits"], load, []);
 
   async function load() {
     const { data } = await supabase

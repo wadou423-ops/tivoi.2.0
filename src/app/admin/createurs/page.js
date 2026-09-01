@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Check, X } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../../components/LoaderCentered";
+import { useRealtimeReload } from "@/lib/useRealtime";
 
 export default function AdminCreateurs() {
   const [demandes, setDemandes] = useState([]);
@@ -26,6 +27,8 @@ export default function AdminCreateurs() {
     const t = setTimeout(load, 0);
     return () => clearTimeout(t);
   }, []);
+
+  useRealtimeReload(["demandes_createur"], load, []);
 
   async function traiter(demande, nouveauStatut) {
     setActionEnCours(demande.id);

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import { useRealtimeReload } from "@/lib/useRealtime";
 
 export default function AdminChaines() {
   const [chaines, setChaines] = useState([]);
@@ -30,6 +31,8 @@ export default function AdminChaines() {
   useEffect(() => {
     load();
   }, []);
+
+  useRealtimeReload(["chaines", "spots", "coupures"], load, []);
 
   async function load() {
     const [{ data: c }, { data: s }, { data: co }] = await Promise.all([

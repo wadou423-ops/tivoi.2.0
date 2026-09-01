@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../../components/LoaderCentered";
+import { useRealtimeReload } from "@/lib/useRealtime";
 
 export default function AdminUtilisateurs() {
   const [profils, setProfils] = useState([]);
@@ -10,18 +11,21 @@ export default function AdminUtilisateurs() {
   const [recherche, setRecherche] = useState("");
   const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    async function loadProfils() {
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("pseudo", { ascending: true });
-      setProfils(data || []);
-      setLoading(false);
-    }
+  async function loadProfils() {
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .order("pseudo", { ascending: true });
+    setProfils(data || []);
+    setLoading(false);
+  }
 
-    loadProfils();
+  useEffect(() => {
+    const t = setTimeout(loadProfils, 0);
+    return () => clearTimeout(t);
   }, []);
+
+  useRealtimeReload(["profiles"], loadProfils, []);
 
   const profilsAffiches = profils.filter(
     (p) =>
