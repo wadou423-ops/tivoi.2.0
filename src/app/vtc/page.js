@@ -19,7 +19,7 @@ function extraireIdYoutube(url) {
   return match ? match[1] : null;
 }
 
-const INTERVAL_PUB = 600; // secondes entre deux interruptions publicitaires (10 min)
+const INTERVAL_PUB = 30; // secondes entre deux interruptions publicitaires (10 min)
 
 export default function VTC() {
   const [appareil, setAppareil] = useState(null);
@@ -230,7 +230,8 @@ export default function VTC() {
   // ── Vue lecture : film choisi, interrompu par des pubs ──
   if (vue === "lecture" && filmActif) {
     const filmIdYoutube = extraireIdYoutube(filmActif.bande_annonce_url || "");
-    const pub = pubEnCours !== null ? playlist[pubEnCours % Math.max(playlist.length, 1)] : null;
+    const pubsVTC = playlist.filter((p) => p.type === "publicite");
+    const pub = pubEnCours !== null ? pubsVTC[pubEnCours % Math.max(pubsVTC.length, 1)] : null;
 
     function verifierPubMP4() {
       const v = videoRef.current;
@@ -262,9 +263,8 @@ export default function VTC() {
                 videoId={filmIdYoutube}
                 restartAt={0}
                 intervalSec={INTERVAL_PUB}
-                pubs={playlist}
-                pubOverlay={pubEnCours}
-                onPubFin={() => setPubEnCours(null)}
+                pubs={pubsVTC}
+                onTermine={() => setVue("catalogue")}
               />
             </div>
           </div>

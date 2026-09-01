@@ -19,18 +19,39 @@ function chargerAPI() {
   return apiPromise;
 }
 
-// Lecteur YouTube pour la VTC : expose position, pause, reprise
-// et notifie la fin du film (via onTermine)
-export default function YoutubeVTC({ videoId, restartAt = 0, pubOverlay = null, intervalSec, pubs, onPubFin, onTermine }) {
+// Lecteur YouTube VTC : le film est interrompu par des pubs (overlay géré
+// à l'intérieur du composant) toutes les `intervalSec` secondes.
+export default function YoutubeVTC({ videoId, restartAt = 0, intervalSec, pubs, onTermine }) {
   const conteneurRef = useRef(null);
   const playerRef = useRef(null);
   const pubIndexRef = useRef(0);
-  const prochainSeuilRef = useRef(intervalSec);
-  const pubOverlayRef = useRef(null);
+  const seuilRef = useRef(intervalSec);
+  const posAvantPubRef = useRef(0);
+  const [pubActive, setPubActive] = useState(null); // élément pub affiché
 
-  useEffect(() => {
-    pubOverlayRef.current = pubOverlay;
-  }, [pubOverlay]);
+  function verifierPub() {
+    const p = playerRef.current;
+    if (!p?.getCurrentTime || pubActive !== null || pubs.length === 0) return;
+    const pos = p.getCurrentTime();
+    if (pos >= seuilRef.current) {
+      posAvantPubRef.current = pos;
+      p.pauseVideo();
+      setPubActive(pubs[pubIndexRef.current % pubs.length]);
+      pubIndexRef.current += 1;
+      seuilRef.current = pos + intervalSec;
+    }
+  }
+
+  function finPub() {
+    const p = playerRef.current;
+    setPubActive(null);
+    if (p?.seekTo) {
+      try {
+        p.seekTo(posAvantPubRef.current, true);
+        p.playVideo();
+      } catch {}
+    }
+  }
 
   useEffect(() => {
     let annule = false;
@@ -39,20 +60,6 @@ export default function YoutubeVTC({ videoId, restartAt = 0, pubOverlay = null, 
     async function init() {
       await chargerAPI();
       if (annule || !conteneurRef.current) return;
-
-      function verifierPub() {
-        const p = playerRef.current;
-        if (!p?.getCurrentTime) return;
-        const pos = p.getCurrentTime();
-        if (pubOverlayRef.current === null && pos >= prochainSeuilRef.current && pubs.length > 0) {
-          p.pauseVideo();
-          const pub = pubs[pubIndexRef.current % pubs.length];
-          pubIndexRef.current += 1;
-          prochainSeuilRef.current = pos + intervalSec;
-          onPubFin?.({ pub }); // le parent affiche l'overlay pub
-          // La reprise (seekTo) est déclenchée par le parent via la fin de pub
-        }
-      }
 
       playerRef.current = new window.YT.Player(conteneurRef.current, {
         videoId,
@@ -87,16 +94,83 @@ export default function YoutubeVTC({ videoId, restartAt = 0, pubOverlay = null, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoId]);
 
-  // Reprendre après la pub
+  // Rendu : le film + l'overlay pub par-dessus
+  return (
+    <div className="absolute inset-0">
+      <div ref={conteneurRef} className="w-full h-full" />
+
+      {pubActive && (
+        <div className="absolute inset-0 z-40 bg-black">
+          {(() => {
+            const idPub = extraireId(pubActive.media_url);
+            if (idPub) {
+              return <YoutubeOverlay videoId={idPub} onEnded={finPub} />;
+            }
+            if (/\.(mp4|webm|mov)(\?|#|$)/i.test(pubActive.media_url)) {
+              return (
+                <video
+                  src={pubActive.media_url}
+                  autoPlay
+                  playsInline
+                  onEnded={finPub}
+                  className="w-full h-full object-cover"
+                />
+              );
+            }
+            return (
+              <img
+                src={pubActive.media_url}
+                alt="Publicité"
+                className="w-full h-full object-cover"
+                onLoad={() => setTimeout(finPub, (pubActive.duree_secondes || 8) * 1000)}
+              />
+            );
+          })()}
+          <div className="absolute top-6 right-6 bg-primary/90 px-4 py-2 rounded-lg">
+            <span className="text-xs font-title font-bold uppercase tracking-widest text-on-primary">
+              Publicité
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function extraireId(url) {
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=|youtube\.com\/embed\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+function YoutubeOverlay({ videoId, onEnded }) {
+  const conteneurRef = useRef(null);
+  const playerRef = useRef(null);
+
   useEffect(() => {
-    if (pubOverlay === null && playerRef.current?.seekTo) {
-      try {
-        playerRef.current.seekTo(prochainSeuilRef.current - intervalSec, true);
-        playerRef.current.playVideo();
-      } catch {}
-    }
+    let annule = false;
+    chargerAPI().then(() => {
+      if (annule || !conteneurRef.current) return;
+      playerRef.current = new window.YT.Player(conteneurRef.current, {
+        videoId,
+        playerVars: { autoplay: 1, controls: 0, modestbranding: 1, playsinline: 1 },
+        events: {
+          onReady: (e) => {
+            try {
+              e.target.playVideo();
+            } catch {}
+          },
+          onStateChange: (e) => {
+            if (e.data === 0 && onEnded) onEnded();
+          },
+        },
+      });
+    });
+    return () => {
+      annule = true;
+      if (playerRef.current?.destroy) playerRef.current.destroy();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pubOverlay]);
+  }, [videoId]);
 
   return <div ref={conteneurRef} className="w-full h-full" />;
 }
