@@ -128,6 +128,8 @@ export default function CatalogueVOD() {
   const tendances = [...films]
     .sort((a, b) => (b.note || 0) - (a.note || 0))
     .slice(0, 10);
+  const filmsAffiches =
+    categorie === "Tous les genres" ? films : films.filter((f) => f.categorie === categorie);
 
   // Page connectée : identique à l'accueil
   if (connecte && !loading) {
