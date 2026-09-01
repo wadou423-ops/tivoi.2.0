@@ -27,7 +27,10 @@ export default function YoutubeVTC({ videoId, restartAt = 0, pubOverlay = null, 
   const pubIndexRef = useRef(0);
   const prochainSeuilRef = useRef(intervalSec);
   const pubOverlayRef = useRef(null);
-  pubOverlayRef.current = pubOverlay;
+
+  useEffect(() => {
+    pubOverlayRef.current = pubOverlay;
+  }, [pubOverlay]);
 
   useEffect(() => {
     let annule = false;
