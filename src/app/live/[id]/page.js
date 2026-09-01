@@ -6,6 +6,7 @@ import { Send, Gift, Users, Radio } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Banniere from "../../components/Banniere";
 import LoaderCentered from "../../components/LoaderCentered";
+import YoutubeDirect from "../../components/YoutubeDirect";
 
 function nouvelId() {
   return Date.now() + Math.random();
@@ -37,6 +38,33 @@ export default function LiveEnDirect() {
   const [urlEdit, setUrlEdit] = useState("");
   const [savingStream, setSavingStream] = useState(false);
   const chatRef = useRef(null);
+  const videoDirectRef = useRef(null);
+  const heurePauseDirect = useRef(null);
+
+  function rattraperDirect() {
+    const v = videoDirectRef.current;
+    if (!v || !heurePauseDirect.current) return;
+    const ecart = (Date.now() - heurePauseDirect.current) / 1000;
+    heurePauseDirect.current = null;
+    if (ecart > 3 && v.duration && isFinite(v.duration)) {
+      v.currentTime = Math.min(v.currentTime + ecart, v.duration - 1);
+    }
+    v.play();
+  }
+
+  // Quitter l'onglet pendant un direct MP4 : pause (le son s'arrête)
+  useEffect(() => {
+    function onVisible() {
+      if (document.visibilityState !== "visible" && live?.statut === "en_direct" && videoDirectRef.current && !videoDirectRef.current.paused) {
+        heurePauseDirect.current = Date.now();
+        videoDirectRef.current.pause();
+      } else if (document.visibilityState === "visible" && live?.statut === "en_direct" && videoDirectRef.current?.paused) {
+        rattraperDirect();
+      }
+    }
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [live?.statut]);
 
   useEffect(() => {
     async function load() {
@@ -251,14 +279,17 @@ export default function LiveEnDirect() {
           <div className="relative aspect-video rounded-xl overflow-hidden border border-outline-variant/30 bg-surface-lowest">
             {live.statut === "en_direct" && live.url_lecture ? (
               idYoutube ? (
-                <iframe
-                  src={`https://www.youtube.com/embed/${idYoutube[1]}?autoplay=1&rel=0`}
-                  allow="autoplay; fullscreen"
-                  allowFullScreen
-                  className="w-full h-full"
-                />
+                <YoutubeDirect videoId={idYoutube[1]} onEnded={() => setLive((l) => ({ ...l, statut: "termine" }))} />
               ) : (
-                <video src={live.url_lecture} controls autoPlay className="w-full h-full object-contain" />
+                <video
+                  ref={videoDirectRef}
+                  src={live.url_lecture}
+                  controls
+                  autoPlay
+                  onPause={() => (heurePauseDirect.current = Date.now())}
+                  onPlay={() => rattraperDirect()}
+                  className="w-full h-full object-contain"
+                />
               )
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center gap-3 text-on-surface-variant">
@@ -275,10 +306,16 @@ export default function LiveEnDirect() {
                 ● EN DIRECT
               </span>
             )}
-            {/* Compteur spectateurs */}
+            {/* Compteur spectateurs + quitter le direct */}
             <span className="absolute top-3 right-3 bg-surface-lowest/70 backdrop-blur-md caption text-on-surface px-2.5 py-1 rounded flex items-center gap-1.5">
               <Users size={12} className="text-primary" /> {spectateurs}
             </span>
+            <button
+              onClick={() => router.push("/lives")}
+              className="absolute top-12 right-3 bg-surface-lowest/70 backdrop-blur-md caption text-on-surface px-2.5 py-1 rounded flex items-center gap-1.5 hover:text-primary transition-colors"
+            >
+              ← Quitter le direct
+            </button>
 
             {/* Cadeaux qui traversent l'écran */}
             {cadeauxVolants.map((c) => (
