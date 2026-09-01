@@ -353,8 +353,8 @@ function ConnexionContent() {
                 Numéro de téléphone
               </label>
               <div className="relative rounded-lg glow-focus transition-all">
-                <Phone size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" />
-                <span className="absolute left-10 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm font-semibold pointer-events-none pr-2 border-r border-outline-variant h-6 flex items-center">
+                <Phone size={18} className="absolute left-3 top-[calc(50%-7px)] -translate-y-1/2 text-on-surface-variant pointer-events-none" />
+                <span className="absolute left-10 top-[calc(50%-9px)] -translate-y-1/2 text-on-surface-variant text-sm font-semibold pointer-events-none pr-2 border-r border-outline-variant h-6 flex items-center justify-center">
                   +225
                 </span>
                 <input
@@ -365,7 +365,7 @@ function ConnexionContent() {
                   onChange={(e) => setTelephone(e.target.value.replace(/\D/g, "").slice(0, 10))}
                   placeholder="07 00 00 00 00"
                   inputMode="numeric"
-                  className={inputClass + " pl-[76px] pr-4"}
+                  className={inputClass + " pl-[76px] pr-4 text-center"}
                 />
               </div>
               <p className="caption text-on-surface-variant mt-2 opacity-70">

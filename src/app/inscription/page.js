@@ -100,8 +100,8 @@ export default function Inscription() {
           </div>
 
           <div className="relative rounded-lg glow-focus transition-all">
-            <Phone size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" />
-            <span className="absolute left-10 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm font-semibold pointer-events-none pr-2 border-r border-outline-variant h-6 flex items-center">
+            <Phone size={18} className="absolute left-3 top-[calc(50%-7px)] -translate-y-1/2 text-on-surface-variant pointer-events-none" />
+            <span className="absolute left-10 top-[calc(50%-9px)] -translate-y-1/2 text-on-surface-variant text-sm font-semibold pointer-events-none pr-2 border-r border-outline-variant h-6 flex items-center justify-center">
               +225
             </span>
             <input
@@ -111,7 +111,7 @@ export default function Inscription() {
               onChange={(e) => setTelephone(e.target.value.replace(/\D/g, "").slice(0, 10))}
               placeholder="07 00 00 00 00"
               inputMode="numeric"
-                className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant text-on-surface pl-[76px] pr-4 py-3 outline-none focus:border-primary-container transition-colors"
+              className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant text-on-surface pl-[76px] pr-4 py-3 outline-none focus:border-primary-container transition-colors text-center"
             />
             <p className="caption text-on-surface-variant mt-1.5 opacity-70">
               Sert à te connecter par SMS avec un code.
