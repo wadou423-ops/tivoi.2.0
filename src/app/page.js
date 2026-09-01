@@ -400,24 +400,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-        {/* À la une — un peu plus d'air sous le header */}
-        {aLaUne.length > 0 && (
-          <section className="px-5 md:px-20 pt-10 pb-4">
-            <div className="flex justify-between items-end mb-5">
-              <h2 className="headline-md text-on-surface">À la une</h2>
-              <Link href="/catalogue" className="caption text-primary hover:text-primary-container transition-colors">
-                Tout voir →
-              </Link>
-            </div>
-            <div className="flex overflow-x-auto gap-6 pt-2 pb-4 snap-x snap-mandatory hide-scrollbar">
-              {aLaUne.map((film) => (
-                <CarteFilm key={film.id} film={film} onOpen={ouvrirFiche} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        <Etagere titre="Tendances actuelles" films={tendances} />
 
       {/* Bannière */}
       <section className="px-5 md:px-20 py-6">

@@ -55,6 +55,7 @@ export default function CatalogueVOD() {
   const [progressionMap, setProgressionMap] = useState({});
   const [reprendre, setReprendre] = useState([]);
   const [choixReprise, setChoixReprise] = useState(null);
+  const [connexionModale, setConnexionModale] = useState(false);
 
   const chargerTout = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -259,9 +260,13 @@ export default function CatalogueVOD() {
           Aucun contenu pour l&apos;instant dans cette catégorie.
         </p>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-10">
-          {filmsAffiches.map((film) => (
-            <div key={film.id} className="group cursor-pointer flex flex-col gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-10">
+              {filmsAffiches.map((film) => (
+                <div
+                  key={film.id}
+                  onClick={() => setConnexionModale(true)}
+                  className="group cursor-pointer flex flex-col gap-2"
+                >
               <div className="relative aspect-[2/3] w-full bg-surface-high rounded-lg overflow-hidden border border-transparent group-hover:border-primary-container transition-all">
                 {film.image_url && (
                   <img src={film.image_url} alt={film.titre} className="w-full h-full object-cover" />
@@ -299,8 +304,47 @@ export default function CatalogueVOD() {
       )}
 
       <footer className="mt-16 py-8 border-t border-outline-variant/10 text-xs text-outline">
-        © {new Date().getFullYear()} TiVoi — Tous droits réservés.
+        © {new Date().getFullYear()} TiVoi — Tous droits réservés. · v2.2
       </footer>
+
+      {/* Modale : le visiteur doit se connecter pour explorer le catalogue */}
+      {connexionModale && (
+        <div
+          className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-center justify-center p-5"
+          onClick={() => setConnexionModale(false)}
+        >
+          <div
+            className="glass-panel rounded-xl max-w-md w-full p-8 text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setConnexionModale(false)}
+              className="absolute top-4 right-4 w-9 h-9 rounded-full glass-panel flex items-center justify-center text-on-surface hover:text-primary transition-colors"
+            >
+              ✕
+            </button>
+            <h2 className="font-display font-bold text-3xl text-primary tracking-tight mb-3">TiVoi</h2>
+            <p className="body-lg text-on-surface mb-8">
+              Connectez-vous pour explorer le catalogue TiVoi — films, séries et
+              documentaires premium.
+            </p>
+            <div className="flex flex-col gap-3">
+              <Link
+                href="/connexion"
+                className="bg-primary text-on-primary-fixed label-md px-6 py-3.5 rounded-lg hover:bg-primary-container transition-colors"
+              >
+                Se connecter
+              </Link>
+              <Link
+                href="/inscription"
+                className="border border-primary text-primary label-md px-6 py-3.5 rounded-lg hover:bg-primary hover:text-on-primary-fixed transition-colors"
+              >
+                Créer un compte
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
