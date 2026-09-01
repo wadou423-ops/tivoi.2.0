@@ -64,12 +64,13 @@ export default function Header() {
           .from("profiles")
           .select("pseudo, role")
           .eq("id", user.id)
-          .single();
+          .maybeSingle();
         // Un compte admin n'est jamais affiché comme connecté sur le site client
         if (profile?.role === "admin") {
           setPseudo(null);
           setRole("admin");
         } else {
+          // Session active : on affiche l'avatar même sans pseudo (profil à compléter)
           setPseudo(profile?.pseudo || null);
           setRole(profile?.role || null);
         }
@@ -161,22 +162,29 @@ export default function Header() {
             <span className="label-md text-on-surface-variant hover:text-primary transition-colors cursor-default">FR/EN</span>
             {loading ? (
               <div className="w-9 h-9 rounded-full skeleton" />
-            ) : pseudo ? (
+            ) : userId ? (
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setMenuOpen((open) => !open)}
-                  className="flex items-center justify-center w-9 h-9 rounded-full bg-primary-container text-on-primary font-title text-sm font-bold hover:opacity-80 transition-opacity"
+                  className={`flex items-center justify-center w-9 h-9 rounded-full font-title text-sm font-bold hover:opacity-80 transition-opacity ${
+                    pseudo ? "bg-primary-container text-on-primary" : "border border-outline-variant text-primary"
+                  }`}
                 >
-                  {pseudo.charAt(0).toUpperCase()}
+                  {pseudo ? pseudo.charAt(0).toUpperCase() : "?"}
                 </button>
 
                 {menuOpen && (
                   <div className="absolute right-0 mt-2 w-56 rounded-xl bg-surface-low border border-outline-variant shadow-lg py-2 z-50">
                     <div className="px-4 py-2 border-b border-outline-variant/40">
-                      <p className="title-lg text-on-surface">@{pseudo}</p>
+                      <p className="title-lg text-on-surface">{pseudo ? `@${pseudo}` : "Compte sans pseudo"}</p>
                       {role === "createur" && (
                         <Link href="/studio" className="block px-0 py-1 text-sm text-primary hover:text-primary-container transition-colors">
                           Studio créateur
+                        </Link>
+                      )}
+                      {!pseudo && (
+                        <Link href="/choisir-pseudo" className="block px-0 py-1 text-sm text-primary hover:text-primary-container transition-colors">
+                          Complétez votre profil
                         </Link>
                       )}
                       <Link href="/profil" className="block py-1 text-sm text-on-surface-variant hover:text-primary transition-colors">

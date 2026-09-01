@@ -51,7 +51,7 @@ function ConnexionContent() {
       if (user) {
         const { data: p } = await supabase
           .from("profiles")
-          .select("role")
+          .select("role, pseudo")
           .eq("id", user.id)
           .single();
         if (p?.role === "admin") {
@@ -59,6 +59,11 @@ function ConnexionContent() {
           setMessage(
             "Une session administrateur est active dans ce navigateur. Le portail admin et le site client partagent la même session — utilisez http://127.0.0.1:3000/connexion pour vous connecter en client en parallèle."
           );
+          return;
+        }
+        // Compte connecté sans pseudo → le compléter d'abord
+        if (!p?.pseudo) {
+          router.replace("/choisir-pseudo");
           return;
         }
         router.replace(searchParams.get("redirect") || "/");
@@ -105,6 +110,12 @@ function ConnexionContent() {
       setMessage(
         "Ce compte est un compte administrateur — la connexion côté client a été refusée. Utilisez le portail administrateur, ou créez un compte client séparé."
       );
+      return;
+    }
+
+    // Compte sans pseudo → compléter le profil d'abord
+    if (!profile?.pseudo) {
+      router.push("/choisir-pseudo");
       return;
     }
 
@@ -174,6 +185,12 @@ function ConnexionContent() {
       setMessage(
         "Ce compte est un compte administrateur — la connexion côté client a été refusée. Utilisez le portail administrateur, ou créez un compte client séparé."
       );
+      return;
+    }
+
+    // Compte sans pseudo → compléter le profil d'abord
+    if (!profile?.pseudo) {
+      router.push("/choisir-pseudo");
       return;
     }
 

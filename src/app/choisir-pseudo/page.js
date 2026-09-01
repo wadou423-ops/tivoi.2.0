@@ -33,10 +33,18 @@ export default function ChoisirPseudo() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    const { error } = await supabase
+
+    // Le profil peut être absent (trigger raté) : on le crée au besoin
+    const { data: profilExistant } = await supabase
       .from("profiles")
-      .update({ pseudo })
-      .eq("id", user.id);
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const { error } = profilExistant
+      ? await supabase.from("profiles").update({ pseudo }).eq("id", user.id)
+      : await supabase.from("profiles").insert({ id: user.id, pseudo });
+
     setLoading(false);
     if (error) {
       if (error.code === "23505") {
