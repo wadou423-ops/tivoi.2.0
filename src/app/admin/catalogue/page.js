@@ -19,6 +19,7 @@ const VIDE = {
   badge: "",
   actif: true,
   ordre: 0,
+  dispo_vtc: false,
 };
 
 export default function AdminCatalogue() {
@@ -138,6 +139,10 @@ export default function AdminCatalogue() {
           <label className="flex items-center gap-2 caption text-on-surface-variant">
             <input type="checkbox" checked={edition.actif} onChange={(e) => setEdition({ ...edition, actif: e.target.checked })} />
             Actif (visible sur le site)
+          </label>
+          <label className="flex items-center gap-2 caption text-on-surface-variant">
+            <input type="checkbox" checked={!!edition.dispo_vtc} onChange={(e) => setEdition({ ...edition, dispo_vtc: e.target.checked })} />
+            Disponible sur les écrans VTC
           </label>
           <div className="md:col-span-2 flex gap-3">
             <button type="submit" className="bg-primary-container text-on-primary label-md px-8 py-3 rounded-lg hover:bg-primary transition-colors">

@@ -663,3 +663,6 @@ begin
 end;
 $$;
 grant execute on function public.dissocier_appareil(bigint) to authenticated;
+
+-- ---------- CATALOGUE VTC (contenus mis a disposition des passagers) ----------
+alter table catalogue add column if not exists dispo_vtc boolean not null default false;
