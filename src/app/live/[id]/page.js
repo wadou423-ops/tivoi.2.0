@@ -31,17 +31,37 @@ export default function LiveEnDirect() {
   const [spectateurs, setSpectateurs] = useState(0);
   const [reactions, setReactions] = useState([]);
   const [cadeauxVolants, setCadeauxVolants] = useState([]);
+  const [estCreateur, setEstCreateur] = useState(false);
+  const [estAdmin, setEstAdmin] = useState(false);
+  const [chargementLive, setChargementLive] = useState(true);
+  const [urlEdit, setUrlEdit] = useState("");
+  const [savingStream, setSavingStream] = useState(false);
   const chatRef = useRef(null);
 
   useEffect(() => {
     async function load() {
-      const { data: l } = await supabase
+      const { data: l, error: errLive } = await supabase
         .from("lives")
-        .select("id, titre, description, statut, url_lecture, cle_stream, createur_id, profiles:pseudo")
+        .select("id, titre, description, statut, url_lecture, cle_stream, createur_id, profiles(pseudo)")
         .eq("id", id)
         .single();
+      if (errLive) {
+        console.error("[TiVoi] Erreur chargement live :", errLive.message);
+      }
       setLive(l);
-
+      // Identifie le créateur (pour lui permettre de gérer son direct)
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user && l) {
+        setEstCreateur(l.createur_id === user.id);
+        const { data: profil } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+        setEstAdmin(profil?.role === "admin");
+      }
       const { data: m } = await supabase
         .from("messages_live")
         .select("id, pseudo, texte, created_at")
@@ -58,9 +78,6 @@ export default function LiveEnDirect() {
         .order("cout_tokens", { ascending: true });
       setCadeaux(c || []);
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase
           .from("profiles")
@@ -69,6 +86,7 @@ export default function LiveEnDirect() {
           .single();
         setSolde(profile?.solde_tokens ?? 0);
       }
+      setChargementLive(false);
     }
     load();
   }, [id]);
@@ -203,10 +221,18 @@ export default function LiveEnDirect() {
     setTimeout(() => setToast(""), 3000);
   }
 
-  if (!live) {
+  if (chargementLive) {
     return (
       <main className="pt-28 pb-20 px-5 md:px-20 flex items-center justify-center">
         <LoaderCentered />
+      </main>
+    );
+  }
+
+  if (!live) {
+    return (
+      <main className="pt-28 pb-20 px-5 md:px-20 text-center">
+        <p className="text-on-surface-variant">Ce live n&apos;existe pas ou a été supprimé.</p>
       </main>
     );
   }
@@ -299,6 +325,65 @@ export default function LiveEnDirect() {
               par @{live.profiles?.pseudo || "créateur"} {live.description ? `— ${live.description}` : ""}
             </p>
           </div>
+
+          {/* Panneau du créateur : URL du flux + démarrage/arrêt du direct */}
+          {(estCreateur || estAdmin) && (
+            <div className="glass-panel rounded-xl p-5">
+              <h2 className="label-md text-primary uppercase mb-3 flex items-center gap-2">
+                <Radio size={16} /> Réglages du direct (visible par le créateur)
+              </h2>
+              <div className="flex flex-col sm:flex-row gap-3 items-start">
+                <input
+                  value={urlEdit || live.url_lecture || ""}
+                  onChange={(e) => setUrlEdit(e.target.value)}
+                  placeholder="URL du flux (ex : https://www.youtube.com/watch?v=...)"
+                  className="flex-1 bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-primary-container transition-colors text-sm"
+                />
+                <button
+                  onClick={async () => {
+                    setSavingStream(true);
+                    await supabase
+                      .from("lives")
+                      .update({ url_lecture: urlEdit || live.url_lecture || null })
+                      .eq("id", id);
+                    setLive((l) => ({ ...l, url_lecture: urlEdit || l.url_lecture }));
+                    setUrlEdit("");
+                    setSavingStream(false);
+                    setToast("URL du flux enregistrée.");
+                    setTimeout(() => setToast(""), 3000);
+                  }}
+                  disabled={savingStream}
+                  className="border border-outline-variant text-on-surface-variant label-md px-5 py-3 rounded-lg hover:border-primary hover:text-primary transition-colors disabled:opacity-50 whitespace-nowrap"
+                >
+                  {savingStream ? "Enregistrement..." : "Enregistrer l'URL"}
+                </button>
+                {live.statut === "en_direct" ? (
+                  <button
+                    onClick={async () => {
+                      await supabase.from("lives").update({ statut: "termine" }).eq("id", id);
+                      setLive((l) => ({ ...l, statut: "termine" }));
+                    }}
+                    className="border border-error text-error label-md px-5 py-3 rounded-lg hover:bg-error/10 transition-colors whitespace-nowrap"
+                  >
+                    Arrêter le direct
+                  </button>
+                ) : (
+                  <button
+                    onClick={async () => {
+                      await supabase.from("lives").update({ statut: "en_direct" }).eq("id", id);
+                      setLive((l) => ({ ...l, statut: "en_direct" }));
+                    }}
+                    className="bg-primary text-on-primary-fixed label-md px-5 py-3 rounded-lg hover:bg-primary-container transition-colors whitespace-nowrap"
+                  >
+                    Démarrer le direct
+                  </button>
+                )}
+                <p className="caption text-on-surface-variant w-full sm:w-auto">
+                  Clé de stream : <span className="font-mono text-primary">{live.cle_stream}</span>
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Cadeaux */}
           <div className="glass-panel rounded-xl p-4">

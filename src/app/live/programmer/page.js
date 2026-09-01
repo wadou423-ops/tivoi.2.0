@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, Clapperboard } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import LoaderCentered from "../../components/LoaderCentered";
 
 export default function ProgrammerLive() {
   const router = useRouter();
@@ -12,24 +13,57 @@ export default function ProgrammerLive() {
   const [programmeA, setProgrammeA] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [chargement, setChargement] = useState(true);
+  const [autorise, setAutorise] = useState(false);
 
   useEffect(() => {
     async function check() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) return router.push("/connexion");
+      if (!user) return router.replace("/connexion");
       const { data: profile } = await supabase
         .from("profiles")
         .select("role, statut_createur")
         .eq("id", user.id)
         .single();
-      if (profile?.role !== "createur" && profile?.role !== "admin") {
-        setMessage("Seuls les créateurs validés peuvent programmer un live. Faites la demande depuis l'espace créateur.");
+      if (profile?.role === "createur" || profile?.role === "admin") {
+        setAutorise(true);
+      } else {
+        setMessage(
+          "Seuls les créateurs validés peuvent programmer un live. Soumettez votre demande depuis l'espace créateur."
+        );
       }
+      setChargement(false);
     }
     check();
   }, [router]);
+
+  if (chargement) {
+    return (
+      <main className="flex-grow pt-28 pb-20 px-5 md:px-20 flex items-center justify-center min-h-[50vh]">
+        <LoaderCentered />
+      </main>
+    );
+  }
+
+  if (!autorise) {
+    return (
+      <main className="flex-grow pt-28 pb-20 px-5 md:px-20">
+        <div className="glass-panel rounded-xl p-10 max-w-xl mx-auto text-center">
+          <Clapperboard size={56} className="text-primary mx-auto mb-6" />
+          <h1 className="display-lg text-on-surface mb-4">Devenir créateur d&apos;abord</h1>
+          <p className="body-lg text-on-surface-variant mb-8">{message}</p>
+          <a
+            href="/devenir-createur"
+            className="inline-block bg-primary text-on-primary-fixed label-md px-8 py-3 rounded hover:bg-primary-container transition-colors"
+          >
+            Faire ma demande créateur
+          </a>
+        </div>
+      </main>
+    );
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
