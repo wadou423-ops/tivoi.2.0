@@ -11,6 +11,7 @@ import LoaderCentered from "./components/LoaderCentered";
 import CarteFilm from "./components/CarteFilm";
 import FicheRapide from "./components/FicheRapide";
 import FiltreCategories from "./components/FiltreCategories";
+import ModaleConnexion from "./components/ModaleConnexion";
 
 const PILIERS = [
   {
@@ -89,6 +90,7 @@ export default function Home() {
   const [filmModale, setFilmModale] = useState(null);
   const [catalogueCharge, setCatalogueCharge] = useState(false);
   const [choixReprise, setChoixReprise] = useState(null);
+  const [modaleConnexion, setModaleConnexion] = useState(false);
 
   const loadCatalogue = useCallback(async () => {
     const { data } = await supabase
@@ -372,32 +374,45 @@ export default function Home() {
             >
               Explorer la VOD
             </Link>
-            <Link
-              href="/guide-tv"
+            <button
+              onClick={() => setModaleConnexion(true)}
               className="border border-primary text-on-surface label-md px-8 py-3 rounded hover:bg-surface-high transition-colors"
             >
               Voir les chaînes TV
-            </Link>
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Bento 3 piliers */}
+      {/* Bento 3 piliers — visiteur : connexion requise avant d'accéder */}
       <section className="px-5 md:px-20 py-12">
         <h2 className="headline-md text-on-surface mb-6">Découvrir TiVoi</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {PILIERS.map((p) => (
-            <Link
-              key={p.titre}
-              href={p.href}
-              className={`bg-surface-container border border-outline-variant/30 rounded-xl p-6 flex flex-col gap-4 relative overflow-hidden group hover:border-primary/50 transition-colors ${p.decalage}`}
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/20 transition-all" />
-              <p.icon size={36} className="text-primary" />
-              <h3 className="title-lg text-on-surface z-10">{p.titre}</h3>
-              <p className="body-md text-on-surface-variant z-10">{p.texte}</p>
-            </Link>
-          ))}
+          {PILIERS.map((p) =>
+            connecte ? (
+              <Link
+                key={p.titre}
+                href={p.href}
+                className={`bg-surface-container border border-outline-variant/30 rounded-xl p-6 flex flex-col gap-4 relative overflow-hidden group hover:border-primary/50 transition-colors ${p.decalage}`}
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/20 transition-all" />
+                <p.icon size={36} className="text-primary" />
+                <h3 className="title-lg text-on-surface z-10">{p.titre}</h3>
+                <p className="body-md text-on-surface-variant z-10">{p.texte}</p>
+              </Link>
+            ) : (
+              <button
+                key={p.titre}
+                onClick={() => setModaleConnexion(true)}
+                className={`text-left bg-surface-container border border-outline-variant/30 rounded-xl p-6 flex flex-col gap-4 relative overflow-hidden group hover:border-primary/50 transition-colors ${p.decalage}`}
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/20 transition-all" />
+                <p.icon size={36} className="text-primary" />
+                <h3 className="title-lg text-on-surface z-10">{p.titre}</h3>
+                <p className="body-md text-on-surface-variant z-10">{p.texte}</p>
+              </button>
+            )
+          )}
         </div>
       </section>
 
@@ -408,11 +423,13 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="mt-auto px-5 md:px-20 py-8 border-t border-outline-variant/10 text-xs text-outline flex flex-wrap gap-4 justify-between">
-        <span>© {new Date().getFullYear()} TiVoi — Tous droits réservés. · v2.2</span>
+        <span>© {new Date().getFullYear()} TiVoi — Tous droits réservés.</span>
         <Link href="/legales" className="hover:text-primary transition-colors">
           Mentions légales · Confidentialité
         </Link>
       </footer>
+
+      {modaleConnexion && <ModaleConnexion onClose={() => setModaleConnexion(false)} />}
     </main>
   );
 }
