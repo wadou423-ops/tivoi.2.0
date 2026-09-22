@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import SquelettePage from "../components/SquelettePage";
+import ModerateursStudio from "./ModerateursStudio";
 
 export default function StudioCreateur() {
   const router = useRouter();
@@ -259,6 +260,9 @@ export default function StudioCreateur() {
           </div>
         </div>
       </div>
+
+      {/* Modérateurs de mes directs (personnes que je choisis) */}
+      <ModerateursStudio surMessage={setMessage} />
     </main>
   );
 }

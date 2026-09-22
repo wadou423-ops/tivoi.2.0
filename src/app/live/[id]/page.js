@@ -8,6 +8,8 @@ import Banniere from "../../components/Banniere";
 import LoaderCentered from "../../components/LoaderCentered";
 import YoutubeDirect from "../../components/YoutubeDirect";
 import LecteurHLS from "../../components/LecteurHLS";
+import InvitationsAntenne from "./components/InvitationsAntenne";
+import SlidesDirect from "./components/SlidesDirect";
 import { SERVEUR_DIFFUSION_HTTP, DIFFUSION_EN_DEMO, urlHlsDuLive } from "@/lib/config";
 
 function nouvelId() {
@@ -617,6 +619,16 @@ export default function LiveEnDirect() {
                 </p>
               </div>
             </div>
+          )}
+
+          {/* Invitations sur l'antenne (créateur / admin / modérateurs) */}
+          {peutModerer && live.statut === "en_direct" && (
+            <InvitationsAntenne liveId={id} surToast={(t) => { setToast(t); setTimeout(() => setToast(""), 3000); }} />
+          )}
+
+          {/* Slides synchronisées (photos de présentation projetées au public) */}
+          {peutModerer && (
+            <SlidesDirect liveId={id} estCreateur={estCreateur || estAdmin} surToast={(t) => { setToast(t); setTimeout(() => setToast(""), 3000); }} />
           )}
 
           {/* Cadeaux */}

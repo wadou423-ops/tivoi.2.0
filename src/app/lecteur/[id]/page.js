@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../../components/LoaderCentered";
 import CustomVideoPlayer from "../../components/CustomVideoPlayer";
@@ -12,6 +13,7 @@ export default function Lecteur() {
   const router = useRouter();
   const [film, setFilm] = useState(null);
   const [chargement, setChargement] = useState(true);
+  const [acces, setAcces] = useState(null); // null = vérification en cours
   const [restart, setRestart] = useState(false);
 
   useEffect(() => {
@@ -19,6 +21,18 @@ export default function Lecteur() {
       // ?restart=1 → l'utilisateur a choisi de recommencer du début
       setRestart(window.location.search.includes("restart=1"));
       const { data: f } = await supabase.from("catalogue").select("*").eq("id", id).single();
+      if (!f) {
+        setFilm(null);
+        setChargement(false);
+        return;
+      }
+      // Contrôle d'accès : gratuit → OK ; payant → vérifié côté base (RPC)
+      if (f.type_acces === "gratuit") {
+        setAcces(true);
+      } else {
+        const { data: ok } = await supabase.rpc("verifier_acces", { p_contenu_id: f.id });
+        setAcces(!!ok);
+      }
       setFilm(f);
       setChargement(false);
     }
@@ -37,6 +51,37 @@ export default function Lecteur() {
     return (
       <main className="min-h-screen bg-surface-lowest flex items-center justify-center">
         <p className="text-on-surface-variant">Contenu introuvable.</p>
+      </main>
+    );
+  }
+
+  // Accès payant refusé : l'utilisateur paie ou s'abonne, le lecteur ne joue pas
+  if (acces === false) {
+    return (
+      <main className="min-h-screen bg-surface-lowest flex items-center justify-center px-5">
+        <div className="text-center max-w-md">
+          <i className="ph-duotone ph-lock-key text-primary mb-6 inline-block" style={{ fontSize: 64 }} aria-hidden="true" />
+          <h1 className="title-lg text-on-surface mb-2">Ce contenu est réservé</h1>
+          <p className="body-md text-on-surface-variant mb-8">
+            {film.type_acces === "abonnement"
+              ? "Abonnez-vous pour accéder à tout le catalogue."
+              : "Achetez l'accès à ce contenu pour le regarder."}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href={film.type_acces === "abonnement" ? "/abonnements" : `/paiement/achat/${film.id}`}
+              className="bg-primary text-on-primary-fixed label-md px-8 py-3 rounded hover:bg-primary-container transition-colors"
+            >
+              {film.type_acces === "abonnement" ? "Voir les abonnements" : `Payer ${(film.prix_fcfa || 0).toLocaleString("fr-FR")} FCFA`}
+            </Link>
+            <Link
+              href={`/catalogue/${film.id}`}
+              className="border border-outline-variant text-on-surface label-md px-8 py-3 rounded hover:border-primary hover:text-primary transition-colors"
+            >
+              Retour à la fiche
+            </Link>
+          </div>
+        </div>
       </main>
     );
   }

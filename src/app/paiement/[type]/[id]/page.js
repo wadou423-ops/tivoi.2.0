@@ -108,10 +108,12 @@ export default function Paiement() {
       }
     }
 
-    // --- Simulation de la confirmation du fournisseur (mode démo) ---
+    // --- Simulation de la confirmation du fournisseur (mode démo plafonné) ---
     setTimeout(async () => {
-      await supabase.rpc("confirmer_paiement", { p_reference: paiement.reference });
-      router.push(`/confirmation/${paiement.reference}`);
+      const { data: erreur } = await supabase.rpc("confirmer_paiement_demo", {
+        p_reference: paiement.reference,
+      });
+      router.push(`/confirmation/${paiement.reference}${erreur ? "?err=1" : ""}`);
     }, 3000);
   }
 
