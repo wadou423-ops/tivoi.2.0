@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 export default function Notifications() {
   const [notifs, setNotifs] = useState([]);
+  const [invitations, setInvitations] = useState([]);
 
   useEffect(() => {
     async function load() {
@@ -27,13 +28,70 @@ export default function Notifications() {
       if (nonLues.length > 0) {
         await supabase.from("notifications").update({ lu: true }).in("id", nonLues);
       }
+
+      // Invitations de modération en attente de MA réponse
+      const { data: inv } = await supabase
+        .from("moderateurs_live")
+        .select("id, statut, created_at, profiles!moderateurs_live_createur_id_fkey(pseudo)")
+        .eq("utilisateur_id", user.id)
+        .eq("statut", "en_attente")
+        .order("created_at", { ascending: false });
+      setInvitations(inv || []);
     }
     load();
   }, []);
 
+  async function repondre(inviteId, accepter) {
+    const { data: erreur } = await supabase.rpc("repondre_moderateur", {
+      p_moderateur_id: inviteId,
+      p_accepter: accepter,
+    });
+    if (erreur) {
+      alert(erreur);
+      return;
+    }
+    setInvitations((l) => l.filter((i) => i.id !== inviteId));
+  }
+
   return (
     <main className="flex-grow pt-28 pb-20 px-5 md:px-20 max-w-3xl mx-auto w-full">
       <h1 className="display-lg text-on-surface mb-10">Notifications</h1>
+
+      {/* Invitations modérateur en attente de MA réponse */}
+      {invitations.length > 0 && (
+        <div className="mb-10 space-y-3">
+          <h2 className="label-md text-primary uppercase">Invitations modérateur</h2>
+          {invitations.map((i) => (
+            <div
+              key={i.id}
+              className="rounded-xl border border-outline/30 bg-primary/5 p-5 flex flex-col sm:flex-row sm:items-center gap-4 justify-between"
+            >
+              <div>
+                <p className="label-md text-on-surface">
+                  @{i.profiles?.pseudo || "Un créateur"} te propose de modérer ses directs
+                </p>
+                <p className="caption text-on-surface-variant mt-1">
+                  En acceptant, tu pourras supprimer les messages du chat et aider sur l&apos;antenne.
+                </p>
+              </div>
+              <div className="flex gap-2 shrink-0">
+                <button
+                  onClick={() => repondre(i.id, true)}
+                  className="bg-primary text-on-primary-fixed caption font-bold px-5 py-2 rounded-lg hover:bg-primary-container transition-colors"
+                >
+                  Accepter
+                </button>
+                <button
+                  onClick={() => repondre(i.id, false)}
+                  className="border border-outline-variant text-on-surface-variant caption px-5 py-2 rounded-lg hover:text-error transition-colors"
+                >
+                  Refuser
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {notifs.length === 0 ? (
         <div className="bg-surface-low border border-outline-variant rounded-xl p-10 text-center">

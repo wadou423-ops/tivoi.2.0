@@ -9,6 +9,7 @@ export default function ModerateursStudio({ surMessage }) {
   const [moderateurs, setModerateurs] = useState([]);
   const [pseudo, setPseudo] = useState("");
 
+
   useEffect(() => {
     charger();
   }, []);
@@ -29,23 +30,14 @@ export default function ModerateursStudio({ surMessage }) {
   async function ajouter(e) {
     e.preventDefault();
     if (!pseudo.trim()) return;
-    const { data: cible } = await supabase
-      .from("profiles")
-      .select("id")
-      .ilike("pseudo", pseudo.trim())
-      .maybeSingle();
-    if (!cible) {
-      surMessage(`Pseudo « ${pseudo.trim()} » introuvable.`);
-      return;
-    }
-    const { error } = await supabase.from("moderateurs_live").insert({
-      createur_id: (await supabase.auth.getUser()).data.user.id,
-      utilisateur_id: cible.id,
+    // RPC : crée la demande en attente + notifie la personne (elle doit accepter)
+    const { data: erreur } = await supabase.rpc("proposer_moderateur", {
+      p_pseudo: pseudo.trim(),
     });
-    if (error) {
-      surMessage(error.message);
+    if (erreur) {
+      surMessage(erreur);
     } else {
-      surMessage(`@${pseudo.trim()} est maintenant modérateur de tes directs.`);
+      surMessage(`Invitation envoyée à @${pseudo.trim()} — il doit accepter pour devenir modérateur.`);
       setPseudo("");
       charger();
     }
@@ -90,6 +82,9 @@ export default function ModerateursStudio({ surMessage }) {
               className="flex items-center gap-2 caption px-3 py-1.5 rounded-lg border border-outline-variant/30 bg-surface-container"
             >
               @{m.profiles?.pseudo || "?"}
+              <span className={m.statut === "acceptee" ? "text-primary" : m.statut === "refusee" ? "text-error" : "text-on-surface-variant"}>
+                {m.statut === "acceptee" ? "✓ actif" : m.statut === "refusee" ? "✕ refusé" : "en attente"}
+              </span>
               <button onClick={() => retirer(m.id)} className="text-outline hover:text-error" title="Retirer">
                 <i className="ph-duotone ph-x" style={{ fontSize: 12 }} aria-hidden="true" />
               </button>

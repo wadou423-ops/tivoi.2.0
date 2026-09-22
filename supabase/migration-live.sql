@@ -23,20 +23,26 @@ alter table lives add column if not exists termine_a timestamptz;
 alter table lives add column if not exists rediffusion_url text;
 alter table lives add column if not exists visibilite text not null default 'public';
 alter table lives add column if not exists slide_courante integer not null default 0;
+alter table lives add column if not exists en_pause boolean not null default false;
 
 alter table lives drop constraint if exists lives_statut_check;
 alter table lives add constraint lives_statut_check
   check (statut in ('programme', 'en_direct', 'termine', 'annule'));
 
--- ---------- 2. Modérateurs choisis par le créateur ----------
+-- ---------- 2. Modérateurs choisis par le créateur (avec acceptation) ----------
+-- statut : en_attente → la personne doit accepter avant de modérer
 create table if not exists moderateurs_live (
   id bigint generated always as identity primary key,
   createur_id uuid not null references profiles(id) on delete cascade,
   utilisateur_id uuid not null references profiles(id) on delete cascade,
+  statut text not null default 'en_attente'
+    check (statut in ('en_attente', 'acceptee', 'refusee')),
   created_at timestamptz not null default now(),
   unique (createur_id, utilisateur_id),
   check (createur_id <> utilisateur_id)
 );
+-- Migration de la table si elle existait déjà sans la colonne statut
+alter table moderateurs_live add column if not exists statut text not null default 'en_attente';
 alter table moderateurs_live enable row level security;
 drop policy if exists "lecture moderateurs" on moderateurs_live;
 create policy "lecture moderateurs" on moderateurs_live for select using (true);
@@ -147,7 +153,9 @@ create policy "moderer messages" on messages_live for update
     or exists (
       select 1 from lives l
       join moderateurs_live m on m.createur_id = l.createur_id
-      where l.id = live_id and m.utilisateur_id = auth.uid()
+      where l.id = live_id
+        and m.utilisateur_id = auth.uid()
+        and m.statut = 'acceptee'
     )
   );
 
@@ -166,7 +174,9 @@ begin
           from messages_live msg
           join lives l on l.id = msg.live_id
           join moderateurs_live m on m.createur_id = l.createur_id
-          where msg.id = p_message_id and m.utilisateur_id = auth.uid()
+          where msg.id = p_message_id
+            and m.utilisateur_id = auth.uid()
+            and m.statut = 'acceptee'
         )
       );
 end;
@@ -198,6 +208,92 @@ begin
   where m.createur_id = v_createur;
 end; $$;
 grant execute on function public.notifier_live_en_direct(bigint) to authenticated;
+
+-- ---------- 9b. RPC : proposer une modération (l'invité doit accepter) ----------
+-- Le créateur propose → la personne reçoit une notification + une demande
+-- en attente ; elle doit accepter avant d'avoir le pouvoir de modération.
+create or replace function public.proposer_moderateur(p_pseudo text)
+returns text language plpgsql security definer as $$
+declare
+  v_cible profiles%rowtype;
+  v_existant bigint;
+begin
+  select * into v_cible from profiles where lower(pseudo) = lower(p_pseudo);
+  if not found then return 'Pseudo introuvable.'; end if;
+  if v_cible.id = auth.uid() then return 'Vous êtes déjà créateur de vos directs.'; end if;
+  if v_cible.suspendu then return 'Ce compte est suspendu.'; end if;
+
+  -- Une seule demande active par binôme
+  select count(*) into v_existant
+    from moderateurs_live
+    where createur_id = auth.uid() and utilisateur_id = v_cible.id;
+  if v_existant > 0 then return 'Cette personne est déjà modérateur (ou a une demande en cours).'; end if;
+
+  insert into moderateurs_live (createur_id, utilisateur_id, statut)
+  values (auth.uid(), v_cible.id, 'en_attente');
+
+  insert into notifications (user_id, titre, corps)
+  values (
+    v_cible.id,
+    'Invitation modérateur',
+    'Un créateur te propose de modérer ses directs. Réponds depuis ton Studio ou la page Notifications.'
+  );
+  return null;
+end; $$;
+grant execute on function public.proposer_moderateur(text) to authenticated;
+
+-- ---------- 9d. RPC : supprimer un live passé (créateur ou admin) ----------
+-- Supprime le live + en cascade : messages, cadeaux, audience, slides,
+-- invitations (FK ON DELETE CASCADE). Interdit de supprimer un direct en cours
+-- (il faut d'abord l'arrêter) — évite les suppressions accidentelles de contenu.
+create or replace function public.supprimer_live(p_live_id bigint)
+returns text language plpgsql security definer as $$
+declare v_live lives%rowtype;
+begin
+  select * into v_live from lives where id = p_live_id;
+  if not found then return 'Live introuvable.'; end if;
+  if v_live.createur_id <> auth.uid() and not public.est_admin() then
+    return 'Seul le créateur peut supprimer ce live.';
+  end if;
+  if v_live.statut = 'en_direct' then
+    return 'Arrête d''abord le direct avant de le supprimer.';
+  end if;
+
+  delete from lives where id = p_live_id; -- cascade vers les tables liées
+  return null;
+end; $$;
+grant execute on function public.supprimer_live(bigint) to authenticated;
+
+-- Policy DELETE : le créateur (ou l'admin) peut supprimer ses lives
+drop policy if exists "supprimer ses lives" on lives;
+create policy "supprimer ses lives" on lives for delete
+  using (auth.uid() = createur_id or public.est_admin());
+
+-- ---------- 9e. RPC : répondre à une invitation modérateur ----------
+create or replace function public.repondre_moderateur(p_moderateur_id bigint, p_accepter boolean)
+returns text language plpgsql security definer as $$
+declare v_m moderateurs_live%rowtype;
+begin
+  select * into v_m from moderateurs_live where id = p_moderateur_id;
+  if not found then return 'Invitation introuvable.'; end if;
+  if v_m.utilisateur_id <> auth.uid() then return 'Seul le destinataire peut répondre.'; end if;
+  if v_m.statut <> 'en_attente' then return 'Invitation déjà traitée.'; end if;
+
+  update moderateurs_live
+    set statut = case when p_accepter then 'acceptee' else 'refusee' end
+    where id = p_moderateur_id;
+
+  insert into notifications (user_id, titre, corps)
+  values (
+    v_m.createur_id,
+    case when p_accepter then 'Modération acceptée' else 'Modération refusée' end,
+    case when p_accepter
+      then 'Ta proposition de modération a été acceptée. La personne t''aidera sur tes directs.'
+      else 'Ta proposition de modération a été refusée.' end
+  );
+  return null;
+end; $$;
+grant execute on function public.repondre_moderateur(bigint, boolean) to authenticated;
 
 -- ---------- 10. Cadeaux : uniquement sur un direct en cours ----------
 create or replace function public.envoyer_cadeau(p_live_id bigint, p_cadeau_id bigint)
@@ -247,17 +343,42 @@ do $$ begin
   alter publication supabase_realtime add table invitations_live;
 exception when duplicate_object then null; end $$;
 
--- ---------- 12. Index manquants + intégrité ----------
+-- ---------- 13. Enregistrements des directs (les rediffusions) ----------
+-- L'enregistrement fait pendant le direct EST la rediffusion : pas de
+-- publication manuelle. Le créateur ouvre, télécharge ou supprime.
+create table if not exists lives_enregistrements (
+  id bigint generated always as identity primary key,
+  live_id bigint not null references lives(id) on delete cascade,
+  createur_id uuid not null references profiles(id) on delete cascade,
+  chemin text not null,
+  duree_secondes integer not null default 0,
+  taille_octets bigint not null default 0,
+  created_at timestamptz not null default now()
+);
+alter table lives_enregistrements enable row level security;
+drop policy if exists "lecture enregistrements" on lives_enregistrements;
+create policy "lecture enregistrements" on lives_enregistrements for select using (true);
+drop policy if exists "createur gere ses enregistrements" on lives_enregistrements;
+create policy "createur gere ses enregistrements" on lives_enregistrements for all
+  using (auth.uid() = createur_id or public.est_admin())
+  with check (auth.uid() = createur_id or public.est_admin());
+create index if not exists idx_lives_enregistrements_live on lives_enregistrements (live_id);
 create index if not exists idx_messages_live_live on messages_live (live_id);
 create index if not exists idx_cadeaux_envoyes_live on cadeaux_envoyes (live_id);
 create index if not exists idx_lives_spectateurs_live on lives_spectateurs (live_id);
+
+-- FK cadeaux_envoyes → lives (cascade) : on purge d'abord les éventuels
+-- orphelins (lives déjà supprimés) qui empêcheraient la création de la contrainte,
+-- puis on la crée. Le bloc est tolérant : si la FK existe déjà, rien ne se passe.
+do $$ begin
+  delete from cadeaux_envoyes ce
+    where ce.live_id is not null
+      and not exists (select 1 from lives l where l.id = ce.live_id);
+end $$;
 
 do $$ begin
   alter table cadeaux_envoyes
     add constraint fk_cadeaux_envoyes_live
     foreign key (live_id) references lives(id) on delete cascade;
 exception when duplicate_object then null;
-       when others then
-         -- orphelins éventuels : à nettoyer manuellement si ce bloc échoue
-         null;
 end $$;

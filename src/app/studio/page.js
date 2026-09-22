@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import SquelettePage from "../components/SquelettePage";
 import ModerateursStudio from "./ModerateursStudio";
+import EnregistrementsStudio from "./EnregistrementsStudio";
 
 export default function StudioCreateur() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function StudioCreateur() {
   const [chargement, setChargement] = useState(true);
   const [demarrage, setDemarrage] = useState(false);
   const [profile, setProfile] = useState(null);
+  const [confirmation, setConfirmation] = useState(null);
 
   const estCreateurApprouve =
     profile?.role === "admin" || (profile?.role === "createur" && profile?.statut_createur === "valide");
@@ -79,6 +81,7 @@ export default function StudioCreateur() {
       setClassement(top || []);
 
       setStats({ lives: nbLives || 0, cadeaux: totalCadeaux, revenus });
+
       setChargement(false);
     }
     load();
@@ -105,14 +108,40 @@ export default function StudioCreateur() {
 
   const maxJour = Math.max(...journalier.map((j) => j.montant), 1);
 
-  // Passer en direct maintenant : crée le live immédiatement (mode YouTube
+  // Passer en direct maintenant : confirmation, puis création (mode YouTube
   // tant que le serveur de diffusion n'est pas activé)
+  async function demanderConfirmation() {
+    setConfirmation({
+      titre: "Passer en direct ?",
+      texte: "Ton direct démarre immédiatement et sera visible par tous.",
+      cta: "Oui, passer en direct",
+      action: () => demarrerDirect(),
+    });
+  }
+
   async function demarrerDirect() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return router.push("/connexion");
     setDemarrage(true);
+    // Un seul direct à la fois par compte
+    const { data: enCours } = await supabase
+      .from("lives")
+      .select("id")
+      .eq("createur_id", user.id)
+      .eq("statut", "en_direct")
+      .maybeSingle();
+    if (enCours) {
+      setDemarrage(false);
+      setConfirmation({
+        titre: "Un direct est déjà en cours",
+        texte: "Tu ne peux lancer qu'un seul direct à la fois. Veux-tu rejoindre celui en cours ?",
+        cta: "Rejoindre mon direct",
+        action: () => router.push(`/live/${enCours.id}`),
+      });
+      return;
+    }
     const { data: l, error } = await supabase
       .from("lives")
       .insert({
@@ -129,7 +158,8 @@ export default function StudioCreateur() {
       alert(error.message);
       return;
     }
-    router.push(`/live/${l.id}`);
+    // Navigation dure : arrivée immédiate dans la salle du direct
+    window.location.assign(`/live/${l.id}`);
   }
 
   if (chargement) {
@@ -145,7 +175,7 @@ export default function StudioCreateur() {
         <div className="flex flex-wrap items-center gap-3">
           {(estCreateurApprouve) && (
             <button
-              onClick={demarrerDirect}
+              onClick={demanderConfirmation}
               disabled={demarrage}
               className="flex items-center gap-2 bg-primary text-on-primary-fixed label-md px-5 py-2.5 rounded hover:bg-primary-container transition-colors disabled:opacity-50"
             >
@@ -263,6 +293,40 @@ export default function StudioCreateur() {
 
       {/* Modérateurs de mes directs (personnes que je choisis) */}
       <ModerateursStudio surMessage={setMessage} />
+
+      {/* Mes enregistrements de directs (= mes rediffusions) */}
+      <EnregistrementsStudio />
+
+      {/* Modale de confirmation (lancement + live déjà en cours) */}
+      {confirmation && (
+        <div
+          className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-center justify-center p-5"
+          onClick={() => setConfirmation(null)}
+        >
+          <div
+            className="bg-surface-low border border-outline-variant rounded-xl max-w-md w-full p-8 text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <i className="ph-duotone ph-broadcast text-primary mb-4 inline-block" style={{ fontSize: 48 }} aria-hidden="true" />
+            <h2 className="title-lg text-on-surface mb-2">{confirmation.titre}</h2>
+            <p className="body-md text-on-surface-variant mb-8">{confirmation.texte}</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => { const a = confirmation.action; setConfirmation(null); a(); }}
+                className="bg-primary text-on-primary-fixed label-md px-6 py-3 rounded-lg hover:bg-primary-container transition-colors"
+              >
+                {confirmation.cta}
+              </button>
+              <button
+                onClick={() => setConfirmation(null)}
+                className="border border-outline-variant text-on-surface-variant label-md px-6 py-3 rounded-lg hover:text-on-surface transition-colors"
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
