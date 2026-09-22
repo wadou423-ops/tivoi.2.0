@@ -14,6 +14,11 @@ export default function StudioCreateur() {
   const [montant, setMontant] = useState("");
   const [message, setMessage] = useState("");
   const [chargement, setChargement] = useState(true);
+  const [demarrage, setDemarrage] = useState(false);
+  const [profile, setProfile] = useState(null);
+
+  const estCreateurApprouve =
+    profile?.role === "admin" || (profile?.role === "createur" && profile?.statut_createur === "valide");
 
   useEffect(() => {
     async function load() {
@@ -24,9 +29,10 @@ export default function StudioCreateur() {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("role, solde_revenus, pseudo")
+        .select("role, statut_createur, solde_revenus, pseudo")
         .eq("id", user.id)
         .single();
+      setProfile(profile);
 
       const { count: nbLives } = await supabase
         .from("lives")
@@ -98,6 +104,33 @@ export default function StudioCreateur() {
 
   const maxJour = Math.max(...journalier.map((j) => j.montant), 1);
 
+  // Passer en direct maintenant : crée le live immédiatement (mode YouTube
+  // tant que le serveur de diffusion n'est pas activé)
+  async function demarrerDirect() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return router.push("/connexion");
+    setDemarrage(true);
+    const { data: l, error } = await supabase
+      .from("lives")
+      .insert({
+        createur_id: user.id,
+        titre: `Direct de @${profile?.pseudo || "créateur"}`,
+        statut: "en_direct",
+        mode: "youtube",
+        programme_a: new Date().toISOString(),
+      })
+      .select("id")
+      .single();
+    setDemarrage(false);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    router.push(`/live/${l.id}`);
+  }
+
   if (chargement) {
     return <SquelettePage variant="blocs" />;
   }
@@ -108,12 +141,24 @@ export default function StudioCreateur() {
         <div>
           <h1 className="display-lg text-on-surface mb-2">Studio Créateur</h1>
         </div>
-        <button
-          onClick={exporterCSV}
-          className="flex items-center gap-2 border border-primary text-primary label-md px-5 py-2.5 rounded hover:bg-primary hover:text-on-primary-fixed transition-colors"
-        >
-          <i className="ph-duotone ph-download-simple" style={{ fontSize: 16 }} /> Exporter CSV
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          {(estCreateurApprouve) && (
+            <button
+              onClick={demarrerDirect}
+              disabled={demarrage}
+              className="flex items-center gap-2 bg-primary text-on-primary-fixed label-md px-5 py-2.5 rounded hover:bg-primary-container transition-colors disabled:opacity-50"
+            >
+              <i className="ph-duotone ph-broadcast" style={{ fontSize: 16 }} />
+              {demarrage ? "Ouverture..." : "Passer en direct"}
+            </button>
+          )}
+          <button
+            onClick={exporterCSV}
+            className="flex items-center gap-2 border border-primary text-primary label-md px-5 py-2.5 rounded hover:bg-primary hover:text-on-primary-fixed transition-colors"
+          >
+            <i className="ph-duotone ph-download-simple" style={{ fontSize: 16 }} /> Exporter CSV
+          </button>
+        </div>
       </header>
 
       {/* KPIs */}

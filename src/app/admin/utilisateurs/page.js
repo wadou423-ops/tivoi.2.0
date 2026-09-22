@@ -35,11 +35,10 @@ export default function AdminUtilisateurs() {
   );
 
   async function toggleSuspendre(p) {
-    const { error } = await supabase
-      .from("profiles")
-      .update({ suspendu: !p.suspendu })
-      .eq("id", p.id);
-    if (error) setMessage(error.message);
+    const { data: erreur } = await supabase.rpc("admin_basculer_suspension", {
+      p_user_id: p.id,
+    });
+    if (erreur) setMessage(erreur);
     else setProfils((ps) => ps.map((x) => (x.id === p.id ? { ...x, suspendu: !p.suspendu } : x)));
   }
 

@@ -33,35 +33,16 @@ export default function AdminCreateurs() {
     setActionEnCours(demande.id);
     setMessage("");
 
-    const updates = {
-      statut: nouveauStatut,
-    };
-
-    const [{ error: errDemande }, { error: errProfile }] = await Promise.all([
-      supabase.from("demandes_createur").update(updates).eq("id", demande.id),
-      supabase
-        .from("profiles")
-        .update({
-          role: nouveauStatut === "valide" ? "createur" : "utilisateur",
-          statut_createur: nouveauStatut,
-        })
-        .eq("id", demande.user_id),
-      supabase.from("notifications").insert({
-        user_id: demande.user_id,
-        titre:
-          nouveauStatut === "valide"
-            ? "Compte créateur validé"
-            : "Demande créateur refusée",
-        corps:
-          nouveauStatut === "valide"
-            ? "Félicitations ! Votre compte créateur est actif. Ouvrez le Studio pour programmer vos lives."
-            : "Votre demande n'a pas été retenue. Vous pouvez la soumettre à nouveau.",
-      }),
-    ]);
+    // La validation passe par une RPC serveur : demande + profil +
+    // notification sont mis à jour atomiquement côté base
+    const { data: erreur } = await supabase.rpc("admin_valider_createur", {
+      p_demande_id: demande.id,
+      p_accepter: nouveauStatut === "valide",
+    });
 
     setActionEnCours(null);
-    if (errDemande || errProfile) {
-      setMessage(errDemande?.message || errProfile?.message);
+    if (erreur) {
+      setMessage(erreur);
     } else {
       load();
     }

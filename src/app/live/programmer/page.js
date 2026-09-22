@@ -10,6 +10,7 @@ export default function ProgrammerLive() {
   const [titre, setTitre] = useState("");
   const [description, setDescription] = useState("");
   const [programmeA, setProgrammeA] = useState("");
+  const [mode, setMode] = useState("youtube");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
   const [chargement, setChargement] = useState(true);
@@ -64,6 +65,12 @@ export default function ProgrammerLive() {
     e.preventDefault();
     setSaving(true);
     setMessage("");
+    // Validation : pas de programmation dans le passé
+    if (programmeA && new Date(programmeA) < new Date()) {
+      setMessage("Choisissez une date et une heure dans le futur.");
+      setSaving(false);
+      return;
+    }
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -75,6 +82,7 @@ export default function ProgrammerLive() {
         titre,
         description: description || null,
         programme_a: programmeA || null,
+        mode,
         statut: "programme",
       })
       .select("id")
@@ -134,6 +142,32 @@ export default function ProgrammerLive() {
                 onChange={(e) => setProgrammeA(e.target.value)}
                 className={inputClass}
               />
+            </div>
+          </div>
+
+          <div>
+            <label className="label-md text-on-surface mb-2 block flex items-center gap-2">
+              <i className="ph-duotone ph-broadcast text-primary" style={{ fontSize: 16 }} /> Source de diffusion
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                { code: "youtube", titre: "YouTube", texte: "Collez une URL YouTube dans les réglages du live" },
+                { code: "rtmp", titre: "Caméra (OBS / téléphone)", texte: "Diffusion via le serveur TiVoi — à l'activation" },
+              ].map((m) => (
+                <button
+                  key={m.code}
+                  type="button"
+                  onClick={() => setMode(m.code)}
+                  className={`text-left rounded-lg border p-4 transition-colors ${
+                    mode === m.code
+                      ? "border-outline bg-primary-container/20"
+                      : "border-outline-variant hover:border-outline"
+                  }`}
+                >
+                  <p className={`label-md ${mode === m.code ? "text-primary" : "text-on-surface"}`}>{m.titre}</p>
+                  <p className="caption text-on-surface-variant mt-1">{m.texte}</p>
+                </button>
+              ))}
             </div>
           </div>
 

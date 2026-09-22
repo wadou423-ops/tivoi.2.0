@@ -23,40 +23,16 @@ export default function AdminRetraits() {
   }
 
   async function approuver(id) {
-    const { error } = await supabase.from("retraits").update({ statut: "approuve" }).eq("id", id);
-    if (error) setMessage(error.message);
-    else {
-      const r = retraits.find((x) => x.id === id);
-      if (r) {
-        await supabase.from("notifications").insert({
-          user_id: r.createur_id,
-          titre: "Retrait approuvé",
-          corps: `Votre demande de retrait de ${r.montant_fcfa.toLocaleString("fr-FR")} FCFA a été approuvée.`,
-        });
-      }
-      load();
-    }
+    const { data: erreur } = await supabase.rpc("admin_approuver_retrait", { p_retrait_id: id });
+    if (erreur) setMessage(erreur);
+    else load();
   }
 
   async function rejeter(id) {
-    const { error } = await supabase.from("retraits").update({ statut: "rejete" }).eq("id", id);
-    if (error) setMessage(error.message);
-    else {
-      const r = retraits.find((x) => x.id === id);
-      if (r) {
-        // Recréditer le solde créateur
-        await supabase.rpc("demander_retrait", { p_montant: 0 });
-        await supabase.from("profiles").update({
-          solde_revenus: (await supabase.from("profiles").select("solde_revenus").eq("id", r.createur_id).single()).data.solde_revenus + r.montant_fcfa,
-        }).eq("id", r.createur_id);
-        await supabase.from("notifications").insert({
-          user_id: r.createur_id,
-          titre: "Retrait refusé",
-          corps: `Votre demande de retrait de ${r.montant_fcfa.toLocaleString("fr-FR")} FCFA a été refusée. Le montant a été recrédité.`,
-        });
-      }
-      load();
-    }
+    // RPC atomique : statut + recrédit du solde créateur + notification
+    const { data: erreur } = await supabase.rpc("admin_rejeter_retrait", { p_retrait_id: id });
+    if (erreur) setMessage(erreur);
+    else load();
   }
 
   return (
