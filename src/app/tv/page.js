@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { cacheListe } from "@/lib/cache";
 import FiltreCategories from "../components/FiltreCategories";
 
 const TRADUCTIONS = {
@@ -146,17 +147,23 @@ export default function TV() {
         .single();
       setProprietaire(prof?.pseudo || null);
 
-      const [{ data: cat }, { data: une }] = await Promise.all([
-        supabase
-          .from("catalogue")
-          .select("id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces")
-          .eq("actif", true)
-          .order("ordre", { ascending: true }),
-        supabase
-          .from("a_une")
-          .select("ordre, catalogue(id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces)")
-          .eq("actif", true)
-          .order("ordre", { ascending: true }),
+      const [cat, une] = await Promise.all([
+        cacheListe("catalogue:tv", async () => {
+          const { data } = await supabase
+            .from("catalogue")
+            .select("id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces")
+            .eq("actif", true)
+            .order("ordre", { ascending: true });
+          return data;
+        }),
+        cacheListe("a_une:tv", async () => {
+          const { data } = await supabase
+            .from("a_une")
+            .select("ordre, catalogue(id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces)")
+            .eq("actif", true)
+            .order("ordre", { ascending: true });
+          return data;
+        }),
       ]);
       setFilms(cat || []);
       setALaUne((une || []).filter((s) => s.catalogue).map((s) => ({ ...s.catalogue })));

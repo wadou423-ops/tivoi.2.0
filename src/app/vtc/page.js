@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { cacheListe } from "@/lib/cache";
 import YoutubeKiosque from "../components/YoutubeKiosque";
 import YoutubeVTC from "../components/YoutubeVTC";
 
@@ -90,18 +91,24 @@ export default function VTC() {
     if (!appareil?.appaire) return;
 
     async function load() {
-      const [{ data: pl }, { data: cat }] = await Promise.all([
-        supabase
-          .from("playlist_vtc")
-          .select("*")
-          .eq("actif", true)
-          .order("ordre", { ascending: true }),
-        supabase
-          .from("catalogue")
-          .select("id, titre, image_url, categorie, note, badge, type_acces, bande_annonce_url")
-          .eq("actif", true)
-          .eq("dispo_vtc", true)
-          .order("ordre", { ascending: true }),
+      const [pl, cat] = await Promise.all([
+        cacheListe("playlist_vtc", async () => {
+          const { data } = await supabase
+            .from("playlist_vtc")
+            .select("*")
+            .eq("actif", true)
+            .order("ordre", { ascending: true });
+          return data || [];
+        }),
+        cacheListe("catalogue:vtc", async () => {
+          const { data } = await supabase
+            .from("catalogue")
+            .select("id, titre, image_url, categorie, note, badge, type_acces, bande_annonce_url")
+            .eq("actif", true)
+            .eq("dispo_vtc", true)
+            .order("ordre", { ascending: true });
+          return data || [];
+        }),
       ]);
       setPlaylist(pl || []);
       setFilmsVTC(cat || []);

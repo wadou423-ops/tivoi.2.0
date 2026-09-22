@@ -2,10 +2,13 @@
 
 import { useEffect, useRef } from "react";
 import { supabase } from "./supabaseClient";
+import { invaliderPrefixe } from "./cache";
 
-// Recharge automatiquement les données quand les tables changent en base
-// ou au retour sur l'onglet — rafraîchissements regroupés (max 1 par 600 ms)
-// pour éviter les rechargements en rafale qui font clignoter le contenu.
+// Recharge automatiquement les données quand les tables listées changent.
+// - Abonnement filtré par table (et non plus sur tout le schéma public)
+// - Invalide le mini-cache des listes concernées avant de recharger
+// - Rechargements regroupés (max 1 par 600 ms) et un seul point d'entrée
+//   pour focus/visibilité, pour éviter les doubles fetch qui font clignoter.
 export function useRealtimeReload(tables, reload, deps = []) {
   const dernierRef = useRef(0);
 
@@ -17,15 +20,17 @@ export function useRealtimeReload(tables, reload, deps = []) {
       reload();
     }
 
-    const channel = supabase
-      .channel(`rt-${tables.join("-")}-${Math.random().toString(36).slice(2, 8)}`)
-      .on("postgres_changes", { event: "*", schema: "public" }, (payload) => {
-        if (tables.includes(payload.table)) planifier();
-      })
-      .subscribe();
+    const surChangement = (payload) => {
+      invaliderPrefixe(payload.table);
+      planifier();
+    };
 
-    // Un seul point d'entrée : focus et visibilitychange déclenchaient
-    // chacun un rechargement (double fetch au retour d'onglet)
+    const channel = supabase.channel(`rt-${tables.join("-")}-${Math.random().toString(36).slice(2, 8)}`);
+    tables.forEach((table) => {
+      channel.on("postgres_changes", { event: "*", schema: "public", table }, surChangement);
+    });
+    channel.subscribe();
+
     const onVisible = () => {
       if (document.visibilityState === "visible") planifier();
     };

@@ -3,17 +3,21 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import { cacheListe } from "@/lib/cache";
 
 export default function Abonnements() {
   const [paliers, setPaliers] = useState([]);
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase
-        .from("abonnements_paliers")
-        .select("*")
-        .order("ordre", { ascending: true });
-      setPaliers(data || []);
+      const data = await cacheListe("abonnements_paliers", async () => {
+        const { data } = await supabase
+          .from("abonnements_paliers")
+          .select("*")
+          .order("ordre", { ascending: true });
+        return data || [];
+      }, 300000);
+      setPaliers(data);
     }
     load();
   }, []);

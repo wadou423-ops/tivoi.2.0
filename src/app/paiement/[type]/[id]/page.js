@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
-import LoaderCentered from "../../../components/LoaderCentered";
+import SquelettePage from "../../../components/SquelettePage";
 import Spinner from "../../../components/Spinner";
 
 const FOURNISSEURS = [
@@ -116,7 +116,7 @@ export default function Paiement() {
   }
 
   if (chargement) {
-    return <LoaderCentered />;
+    return <SquelettePage variant="panneau" />;
   }
 
   if (!objet) {

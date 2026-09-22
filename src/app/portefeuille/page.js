@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import Banniere from "../components/Banniere";
-import LoaderCentered from "../components/LoaderCentered";
+import SquelettePage from "../components/SquelettePage";
 
 export default function Portefeuille() {
   const [solde, setSolde] = useState(null);
@@ -51,7 +51,7 @@ export default function Portefeuille() {
   }, []);
 
   if (chargement) {
-    return <LoaderCentered />;
+    return <SquelettePage variant="blocs" />;
   }
 
   if (!chargement && solde === null) {

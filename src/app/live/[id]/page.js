@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { cacheListe } from "@/lib/cache";
 import Banniere from "../../components/Banniere";
 import LoaderCentered from "../../components/LoaderCentered";
 import YoutubeDirect from "../../components/YoutubeDirect";
@@ -98,12 +99,15 @@ export default function LiveEnDirect() {
         .limit(50);
       setMessages((m || []).reverse());
 
-      const { data: c } = await supabase
-        .from("cadeaux")
-        .select("*")
-        .eq("actif", true)
-        .order("cout_tokens", { ascending: true });
-      setCadeaux(c || []);
+      const c = await cacheListe("cadeaux", async () => {
+        const { data } = await supabase
+          .from("cadeaux")
+          .select("*")
+          .eq("actif", true)
+          .order("cout_tokens", { ascending: true });
+        return data || [];
+      }, 300000);
+      setCadeaux(c);
 
       if (user) {
         const { data: profile } = await supabase

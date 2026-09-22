@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { cacheListe } from "@/lib/cache";
 import Banniere from "../components/Banniere";
 
 export default function GuideTV() {
@@ -11,13 +12,16 @@ export default function GuideTV() {
 
   useEffect(() => {
     async function load() {
-      const { data: c } = await supabase
-        .from("chaines")
-        .select("*")
-        .eq("actif", true)
-        .order("nom", { ascending: true });
-      setChaines(c || []);
-      if (c && c.length > 0) setActive(c[0]);
+      const c = await cacheListe("chaines", async () => {
+        const { data } = await supabase
+          .from("chaines")
+          .select("*")
+          .eq("actif", true)
+          .order("nom", { ascending: true });
+        return data || [];
+      }, 300000);
+      setChaines(c);
+      if (c.length > 0) setActive(c[0]);
     }
     load();
   }, []);
@@ -25,12 +29,15 @@ export default function GuideTV() {
   useEffect(() => {
     async function loadEpg() {
       if (!active) return;
-      const { data } = await supabase
-        .from("epg")
-        .select("*")
-        .eq("chaine_id", active.id)
-        .order("debut", { ascending: true });
-      setEpg(data || []);
+      const data = await cacheListe(`epg:${active.id}`, async () => {
+        const { data } = await supabase
+          .from("epg")
+          .select("*")
+          .eq("chaine_id", active.id)
+          .order("debut", { ascending: true });
+        return data || [];
+      });
+      setEpg(data);
     }
     loadEpg();
   }, [active]);

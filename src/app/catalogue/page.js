@@ -4,8 +4,9 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import { cacheListe } from "@/lib/cache";
 import { useRealtimeReload } from "@/lib/useRealtime";
-import LoaderCentered from "../components/LoaderCentered";
+import SquelettePage from "../components/SquelettePage";
 import FiltreCategories from "../components/FiltreCategories";
 import CarteFilm from "../components/CarteFilm";
 
@@ -70,17 +71,23 @@ export default function CatalogueVOD() {
       setConnecte(false);
     }
 
-    const [{ data }, { data: une }] = await Promise.all([
-      supabase
-        .from("catalogue")
-        .select("*")
-        .eq("actif", true)
-        .order("ordre", { ascending: true }),
-      supabase
-        .from("a_une")
-        .select("ordre, catalogue(id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces, bande_annonce_url)")
-        .eq("actif", true)
-        .order("ordre", { ascending: true }),
+    const [data, une] = await Promise.all([
+      cacheListe("catalogue:catalogue", async () => {
+        const { data } = await supabase
+          .from("catalogue")
+          .select("*")
+          .eq("actif", true)
+          .order("ordre", { ascending: true });
+        return data;
+      }),
+      cacheListe("a_une:catalogue", async () => {
+        const { data } = await supabase
+          .from("a_une")
+          .select("ordre, catalogue(id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces, bande_annonce_url)")
+          .eq("actif", true)
+          .order("ordre", { ascending: true });
+        return data;
+      }),
     ]);
 
     if (data) setFilms(data);
@@ -231,11 +238,7 @@ export default function CatalogueVOD() {
 
   // Visiteur : page vitrine avec grille
   if (loading) {
-    return (
-      <main className="px-6 md:px-20 pt-28 pb-12">
-        <LoaderCentered />
-      </main>
-    );
+    return <SquelettePage variant="grille" />;
   }
 
   return (

@@ -4,9 +4,10 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import { cacheListe } from "@/lib/cache";
 import { useRealtimeReload } from "@/lib/useRealtime";
 import Banniere from "./components/Banniere";
-import LoaderCentered from "./components/LoaderCentered";
+import SquelettePage from "./components/SquelettePage";
 import CarteFilm from "./components/CarteFilm";
 import FicheRapide from "./components/FicheRapide";
 import FiltreCategories from "./components/FiltreCategories";
@@ -92,35 +93,36 @@ export default function Home() {
   const [modaleConnexion, setModaleConnexion] = useState(false);
 
   const loadCatalogue = useCallback(async () => {
-    const { data } = await supabase
-      .from("catalogue")
-      .select("id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces, bande_annonce_url")
-      .eq("actif", true)
-      .order("ordre", { ascending: true });
-    setCatalogue(data || []);
+    const data = await cacheListe("catalogue:accueil", async () => {
+      const { data } = await supabase
+        .from("catalogue")
+        .select("id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces, bande_annonce_url")
+        .eq("actif", true)
+        .order("ordre", { ascending: true });
+      return data || [];
+    });
+    setCatalogue(data);
     setCatalogueCharge(true);
   }, []);
 
   const loadALaUne = useCallback(async () => {
-    const { data } = await supabase
-      .from("a_une")
-      .select(
-        "id, contenu_id, ordre, catalogue(id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces, bande_annonce_url)"
-      )
-      .eq("actif", true)
-      .order("ordre", { ascending: true });
-    setALaUne(
-      (data || [])
-        .filter((s) => s.catalogue)
-        .map((s) => ({ ...s.catalogue }))
-    );
+    const data = await cacheListe("a_une:accueil", async () => {
+      const { data } = await supabase
+        .from("a_une")
+        .select(
+          "id, contenu_id, ordre, catalogue(id, titre, image_url, categorie, note, badge, prix_fcfa, type_acces, bande_annonce_url)"
+        )
+        .eq("actif", true)
+        .order("ordre", { ascending: true });
+      return data || [];
+    });
+    setALaUne(data.filter((s) => s.catalogue).map((s) => ({ ...s.catalogue })));
   }, []);
 
   const loadProgressions = useCallback(async () => {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    console.log("[TiVoi] 1. Utilisateur connecté :", user ? user.id : "AUCUN");
     if (!user) {
       setReprendre([]);
       setProgressionMap({});
@@ -139,7 +141,6 @@ export default function Home() {
       console.error("[TiVoi] Erreur progressions :", error.message);
       return;
     }
-    console.log("[TiVoi] 2. Progressions trouvées en base :", progs ? progs.length : "requête vide", JSON.stringify(progs || []));
     if (!progs || progs.length === 0) {
       setReprendre([]);
       return;
@@ -229,13 +230,9 @@ export default function Home() {
     setChoixReprise(film);
   }
 
-  // Tant que la session n'est pas vérifiée : spinner (pas de flash version visiteur)
+  // Tant que la session n'est pas vérifiée : squelette d'accueil (pas de flash version visiteur)
   if (chargement) {
-    return (
-      <main className="flex-grow min-h-screen flex items-center justify-center pt-20">
-        <LoaderCentered />
-      </main>
-    );
+    return <SquelettePage variant="hero" />;
   }
 
   // ---------- Mode connecté : expérience Netflix ----------

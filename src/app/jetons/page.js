@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import { cacheListe } from "@/lib/cache";
 
 export default function AcheterJetons() {
   const [packs, setPacks] = useState([]);
@@ -10,12 +11,15 @@ export default function AcheterJetons() {
 
   useEffect(() => {
     async function load() {
-      const { data: p } = await supabase
-        .from("packs_tokens")
-        .select("*")
-        .eq("actif", true)
-        .order("tokens", { ascending: true });
-      setPacks(p || []);
+      const p = await cacheListe("packs_tokens", async () => {
+        const { data } = await supabase
+          .from("packs_tokens")
+          .select("*")
+          .eq("actif", true)
+          .order("tokens", { ascending: true });
+        return data || [];
+      }, 300000);
+      setPacks(p);
 
       const {
         data: { user },

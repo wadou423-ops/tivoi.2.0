@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import LoaderCentered from "../components/LoaderCentered";
+import SquelettePage from "../components/SquelettePage";
 
 export default function StudioCreateur() {
   const router = useRouter();
@@ -99,11 +99,7 @@ export default function StudioCreateur() {
   const maxJour = Math.max(...journalier.map((j) => j.montant), 1);
 
   if (chargement) {
-    return (
-      <main className="pt-28 pb-20 px-5 md:px-20 flex items-center justify-center min-h-[60vh]">
-        <LoaderCentered />
-      </main>
-    );
+    return <SquelettePage variant="blocs" />;
   }
 
   return (

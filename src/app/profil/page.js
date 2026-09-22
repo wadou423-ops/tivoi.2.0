@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import LoaderCentered from "../components/LoaderCentered";
+import SquelettePage from "../components/SquelettePage";
 
 export default function Profil() {
   const router = useRouter();
@@ -44,11 +44,7 @@ export default function Profil() {
   }
 
   if (!profile) {
-    return (
-      <main className="pt-28 pb-20 px-5 md:px-20 flex items-center justify-center min-h-screen">
-        <LoaderCentered />
-      </main>
-    );
+    return <SquelettePage variant="blocs" />;
   }
 
   const MENU = [
