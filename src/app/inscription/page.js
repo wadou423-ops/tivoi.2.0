@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Lock, User as UserIcon, Phone, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Spinner from "../components/Spinner";
 
@@ -55,10 +54,8 @@ export default function Inscription() {
 
       <form
         onSubmit={handleSubmit}
-        className="relative z-10 w-full max-w-md p-8 rounded-xl glass-panel glow-focus shadow-2xl"
+        className="relative z-10 w-full max-w-md p-8 rounded-xl bg-surface-low border border-outline-variant glow-focus"
       >
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary-container to-transparent opacity-50" />
-
         <div className="text-center mb-8">
           <h1 className="font-display font-bold text-4xl text-primary tracking-tight mb-3">TiVoi</h1>
           <p className="text-on-surface-variant">Rejoignez l&apos;expérience cinéma premium.</p>
@@ -67,14 +64,14 @@ export default function Inscription() {
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <div className="relative rounded-lg glow-focus transition-all">
-              <UserIcon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+              <i className="ph-duotone ph-user absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style={{ fontSize: 16 }} />
               <input
                 type="text"
                 required
                 value={prenom}
                 onChange={(e) => setPrenom(e.target.value)}
                 placeholder="Prénom"
-                className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant text-on-surface pl-9 pr-3 py-3 outline-none focus:border-primary-container transition-colors"
+                className="w-full bg-surface-low border border-outline-variant text-on-surface pl-9 pr-3 py-3 outline-none focus:border-outline transition-colors"
               />
             </div>
             <input
@@ -83,24 +80,24 @@ export default function Inscription() {
               value={nom}
               onChange={(e) => setNom(e.target.value)}
               placeholder="Nom"
-              className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-3 py-3 outline-none focus:border-primary-container transition-colors"
+              className="w-full bg-surface-low border border-outline-variant rounded-lg text-on-surface px-3 py-3 outline-none focus:border-outline transition-colors"
             />
           </div>
 
           <div className="relative rounded-lg glow-focus transition-all">
-            <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+            <i className="ph-duotone ph-envelope-simple absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style={{ fontSize: 18 }} />
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
-              className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant text-on-surface pl-10 pr-4 py-3 outline-none focus:border-primary-container transition-colors"
+              className="w-full bg-surface-low border border-outline-variant text-on-surface pl-10 pr-4 py-3 outline-none focus:border-outline transition-colors"
             />
           </div>
 
           <div className="relative rounded-lg glow-focus transition-all">
-            <Phone size={18} className="absolute left-3 top-[calc(50%-7px)] -translate-y-1/2 text-on-surface-variant pointer-events-none" />
+            <i className="ph-duotone ph-phone absolute left-3 top-[calc(50%-7px)] -translate-y-1/2 text-on-surface-variant pointer-events-none" style={{ fontSize: 18 }} />
             <span className="absolute left-10 top-[calc(50%-9px)] -translate-y-1/2 text-on-surface-variant text-sm font-semibold pointer-events-none pr-2 border-r border-outline-variant h-6 flex items-center justify-center">
               +225
             </span>
@@ -111,7 +108,7 @@ export default function Inscription() {
               onChange={(e) => setTelephone(e.target.value.replace(/\D/g, "").slice(0, 10))}
               placeholder="07 00 00 00 00"
               inputMode="numeric"
-              className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant text-on-surface pl-[76px] pr-4 py-3 outline-none focus:border-primary-container transition-colors text-center"
+              className="w-full bg-surface-low border border-outline-variant text-on-surface pl-[76px] pr-4 py-3 outline-none focus:border-outline transition-colors text-center"
             />
             <p className="caption text-on-surface-variant mt-1.5 opacity-70">
               Sert à te connecter par SMS avec un code.
@@ -119,7 +116,7 @@ export default function Inscription() {
           </div>
 
           <div className="relative rounded-lg glow-focus transition-all">
-            <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+            <i className="ph-duotone ph-lock absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style={{ fontSize: 18 }} />
             <input
               type={showPassword ? "text" : "password"}
               required
@@ -127,14 +124,14 @@ export default function Inscription() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mot de passe"
-              className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant text-on-surface pl-10 pr-10 py-3 outline-none focus:border-primary-container transition-colors"
+              className="w-full bg-surface-low border border-outline-variant text-on-surface pl-10 pr-10 py-3 outline-none focus:border-outline transition-colors"
             />
             <button
               type="button"
               onClick={() => setShowPassword((s) => !s)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors"
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showPassword ? <i className="ph-duotone ph-eye-slash" style={{ fontSize: 18 }} /> : <i className="ph-duotone ph-eye" style={{ fontSize: 18 }} />}
             </button>
           </div>
 

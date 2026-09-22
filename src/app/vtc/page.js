@@ -155,7 +155,7 @@ export default function VTC() {
           {appareil.code_activation.split("").map((c, i) => (
             <span
               key={i}
-              className="w-16 h-20 md:w-20 md:h-24 rounded-xl glass-panel flex items-center justify-center text-4xl font-mono font-bold text-primary"
+              className="w-16 h-20 md:w-20 md:h-24 rounded-xl bg-surface-low border border-outline-variant flex items-center justify-center text-4xl font-mono font-bold text-primary"
             >
               {c}
             </span>
@@ -208,7 +208,7 @@ export default function VTC() {
                   setFilmActif(film);
                   setVue("lecture");
                 }}
-                className="text-left rounded-xl overflow-hidden bg-surface-container border border-outline-variant/20 hover:border-primary active:scale-95 transition-all"
+                className="text-left rounded-xl overflow-hidden bg-surface-container border border-outline-variant/20 hover:border-outline active:scale-95 transition-all"
               >
                 <div className="relative aspect-[2/3] bg-surface-high">
                   {film.image_url && (
@@ -382,7 +382,7 @@ export default function VTC() {
 
       {current?.type === "publicite" && (
         <div className="absolute top-6 right-6 z-20 flex flex-col items-end gap-2">
-          <div className="bg-primary/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-[0_0_15px_rgba(212,175,55,0.3)]">
+          <div className="bg-primary/90 backdrop-blur-md px-4 py-2 rounded-lg">
             <span className="text-xs font-title font-bold uppercase tracking-widest text-on-primary">
               Publicité
             </span>
@@ -399,9 +399,9 @@ export default function VTC() {
       {/* Bouton tactile : le passager choisit son film */}
       <button
         onClick={() => setVue("catalogue")}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 bg-primary text-on-primary-fixed font-title font-bold text-lg px-10 py-4 rounded-full shadow-[0_0_25px_rgba(212,175,55,0.4)] hover:scale-105 active:scale-95 transition-transform"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 bg-primary text-on-primary-fixed font-title font-bold text-lg px-10 py-4 rounded-full active:scale-95 transition-transform flex items-center justify-center gap-3"
       >
-        🎬 Choisir un film
+        <i className="ph-duotone ph-film-slate" style={{ fontSize: 22 }} aria-hidden="true" /> Choisir un film
       </button>
     </main>
   );

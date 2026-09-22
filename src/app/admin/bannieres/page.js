@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import UploadFichier from "../../components/UploadFichier";
 import { useRealtimeReload } from "@/lib/useRealtime";
@@ -58,13 +57,13 @@ export default function AdminBannieres() {
   }
 
   const inputClass =
-    "w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-2.5 outline-none focus:border-primary-container transition-colors text-sm";
+    "w-full bg-surface-low border border-outline-variant rounded-lg text-on-surface px-4 py-2.5 outline-none focus:border-outline transition-colors text-sm";
 
   return (
     <main className="px-6 md:px-12 py-12">
       <h1 className="font-display font-bold text-3xl text-primary mb-8">Bannières publicitaires</h1>
 
-      <form onSubmit={ajouter} className="glass-panel rounded-xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form onSubmit={ajouter} className="bg-surface-low border border-outline-variant rounded-xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="caption text-on-surface-variant block mb-1">Emplacement</label>
           <select value={form.emplacement} onChange={(e) => setForm({ ...form, emplacement: e.target.value })} className={inputClass}>
@@ -87,7 +86,7 @@ export default function AdminBannieres() {
           <input type="url" value={form.lien} onChange={(e) => setForm({ ...form, lien: e.target.value })} className={inputClass} />
         </div>
         <button type="submit" className="md:col-span-2 flex items-center justify-center gap-2 bg-primary text-on-primary-fixed label-md px-6 py-3 rounded hover:bg-primary-container transition-colors">
-          <Plus size={16} /> Publier la bannière
+          <i className="ph-duotone ph-plus" style={{ fontSize: 16 }} /> Publier la bannière
         </button>
       </form>
 
@@ -108,7 +107,7 @@ export default function AdminBannieres() {
               {b.actif ? "Active" : "Inactive"}
             </button>
             <button onClick={() => supprimer(b.id)} className="text-on-surface-variant hover:text-error p-1">
-              <Trash2 size={16} />
+              <i className="ph-duotone ph-trash" style={{ fontSize: 16 }} />
             </button>
           </div>
         ))}

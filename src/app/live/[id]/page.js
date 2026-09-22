@@ -1,8 +1,7 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import IconeMS from "../../components/IconeMS";
 import { supabase } from "@/lib/supabaseClient";
 import Banniere from "../../components/Banniere";
 import LoaderCentered from "../../components/LoaderCentered";
@@ -52,7 +51,7 @@ export default function LiveEnDirect() {
     v.play();
   }
 
-  // Quitter l'onglet pendant un direct MP4 : pause (le son s'arrÃªte)
+  // Quitter l'onglet pendant un direct MP4 : pause (le son s'arrête)
   useEffect(() => {
     function onVisible() {
       if (document.visibilityState !== "visible" && live?.statut === "en_direct" && videoDirectRef.current && !videoDirectRef.current.paused) {
@@ -77,7 +76,7 @@ export default function LiveEnDirect() {
         console.error("[TiVoi] Erreur chargement live :", errLive.message);
       }
       setLive(l);
-      // Identifie le crÃ©ateur (pour lui permettre de gÃ©rer son direct)
+      // Identifie le créateur (pour lui permettre de gérer son direct)
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -139,7 +138,7 @@ export default function LiveEnDirect() {
     }
   }
 
-  // Chat temps rÃ©el + prÃ©sence + rÃ©actions + cadeaux animÃ©s
+  // Chat temps réel + présence + réactions + cadeaux animés
   useEffect(() => {
     const channel = supabase
       .channel(`live-${id}`, { config: { presence: { key: clePresence() } } })
@@ -147,7 +146,7 @@ export default function LiveEnDirect() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "messages_live", filter: `live_id=eq.${id}` },
         (payload) => {
-          // DÃ©duplique avec l'affichage optimiste
+          // Déduplique avec l'affichage optimiste
           setMessages((prev) => {
             const doublon = prev.some(
               (m) =>
@@ -212,7 +211,7 @@ export default function LiveEnDirect() {
       .eq("id", user.id)
       .single();
 
-    // Affichage optimiste : le message apparaÃ®t instantanÃ©ment
+    // Affichage optimiste : le message apparaît instantanément
     const tempId = `optimiste-${Date.now()}`;
     setMessages((prev) => [
       ...prev,
@@ -242,7 +241,7 @@ export default function LiveEnDirect() {
     if (error) {
       setToast(error.message);
     } else {
-      setToast(`${cadeau.emoji} ${cadeau.nom} envoyÃ© Ã  @${live?.profiles?.pseudo || "crÃ©ateur"} !`);
+      setToast(`${cadeau.emoji} ${cadeau.nom} envoyé à @${live?.profiles?.pseudo || "créateur"} !`);
       ajouterCadeauVolant(cadeau.emoji);
       setSolde((s) => s - cadeau.cout_tokens);
     }
@@ -260,7 +259,7 @@ export default function LiveEnDirect() {
   if (!live) {
     return (
       <main className="pt-28 pb-20 px-5 md:px-20 text-center">
-        <p className="text-on-surface-variant">Ce live n&apos;existe pas ou a Ã©tÃ© supprimÃ©.</p>
+        <p className="text-on-surface-variant">Ce live n&apos;existe pas ou a été supprimé.</p>
       </main>
     );
   }
@@ -269,7 +268,7 @@ export default function LiveEnDirect() {
     ? live.url_lecture.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|live\/|embed\/))([a-zA-Z0-9_-]{11})/)
     : null;
 
-  const EMOJIS_REACTION = ["â¤ï¸", "ðŸ”¥", "ðŸ‘", "ðŸ˜®", "ðŸ˜‚"];
+  const EMOJIS_REACTION = ["❤️", "🔥", "👏", "😮", "😂"];
 
   return (
     <main className="pt-24 pb-10 px-5 md:px-20">
@@ -293,31 +292,31 @@ export default function LiveEnDirect() {
               )
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center gap-3 text-on-surface-variant">
-                <IconeMS nom="live_tv" taille={52} rempli={false} className="text-primary/40" />
+                <i className="ph-duotone ph-television text-primary/40" style={{ fontSize: 52 }} aria-hidden="true" />
                 <p className="body-lg">
                   {live.statut === "programme"
-                    ? "Live programmÃ© â€” le direct dÃ©marre bientÃ´t."
-                    : "Ce live est terminÃ©."}
+                    ? "Live programmé — le direct démarre bientôt."
+                    : "Ce live est terminé."}
                 </p>
               </div>
             )}
             {live.statut === "en_direct" && (
               <span className="absolute top-3 left-3 bg-error text-on-error caption font-bold px-2 py-1 rounded pulse-live">
-                â— EN DIRECT
+                ● EN DIRECT
               </span>
             )}
             {/* Compteur spectateurs + quitter le direct */}
             <span className="absolute top-3 right-3 bg-surface-lowest/70 backdrop-blur-md caption text-on-surface px-2.5 py-1 rounded flex items-center gap-1.5">
-              <IconeMS nom="visibility" taille={13} rempli={false} className="text-primary" /> {spectateurs}
+              <i className="ph-duotone ph-eye text-primary" style={{ fontSize: 13 }} aria-hidden="true" /> {spectateurs}
             </span>
             <button
               onClick={() => router.push("/lives")}
               className="absolute top-12 right-3 bg-surface-lowest/70 backdrop-blur-md caption text-on-surface px-2.5 py-1 rounded flex items-center gap-1.5 hover:text-primary transition-colors"
             >
-              â† Quitter le direct
+              ← Quitter le direct
             </button>
 
-            {/* Cadeaux qui traversent l'Ã©cran */}
+            {/* Cadeaux qui traversent l'écran */}
             {cadeauxVolants.map((c) => (
               <span
                 key={c.id}
@@ -328,7 +327,7 @@ export default function LiveEnDirect() {
               </span>
             ))}
 
-            {/* RÃ©actions flottantes */}
+            {/* Réactions flottantes */}
             {reactions.map((r) => (
               <span
                 key={r.id}
@@ -340,41 +339,41 @@ export default function LiveEnDirect() {
             ))}
           </div>
 
-          {/* Barre de rÃ©actions */}
+          {/* Barre de réactions */}
           <div className="flex items-center gap-2">
             {EMOJIS_REACTION.map((e) => (
               <button
                 key={e}
                 onClick={() => envoyerReaction(e)}
-                className="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-lg hover:scale-110 active:scale-95 transition-transform"
+                className="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-lg active:scale-95 transition-transform"
               >
                 {e}
               </button>
             ))}
             <span className="caption text-on-surface-variant ml-2">
-              RÃ©agis en direct â€” tout le monde voit tes emojis
+              Réagis en direct — tout le monde voit tes emojis
             </span>
           </div>
 
           <div>
             <h1 className="headline-md text-on-surface">{live.titre}</h1>
             <p className="body-md text-on-surface-variant mt-1">
-              par @{live.profiles?.pseudo || "crÃ©ateur"} {live.description ? `â€” ${live.description}` : ""}
+              par @{live.profiles?.pseudo || "créateur"} {live.description ? `— ${live.description}` : ""}
             </p>
           </div>
 
-          {/* Panneau du crÃ©ateur : URL du flux + dÃ©marrage/arrÃªt du direct */}
+          {/* Panneau du créateur : URL du flux + démarrage/arrêt du direct */}
           {(estCreateur || estAdmin) && (
-            <div className="glass-panel rounded-xl p-5">
+            <div className="bg-surface-low border border-outline-variant rounded-xl p-5">
               <h2 className="label-md text-primary uppercase mb-3 flex items-center gap-2">
-                <IconeMS nom="settings_input_antenna" taille={18} rempli={false} /> RÃ©glages du direct (visible par le crÃ©ateur)
+                <i className="ph-duotone ph-broadcast" style={{ fontSize: 18 }} aria-hidden="true" /> Réglages du direct (visible par le créateur)
               </h2>
               <div className="flex flex-col sm:flex-row gap-3 items-start">
                 <input
                   value={urlEdit || live.url_lecture || ""}
                   onChange={(e) => setUrlEdit(e.target.value)}
                   placeholder="URL du flux (ex : https://www.youtube.com/watch?v=...)"
-                  className="flex-1 bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-primary-container transition-colors text-sm"
+                  className="flex-1 bg-surface-low border border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-outline transition-colors text-sm"
                 />
                 <button
                   onClick={async () => {
@@ -386,7 +385,7 @@ export default function LiveEnDirect() {
                     setLive((l) => ({ ...l, url_lecture: urlEdit || l.url_lecture }));
                     setUrlEdit("");
                     setSavingStream(false);
-                    setToast("URL du flux enregistrÃ©e.");
+                    setToast("URL du flux enregistrée.");
                     setTimeout(() => setToast(""), 3000);
                   }}
                   disabled={savingStream}
@@ -402,7 +401,7 @@ export default function LiveEnDirect() {
                     }}
                     className="border border-error text-error label-md px-5 py-3 rounded-lg hover:bg-error/10 transition-colors whitespace-nowrap"
                   >
-                    ArrÃªter le direct
+                    Arrêter le direct
                   </button>
                 ) : (
                   <button
@@ -412,24 +411,24 @@ export default function LiveEnDirect() {
                     }}
                     className="bg-primary text-on-primary-fixed label-md px-5 py-3 rounded-lg hover:bg-primary-container transition-colors whitespace-nowrap"
                   >
-                    DÃ©marrer le direct
+                    Démarrer le direct
                   </button>
                 )}
                 <p className="caption text-on-surface-variant w-full sm:w-auto">
-                  ClÃ© de stream : <span className="font-mono text-primary">{live.cle_stream}</span>
+                  Clé de stream : <span className="font-mono text-primary">{live.cle_stream}</span>
                 </p>
               </div>
             </div>
           )}
 
           {/* Cadeaux */}
-          <div className="glass-panel rounded-xl p-4">
+          <div className="bg-surface-low border border-outline-variant rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <h2 className="label-md text-primary uppercase flex items-center gap-2">
-                <IconeMS nom="redeem" taille={18} /> Offrir un cadeau
+                <i className="ph-duotone ph-gift" style={{ fontSize: 18 }} aria-hidden="true" /> Offrir un cadeau
               </h2>
               <span className="caption text-on-surface-variant">
-                Solde : <span className="text-primary font-bold">{solde ?? "â€”"} jetons</span>
+                Solde : <span className="text-primary font-bold">{solde ?? "—"} jetons</span>
               </span>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-1 hide-scrollbar">
@@ -437,11 +436,11 @@ export default function LiveEnDirect() {
                 <button
                   key={c.id}
                   onClick={() => offrirCadeau(c)}
-                  className="flex-none flex flex-col items-center gap-1 px-4 py-3 rounded-lg border border-outline-variant/30 hover:border-primary bg-surface-container transition-colors"
+                  className="flex-none flex flex-col items-center gap-1 px-4 py-3 rounded-lg border border-outline-variant/30 hover:border-outline bg-surface-container transition-colors"
                 >
                   <span className="text-2xl">{c.emoji}</span>
                   <span className="caption text-on-surface">{c.nom}</span>
-                  <span className="caption text-primary font-bold">{c.cout_tokens} ðŸª™</span>
+                  <span className="caption text-primary font-bold">{c.cout_tokens} 🪙</span>
                 </button>
               ))}
             </div>
@@ -450,9 +449,9 @@ export default function LiveEnDirect() {
 
         {/* Chat */}
         <div className="lg:col-span-4 flex flex-col">
-          <div className="glass-panel rounded-xl flex flex-col h-[600px]">
+          <div className="bg-surface-low border border-outline-variant rounded-xl flex flex-col h-[600px]">
             <div className="px-4 py-3 border-b border-outline-variant/20 flex items-center gap-2">
-              <IconeMS nom="visibility" taille={16} rempli={false} className="text-primary" />
+              <i className="ph-duotone ph-eye text-primary" style={{ fontSize: 16 }} aria-hidden="true" />
               <span className="label-md text-on-surface">Chat en direct</span>
             </div>
             <div ref={chatRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
@@ -463,7 +462,7 @@ export default function LiveEnDirect() {
                 </div>
               ))}
               {messages.length === 0 && (
-                <p className="caption text-on-surface-variant">Aucun message â€” lancez la conversation !</p>
+                <p className="caption text-on-surface-variant">Aucun message — lancez la conversation !</p>
               )}
             </div>
             <form onSubmit={envoyer} className="p-3 border-t border-outline-variant/20 flex gap-2">
@@ -471,13 +470,13 @@ export default function LiveEnDirect() {
                 value={texte}
                 onChange={(e) => setTexte(e.target.value)}
                 placeholder="Votre message..."
-                className="flex-1 bg-surface-variant/50 border-0 rounded-lg text-on-surface px-3 py-2.5 outline-none focus:ring-1 focus:ring-primary"
+                className="flex-1 bg-surface-low border border-outline-variant rounded-lg text-on-surface px-3 py-2.5 outline-none focus:border-outline transition-colors"
               />
               <button
                 type="submit"
                 className="bg-primary text-on-primary-fixed rounded-lg px-3 flex items-center justify-center hover:bg-primary-container transition-colors"
               >
-                <IconeMS nom="send" taille={18} rempli={false} />
+                <i className="ph-duotone ph-paper-plane-tilt" style={{ fontSize: 18 }} aria-hidden="true" />
               </button>
             </form>
           </div>

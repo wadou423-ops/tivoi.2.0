@@ -46,14 +46,14 @@ export default function PagesLegales() {
       <h1 className="display-lg text-on-surface mb-10">Mentions légales & confidentialité</h1>
       <div className="space-y-8">
         {SECTIONS.map((s) => (
-          <section key={s.titre} className="glass-panel rounded-xl p-6">
+          <section key={s.titre} className="bg-surface-low border border-outline-variant rounded-xl p-6">
             <h2 className="title-lg text-primary mb-3">{s.titre}</h2>
             <p className="body-md text-on-surface-variant leading-relaxed">{s.contenu}</p>
           </section>
         ))}
       </div>
       <p className="caption text-outline mt-10 text-center">
-        Dernière mise à jour : {new Date().toLocaleDateString("fr-FR", { dateStyle: "long" })}
+        Dernière mise à jour : 22 septembre 2026
       </p>
     </main>
   );

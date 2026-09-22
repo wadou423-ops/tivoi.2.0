@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRealtimeReload } from "@/lib/useRealtime";
 
@@ -90,7 +89,7 @@ export default function AdminChaines() {
   }
 
   const inputClass =
-    "w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-2.5 outline-none focus:border-primary-container transition-colors text-sm";
+    "w-full bg-surface-low border border-outline-variant rounded-lg text-on-surface px-4 py-2.5 outline-none focus:border-outline transition-colors text-sm";
 
   return (
     <main className="px-6 md:px-12 py-12">
@@ -108,7 +107,7 @@ export default function AdminChaines() {
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`label-md px-5 py-2 rounded transition-colors ${
-              tab === t.id ? "bg-primary-container/20 border border-primary text-primary" : "border border-outline-variant text-on-surface-variant hover:border-primary/50"
+              tab === t.id ? "bg-primary-container/20 border border-outline text-primary" : "border border-outline-variant text-on-surface-variant hover:border-primary/50"
             }`}
           >
             {t.label}
@@ -118,7 +117,7 @@ export default function AdminChaines() {
 
       {tab === "chaines" && (
         <>
-          <form onSubmit={ajouterChaine} className="glass-panel rounded-xl p-6 mb-6 grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
+          <form onSubmit={ajouterChaine} className="bg-surface-low border border-outline-variant rounded-xl p-6 mb-6 grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
             <input required value={nom} onChange={(e) => setNom(e.target.value)} placeholder="Nom de la chaîne" className={inputClass} />
             <select value={type} onChange={(e) => setType(e.target.value)} className={inputClass}>
               <option value="youtube">YouTube</option>
@@ -126,7 +125,7 @@ export default function AdminChaines() {
             </select>
             <input required type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="URL du flux" className={inputClass} />
             <button type="submit" className="flex items-center justify-center gap-2 bg-primary text-on-primary-fixed label-md px-5 py-2.5 rounded hover:bg-primary-container transition-colors">
-              <Plus size={16} /> Ajouter
+              <i className="ph-duotone ph-plus" style={{ fontSize: 16 }} /> Ajouter
             </button>
           </form>
           <div className="space-y-2">
@@ -137,7 +136,7 @@ export default function AdminChaines() {
                   <p className="caption text-outline truncate">{c.url}</p>
                 </div>
                 <button onClick={() => supprimer("chaines", c.id)} className="text-on-surface-variant hover:text-error p-1">
-                  <Trash2 size={16} />
+                  <i className="ph-duotone ph-trash" style={{ fontSize: 16 }} />
                 </button>
               </div>
             ))}
@@ -147,12 +146,12 @@ export default function AdminChaines() {
 
       {tab === "spots" && (
         <>
-          <form onSubmit={ajouterSpot} className="glass-panel rounded-xl p-6 mb-6 grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
+          <form onSubmit={ajouterSpot} className="bg-surface-low border border-outline-variant rounded-xl p-6 mb-6 grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
             <input required value={spotTitre} onChange={(e) => setSpotTitre(e.target.value)} placeholder="Titre du spot" className={inputClass} />
             <input value={spotAnnonceur} onChange={(e) => setSpotAnnonceur(e.target.value)} placeholder="Annonceur" className={inputClass} />
             <input required type="url" value={spotUrl} onChange={(e) => setSpotUrl(e.target.value)} placeholder="URL de la vidéo" className={inputClass} />
             <button type="submit" className="flex items-center justify-center gap-2 bg-primary text-on-primary-fixed label-md px-5 py-2.5 rounded hover:bg-primary-container transition-colors">
-              <Plus size={16} /> Ajouter
+              <i className="ph-duotone ph-plus" style={{ fontSize: 16 }} /> Ajouter
             </button>
           </form>
           <div className="space-y-2">
@@ -162,7 +161,7 @@ export default function AdminChaines() {
                   <p className="body-md text-on-surface">{s.titre} <span className="caption text-primary ml-2">{s.annonceur}</span></p>
                 </div>
                 <button onClick={() => supprimer("spots", s.id)} className="text-on-surface-variant hover:text-error p-1">
-                  <Trash2 size={16} />
+                  <i className="ph-duotone ph-trash" style={{ fontSize: 16 }} />
                 </button>
               </div>
             ))}
@@ -172,7 +171,7 @@ export default function AdminChaines() {
 
       {tab === "coupures" && (
         <>
-          <form onSubmit={ajouterCoupure} className="glass-panel rounded-xl p-6 mb-6 grid grid-cols-1 sm:grid-cols-5 gap-4 items-end">
+          <form onSubmit={ajouterCoupure} className="bg-surface-low border border-outline-variant rounded-xl p-6 mb-6 grid grid-cols-1 sm:grid-cols-5 gap-4 items-end">
             <select required value={coupureChaine} onChange={(e) => setCoupureChaine(e.target.value)} className={inputClass}>
               <option value="">Chaîne...</option>
               {chaines.map((c) => (
@@ -188,7 +187,7 @@ export default function AdminChaines() {
             <input required type="time" value={coupureHeure} onChange={(e) => setCoupureHeure(e.target.value)} className={inputClass} />
             <input type="number" min="1" value={coupureRecurrence} onChange={(e) => setCoupureRecurrence(e.target.value)} placeholder="Toutes les N min" className={inputClass} />
             <button type="submit" className="flex items-center justify-center gap-2 bg-primary text-on-primary-fixed label-md px-5 py-2.5 rounded hover:bg-primary-container transition-colors">
-              <Plus size={16} /> Programmer
+              <i className="ph-duotone ph-plus" style={{ fontSize: 16 }} /> Programmer
             </button>
           </form>
           <div className="space-y-2">
@@ -202,7 +201,7 @@ export default function AdminChaines() {
                   {co.spots && <p className="caption text-on-surface-variant">Spot : {co.spots.titre}</p>}
                 </div>
                 <button onClick={() => supprimer("coupures", co.id)} className="text-on-surface-variant hover:text-error p-1">
-                  <Trash2 size={16} />
+                  <i className="ph-duotone ph-trash" style={{ fontSize: 16 }} />
                 </button>
               </div>
             ))}

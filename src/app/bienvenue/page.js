@@ -92,7 +92,7 @@ export default function Bienvenue() {
       </div>
 
       {/* Barre de contrôle */}
-      <div className="glass-panel w-full z-20 px-5 py-6 md:px-20 md:py-8 flex flex-row items-center justify-between mt-auto">
+      <div className="bg-surface-low border border-outline-variant w-full z-20 px-5 py-6 md:px-20 md:py-8 flex flex-row items-center justify-between mt-auto">
         <div className="flex items-center gap-2">
           {SLIDES.map((_, i) => (
             <button
@@ -106,7 +106,7 @@ export default function Bienvenue() {
         </div>
         <button
           onClick={() => terminer("/inscription")}
-          className="bg-primary text-on-primary label-md uppercase px-8 py-3 rounded hover:bg-primary-container transition-all duration-300 shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+          className="bg-primary text-on-primary label-md uppercase px-8 py-3 rounded hover:bg-primary-container transition-all duration-300"
         >
           Commencer
         </button>

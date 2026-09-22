@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, Check } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Spinner from "./Spinner";
 
@@ -40,7 +39,7 @@ export default function UploadFichier({ url, onChange, label = "Image" }) {
       </label>
       <div className="flex gap-2">
         <label className="flex-none cursor-pointer flex items-center gap-2 border border-outline-variant rounded-lg px-3 py-2 caption text-on-surface-variant hover:border-primary hover:text-primary transition-colors">
-          {upload ? <Spinner size={14} /> : <Upload size={14} />}
+          {upload ? <Spinner size={14} /> : <i className="ph-duotone ph-upload-simple" style={{ fontSize: 14 }} />}
           {upload ? "Envoi..." : "Fichier"}
           <input type="file" accept="image/*,video/*" onChange={televerser} className="hidden" disabled={upload} />
         </label>
@@ -49,12 +48,12 @@ export default function UploadFichier({ url, onChange, label = "Image" }) {
           value={url}
           onChange={(e) => onChange(e.target.value)}
           placeholder="https://..."
-          className="flex-1 bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-3 py-2 outline-none focus:border-primary-container transition-colors text-sm"
+          className="flex-1 bg-surface-low border border-outline-variant rounded-lg text-on-surface px-3 py-2 outline-none focus:border-outline transition-colors text-sm"
         />
       </div>
       {url && !upload && (
         <p className="caption text-primary mt-1 flex items-center gap-1">
-          <Check size={12} /> Fichier prêt
+          <i className="ph-duotone ph-check" style={{ fontSize: 12 }} /> Fichier prêt
         </p>
       )}
       {erreur && <p className="caption text-error mt-1">{erreur}</p>}

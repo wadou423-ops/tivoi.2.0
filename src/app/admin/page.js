@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Users, Clapperboard, Radio, TrendingUp, Wallet, Film } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function AdminOverview() {
@@ -50,12 +49,12 @@ export default function AdminOverview() {
   }, []);
 
   const CARDS = [
-    { label: "Utilisateurs", valeur: kpis.utilisateurs, icone: Users, href: "/admin/utilisateurs" },
-    { label: "Créateurs validés", valeur: kpis.createurs, icone: Clapperboard, href: "/admin/createurs" },
-    { label: "Lives en direct", valeur: kpis.livesDirect, icone: Radio, href: "/lives" },
-    { label: "Revenus plateforme", valeur: `${kpis.revenus.toLocaleString("fr-FR")} FCFA`, icone: TrendingUp, href: null },
-    { label: "Retraits en attente", valeur: kpis.retraits, icone: Wallet, href: "/admin/retraits" },
-    { label: "Contenus actifs", valeur: kpis.contenus, icone: Film, href: "/admin/catalogue" },
+    { label: "Utilisateurs", valeur: kpis.utilisateurs, icone: "users", href: "/admin/utilisateurs" },
+    { label: "Créateurs validés", valeur: kpis.createurs, icone: "film-slate", href: "/admin/createurs" },
+    { label: "Lives en direct", valeur: kpis.livesDirect, icone: "broadcast", href: "/lives" },
+    { label: "Revenus plateforme", valeur: `${kpis.revenus.toLocaleString("fr-FR")} FCFA`, icone: "trend-up", href: null },
+    { label: "Retraits en attente", valeur: kpis.retraits, icone: "wallet", href: "/admin/retraits" },
+    { label: "Contenus actifs", valeur: kpis.contenus, icone: "film-slate", href: "/admin/catalogue" },
   ];
 
   return (
@@ -66,7 +65,7 @@ export default function AdminOverview() {
         {CARDS.map((c) => {
           const inner = (
             <>
-              <c.icone size={22} className="text-primary mb-4" />
+              <i className={`ph-duotone ph-${c.icone} text-primary mb-4 inline-block`} style={{ fontSize: 22 }} />
               <p className="font-display font-bold text-3xl text-on-surface">{c.valeur}</p>
               <p className="caption text-on-surface-variant mt-2">{c.label}</p>
             </>
@@ -75,12 +74,12 @@ export default function AdminOverview() {
             <Link
               key={c.label}
               href={c.href}
-              className="block rounded-xl border border-primary-container/10 bg-surface-low p-8 card-hover"
+              className="block rounded-xl border border-outline-variant/20 bg-surface-low p-8 card-hover"
             >
               {inner}
             </Link>
           ) : (
-            <div key={c.label} className="rounded-xl border border-primary-container/10 bg-surface-low p-8">
+            <div key={c.label} className="rounded-xl border border-outline-variant/20 bg-surface-low p-8">
               {inner}
             </div>
           );

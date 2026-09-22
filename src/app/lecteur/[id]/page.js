@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../../components/LoaderCentered";
 import CustomVideoPlayer from "../../components/CustomVideoPlayer";
@@ -76,7 +75,7 @@ export default function Lecteur() {
         onClick={() => router.back()}
         className="absolute top-6 right-6 z-50 flex items-center gap-2 rounded-lg glass-panel px-4 py-2.5 text-on-surface hover:text-primary transition-colors"
       >
-        <ArrowLeft size={18} /> <span className="text-sm">Retour</span>
+        <i className="ph-duotone ph-arrow-left" style={{ fontSize: 18 }} /> <span className="text-sm">Retour</span>
       </button>
 
       {/* Filigrane */}

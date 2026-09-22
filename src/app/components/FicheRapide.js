@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { X, Play, Lock } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { prefetchFiche } from "@/lib/cache";
 
@@ -64,7 +63,7 @@ export default function FicheRapide({ filmId, onClose }) {
             onClick={onClose}
             className="absolute top-4 right-4 w-9 h-9 rounded-full glass-panel flex items-center justify-center text-on-surface hover:text-primary transition-colors"
           >
-            <X size={18} />
+            <i className="ph-duotone ph-x" style={{ fontSize: 18 }} />
           </button>
           <div className="absolute bottom-4 left-6 right-6">
             <h2 className="display-lg text-on-surface !text-2xl">{film.titre}</h2>
@@ -74,7 +73,7 @@ export default function FicheRapide({ filmId, onClose }) {
         <div className="p-6">
           <div className="flex flex-wrap gap-3 mb-4">
             {film.badge && (
-              <span className="caption px-2.5 py-1 rounded border border-primary/30 bg-primary/5 text-primary">
+              <span className="caption px-2.5 py-1 rounded border border-outline/30 bg-primary/5 text-primary">
                 {film.badge}
               </span>
             )}
@@ -93,21 +92,21 @@ export default function FicheRapide({ filmId, onClose }) {
                 href={`/lecteur/${film.id}`}
                 className="bg-primary text-on-primary-fixed label-md px-6 py-3 rounded hover:bg-primary-container transition-colors flex items-center gap-2"
               >
-                <Play size={16} fill="currentColor" /> Regarder
+                <i className="ph-duotone ph-play" style={{ fontSize: 16 }} /> Regarder
               </Link>
             ) : film.type_acces === "abonnement" ? (
               <Link
                 href="/abonnements"
                 className="bg-primary text-on-primary-fixed label-md px-6 py-3 rounded hover:bg-primary-container transition-colors flex items-center gap-2"
               >
-                <Lock size={15} />                 S&apos;abonner pour regarder
+                <i className="ph-duotone ph-lock" style={{ fontSize: 15 }} />                 S&apos;abonner pour regarder
               </Link>
             ) : (
               <Link
                 href={`/paiement/achat/${film.id}`}
                 className="bg-primary text-on-primary-fixed label-md px-6 py-3 rounded hover:bg-primary-container transition-colors flex items-center gap-2"
               >
-                <Lock size={15} />
+                <i className="ph-duotone ph-lock" style={{ fontSize: 15 }} />
                 {`${(film.prix_fcfa || 0).toLocaleString("fr-FR")} FCFA`}
               </Link>
             )}

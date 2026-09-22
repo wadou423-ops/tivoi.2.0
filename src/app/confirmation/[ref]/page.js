@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function Confirmation() {
@@ -66,14 +65,14 @@ export default function Confirmation() {
 
   return (
     <main className="flex-grow flex items-center justify-center py-16 px-5 md:px-20 pt-28">
-      <div className="glass-panel rounded-xl p-10 max-w-lg w-full text-center">
+      <div className="bg-surface-low border border-outline-variant rounded-xl p-10 max-w-lg w-full text-center">
         <div className="flex justify-center mb-6">
           {confirme ? (
-            <CheckCircle2 size={72} className="text-primary" />
+            <i className="ph-duotone ph-check-circle text-primary" style={{ fontSize: 72 }} />
           ) : echoue ? (
-            <XCircle size={72} className="text-error" />
+            <i className="ph-duotone ph-x-circle text-error" style={{ fontSize: 72 }} />
           ) : (
-            <Loader2 size={72} className="text-primary animate-spin" />
+            <i className="ph-duotone ph-circle-notch text-primary animate-spin inline-block" style={{ fontSize: 72 }} />
           )}
         </div>
 
@@ -88,7 +87,7 @@ export default function Confirmation() {
               : "Nous attendons la confirmation du fournisseur de paiement (quelques secondes en mode démo)."}
         </p>
 
-        <div className="glass-panel rounded-lg p-5 text-left mb-8 space-y-3">
+        <div className="bg-surface-low border border-outline-variant rounded-lg p-5 text-left mb-8 space-y-3">
           <div className="flex justify-between body-md">
             <span className="text-on-surface-variant">Référence</span>
             <span className="text-on-surface font-mono text-sm">{paiement.reference}</span>

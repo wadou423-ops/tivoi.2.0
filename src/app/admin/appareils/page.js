@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Monitor, Check } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../../components/LoaderCentered";
 
@@ -68,7 +67,7 @@ export default function AdminAppareils() {
       </p>
 
       {/* Activer par code */}
-      <form onSubmit={activer} className="glass-panel rounded-xl p-6 mb-8">
+      <form onSubmit={activer} className="bg-surface-low border border-outline-variant rounded-xl p-6 mb-8">
         <h2 className="title-lg text-primary mb-2">Activer un appareil</h2>
         <p className="caption text-on-surface-variant mb-4">
           Saisis le code affiché par la tablette ou la TV au premier démarrage.
@@ -81,13 +80,13 @@ export default function AdminAppareils() {
             value={code}
             onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
             placeholder="123456"
-            className="flex-1 bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-primary-container transition-colors font-mono text-2xl tracking-[0.5em] text-center"
+            className="flex-1 bg-surface-low border border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-outline transition-colors font-mono text-2xl tracking-[0.5em] text-center"
           />
           <button
             type="submit"
             className="flex items-center gap-2 bg-primary-container text-on-primary label-md px-6 rounded-lg hover:bg-primary transition-colors"
           >
-            <Check size={16} /> Activer
+            <i className="ph-duotone ph-check" style={{ fontSize: 16 }} /> Activer
           </button>
         </div>
         {message && <p className="caption text-on-surface-variant mt-3">{message}</p>}
@@ -100,7 +99,7 @@ export default function AdminAppareils() {
             key={a.id}
             className="flex items-center gap-4 rounded-xl border border-outline-variant/20 bg-surface-low px-4 py-3"
           >
-            <Monitor size={20} className="text-primary shrink-0" />
+            <i className="ph-duotone ph-monitor text-primary shrink-0" style={{ fontSize: 20 }} />
             <div className="flex-1">
               <p className="body-md text-on-surface">{a.nom || `Appareil ${a.code_activation}`}</p>
               <p className="caption text-on-surface-variant">

@@ -66,7 +66,7 @@ export default function AdminVTC() {
   }
 
   const inputClass =
-    "w-full rounded-lg bg-surface-variant/50 border-0 border-b-2 border-outline-variant text-on-surface px-4 py-2.5 outline-none focus:border-primary-container transition-colors";
+    "w-full rounded-lg bg-surface-low border border-outline-variant text-on-surface px-4 py-2.5 outline-none focus:border-outline transition-colors";
 
   return (
     <main className="px-6 md:px-12 py-12 max-w-3xl">
@@ -76,7 +76,7 @@ export default function AdminVTC() {
 
       <form
         onSubmit={handleAdd}
-        className="rounded-xl border border-primary-container/10 bg-surface-low p-6 mb-10 glow-focus"
+        className="rounded-xl border border-outline-variant/20 bg-surface-low p-6 mb-10 glow-focus"
       >
         <h2 className="font-display font-semibold text-xl text-on-surface mb-4">
           Ajouter un élément

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Star, Play, Coins, Plus, Send } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../../components/LoaderCentered";
 
@@ -127,7 +126,7 @@ export default function FicheContenu() {
         href="/catalogue"
         className="absolute top-24 left-5 md:left-20 z-50 flex items-center justify-center w-12 h-12 rounded-full glass-panel hover:bg-surface-high transition-colors"
       >
-        <ArrowLeft size={20} className="text-on-surface" />
+        <i className="ph-duotone ph-arrow-left text-on-surface" style={{ fontSize: 20 }} />
       </Link>
 
       {/* Hero */}
@@ -141,13 +140,13 @@ export default function FicheContenu() {
         <div className="relative z-10 px-5 md:px-20 pb-12 w-full md:w-2/3 lg:w-1/2">
           <div className="flex items-center gap-2 mb-4">
             {film.badge && (
-              <span className="px-3 py-1 caption text-primary border border-primary/30 rounded bg-primary/5">
+              <span className="px-3 py-1 caption text-primary border border-outline/30 rounded bg-primary/5">
                 {film.badge}
               </span>
             )}
             {moyenne && (
               <span className="caption text-on-surface-variant flex items-center gap-1">
-                <Star size={14} fill="currentColor" className="text-primary" />
+                <i className="ph-duotone ph-star text-primary" style={{ fontSize: 14 }} />
                 {moyenne.toFixed(1)} ({nbNotes} avis)
               </span>
             )}
@@ -161,21 +160,21 @@ export default function FicheContenu() {
             {film.type_acces === "gratuit" || acces ? (
               <Link
                 href={`/lecteur/${film.id}`}
-                className="bg-primary text-on-primary-fixed label-md px-8 py-3 rounded hover:bg-primary-container transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                className="bg-primary text-on-primary-fixed label-md px-8 py-3 rounded hover:bg-primary-container transition-colors flex items-center justify-center gap-2"
               >
-                <Play size={18} fill="currentColor" /> Regarder
+                <i className="ph-duotone ph-play" style={{ fontSize: 18 }} /> Regarder
               </Link>
             ) : film.type_acces === "abonnement" ? (
               <Link
                 href="/abonnements"
-                className="bg-primary text-on-primary-fixed label-md px-8 py-3 rounded hover:bg-primary-container transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                className="bg-primary text-on-primary-fixed label-md px-8 py-3 rounded hover:bg-primary-container transition-colors flex items-center justify-center gap-2"
               >
                 S&apos;abonner pour regarder
               </Link>
             ) : (
               <Link
                 href={`/paiement/achat/${film.id}`}
-                className="bg-primary text-on-primary-fixed label-md px-8 py-3 rounded hover:bg-primary-container transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                className="bg-primary text-on-primary-fixed label-md px-8 py-3 rounded hover:bg-primary-container transition-colors flex items-center justify-center gap-2"
               >
                 {`Louer — ${(film.prix_fcfa || 0).toLocaleString("fr-FR")} FCFA`}
               </Link>
@@ -184,7 +183,7 @@ export default function FicheContenu() {
               href="/jetons"
               className="glass-panel label-md px-8 py-3 rounded flex items-center justify-center gap-2 hover:border-primary/50 transition-colors"
             >
-              <Coins size={18} className="text-primary" /> Acheter des Jetons
+              <i className="ph-duotone ph-coins text-primary" style={{ fontSize: 18 }} /> Acheter des Jetons
             </Link>
           </div>
         </div>
@@ -207,21 +206,21 @@ export default function FicheContenu() {
           {/* Commentaires */}
           <section>
             <h2 className="headline-md text-on-surface mb-4">Commentaires ({commentaires.length})</h2>
-            <form onSubmit={commenter} className="glass-panel glow-focus rounded-xl p-4 mb-6">
+            <form onSubmit={commenter} className="bg-surface-low border border-outline-variant glow-focus rounded-xl p-4 mb-6">
               <textarea
                 value={texte}
                 onChange={(e) => setTexte(e.target.value)}
                 required
                 rows={3}
                 placeholder="Partagez votre avis..."
-                className="w-full bg-transparent border-0 outline-none text-on-surface resize-none placeholder:text-on-surface-variant/50"
+                className="w-full bg-surface-lowest/50 border border-outline-variant/40 rounded-lg p-3 outline-none text-on-surface resize-none placeholder:text-on-surface-variant/50"
               />
               <button
                 type="submit"
                 disabled={envoi}
                 className="bg-primary text-on-primary-fixed label-md px-6 py-2 rounded hover:bg-primary-container transition-colors flex items-center gap-2 disabled:opacity-50"
               >
-                <Send size={14} /> Publier
+                <i className="ph-duotone ph-paper-plane-tilt" style={{ fontSize: 14 }} /> Publier
               </button>
             </form>
             <div className="space-y-4">
@@ -239,16 +238,12 @@ export default function FicheContenu() {
         </div>
 
         {/* Colonne droite : notation */}
-        <aside className="glass-panel rounded-xl p-6 h-fit">
+        <aside className="bg-surface-low border border-outline-variant rounded-xl p-6 h-fit">
           <h2 className="title-lg text-primary mb-4">Votre note</h2>
           <div className="flex gap-2">
             {[1, 2, 3, 4, 5].map((n) => (
-              <button key={n} onClick={() => noter(n)} className="transition-transform hover:scale-110">
-                <Star
-                  size={28}
-                  className={n <= maNote ? "text-primary" : "text-outline-variant"}
-                  fill={n <= maNote ? "currentColor" : "none"}
-                />
+              <button key={n} onClick={() => noter(n)} className="transition-transform active:scale-95">
+                <i className={`ph-duotone ph-star ${n <= maNote ? "text-primary" : "text-outline-variant"}`} style={{ fontSize: 28 }} />
               </button>
             ))}
           </div>

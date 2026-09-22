@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Lock, FileText, ArrowLeft } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../../../components/LoaderCentered";
 import Spinner from "../../../components/Spinner";
@@ -138,7 +137,7 @@ export default function Paiement() {
         {/* Colonne gauche : méthodes */}
         <div className="lg:col-span-8 flex flex-col gap-6">
           <Link href="-1" onClick={(e) => { e.preventDefault(); history.back(); }} className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors w-fit">
-            <ArrowLeft size={18} /> Retour
+            <i className="ph-duotone ph-arrow-left" style={{ fontSize: 18 }} /> Retour
           </Link>
 
           <div>
@@ -152,8 +151,8 @@ export default function Paiement() {
                 onClick={() => setFournisseur(f.code)}
                 className={`h-28 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
                   fournisseur === f.code
-                    ? "border-primary bg-primary/5 shadow-[0_0_15px_rgba(212,175,55,0.2)]"
-                    : "border-outline-variant/30 bg-surface-container hover:border-primary/50"
+                    ? "border-outline bg-primary/5"
+                    : "border-outline-variant/30 bg-surface-container hover:border-outline"
                 }`}
               >
                 <span className="text-3xl">{f.emoji}</span>
@@ -165,14 +164,14 @@ export default function Paiement() {
           </div>
 
           {(fournisseur !== "carte" && fournisseur !== "paypal") && (
-            <div className="glass-panel glow-focus rounded-xl p-5">
+            <div className="bg-surface-low border border-outline-variant glow-focus rounded-xl p-5">
               <label className="label-md text-on-surface mb-2 block">Numéro Mobile Money</label>
               <input
                 type="tel"
                 value={telephone}
                 onChange={(e) => setTelephone(e.target.value)}
                 placeholder="07 XX XX XX XX"
-                className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-primary-container transition-colors"
+                className="w-full bg-surface-low border border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-outline transition-colors"
               />
               <p className="caption text-on-surface-variant mt-2 opacity-70">
                 Un code de confirmation vous sera envoyé par le fournisseur. (Mode démo : validation automatique)
@@ -183,9 +182,9 @@ export default function Paiement() {
 
         {/* Colonne droite : récapitulatif */}
         <div className="lg:col-span-4 mt-8 lg:mt-0">
-          <div className="glass-panel rounded-xl p-6 flex flex-col h-full">
+          <div className="bg-surface-low border border-outline-variant rounded-xl p-6 flex flex-col h-full">
             <h2 className="title-lg text-primary mb-6 flex items-center gap-2">
-              <FileText size={20} /> Récapitulatif
+              <i className="ph-duotone ph-file-text" style={{ fontSize: 20 }} /> Récapitulatif
             </h2>
 
             <div className="flex gap-4 items-start pb-4 border-b border-outline-variant/20">
@@ -220,9 +219,9 @@ export default function Paiement() {
             <button
               onClick={payer}
               disabled={processing}
-              className="w-full bg-primary-container text-on-primary label-md py-4 rounded-lg mt-8 hover:bg-primary transition-colors duration-200 flex justify-center items-center gap-2 shadow-[0_0_15px_rgba(212,175,55,0.3)] disabled:opacity-50"
+              className="w-full bg-primary-container text-on-primary label-md py-4 rounded-lg mt-8 hover:bg-primary transition-colors duration-200 flex justify-center items-center gap-2 disabled:opacity-50"
             >
-              <Lock size={16} />
+              <i className="ph-duotone ph-lock" style={{ fontSize: 16 }} />
               {processing
                 ? "Traitement en cours..."
                 : "Payer maintenant"}

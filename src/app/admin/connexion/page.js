@@ -2,7 +2,6 @@
 
 import { useState, Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Lock, ShieldAlert } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Spinner from "../../components/Spinner";
 
@@ -93,15 +92,15 @@ function ConnexionAdminContent() {
         </div>
 
         {message && (
-          <div className="glass-panel rounded-lg p-4 mb-5 flex items-center gap-3">
-            <ShieldAlert size={18} className="text-error shrink-0" />
+          <div className="bg-surface-low border border-outline-variant rounded-lg p-4 mb-5 flex items-center gap-3">
+            <i className="ph-duotone ph-shield-warning text-error shrink-0" style={{ fontSize: 18 }} />
             <p className="caption text-on-surface-variant">{message}</p>
           </div>
         )}
 
         <form
           onSubmit={handleSubmit}
-          className="glass-panel glow-focus rounded-xl p-8 flex flex-col gap-5"
+          className="bg-surface-low border border-outline-variant glow-focus rounded-xl p-8 flex flex-col gap-5"
         >
           <div>
             <label htmlFor="admin-email" className="label-md text-on-surface mb-2 block">
@@ -114,7 +113,7 @@ function ConnexionAdminContent() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="admin@tivoi.ci"
-              className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-primary-container transition-colors"
+              className="w-full bg-surface-low border border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-outline transition-colors"
             />
           </div>
           <div>
@@ -122,7 +121,7 @@ function ConnexionAdminContent() {
               Mot de passe
             </label>
             <div className="relative">
-              <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+              <i className="ph-duotone ph-lock absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style={{ fontSize: 16 }} />
               <input
                 id="admin-password"
                 type="password"
@@ -130,7 +129,7 @@ function ConnexionAdminContent() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface pl-9 pr-4 py-3 outline-none focus:border-primary-container transition-colors"
+                className="w-full bg-surface-low border border-outline-variant rounded-lg text-on-surface pl-9 pr-4 py-3 outline-none focus:border-outline transition-colors"
               />
             </div>
           </div>

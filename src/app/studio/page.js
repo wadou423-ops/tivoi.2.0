@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Download, TrendingUp, Radio, Gift, LogOut } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../components/LoaderCentered";
 
@@ -117,20 +116,20 @@ export default function StudioCreateur() {
           onClick={exporterCSV}
           className="flex items-center gap-2 border border-primary text-primary label-md px-5 py-2.5 rounded hover:bg-primary hover:text-on-primary-fixed transition-colors"
         >
-          <Download size={16} /> Exporter CSV
+          <i className="ph-duotone ph-download-simple" style={{ fontSize: 16 }} /> Exporter CSV
         </button>
       </header>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         {[
-          { label: "Lives réalisés", valeur: stats.lives, icone: Radio },
-          { label: "Cadeaux reçus", valeur: stats.cadeaux, icone: Gift },
-          { label: "Solde revenus", valeur: `${stats.revenus.toLocaleString("fr-FR")} FCFA`, icone: TrendingUp },
-          { label: "Classement", valeur: classement.findIndex((c) => c) >= 0 ? `Top ${classement.length}` : "—", icone: TrendingUp },
+          { label: "Lives réalisés", valeur: stats.lives, icone: "broadcast" },
+          { label: "Cadeaux reçus", valeur: stats.cadeaux, icone: "gift" },
+          { label: "Solde revenus", valeur: `${stats.revenus.toLocaleString("fr-FR")} FCFA`, icone: "trend-up" },
+          { label: "Classement", valeur: classement.findIndex((c) => c) >= 0 ? `Top ${classement.length}` : "—", icone: "trend-up" },
         ].map((k) => (
           <div key={k.label} className="bg-surface-container rounded-xl border border-outline-variant/30 p-6">
-            <k.icone size={20} className="text-primary mb-3" />
+            <i className={`ph-duotone ph-${k.icone} text-primary mb-3 inline-block`} style={{ fontSize: 20 }} />
             <p className="display-lg text-on-surface">{k.valeur}</p>
             <p className="caption text-on-surface-variant mt-1">{k.label}</p>
           </div>
@@ -179,7 +178,7 @@ export default function StudioCreateur() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Retrait */}
-        <div className="glass-panel rounded-xl p-6">
+        <div className="bg-surface-low border border-outline-variant rounded-xl p-6">
           <h2 className="title-lg text-primary mb-4">Demander un retrait</h2>
           <p className="caption text-on-surface-variant mb-4">
             Solde disponible : <span className="text-primary font-bold">{stats.revenus.toLocaleString("fr-FR")} FCFA</span>
@@ -192,13 +191,13 @@ export default function StudioCreateur() {
               value={montant}
               onChange={(e) => setMontant(e.target.value)}
               placeholder="Montant en FCFA"
-              className="flex-1 bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-primary-container transition-colors"
+              className="flex-1 bg-surface-low border border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-outline transition-colors"
             />
             <button
               type="submit"
               className="bg-primary-container text-on-primary label-md px-6 rounded-lg hover:bg-primary transition-colors flex items-center gap-2"
             >
-              <LogOut size={16} /> Retirer
+              <i className="ph-duotone ph-sign-out" style={{ fontSize: 16 }} /> Retirer
             </button>
           </form>
           {message && <p className="caption text-on-surface-variant mt-3">{message}</p>}

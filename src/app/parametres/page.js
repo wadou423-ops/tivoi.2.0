@@ -86,13 +86,13 @@ export default function Parametres() {
   }
 
   const inputClass =
-    "w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-primary-container transition-colors";
+    "w-full bg-surface-low border border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-outline transition-colors";
 
   return (
     <main className="flex-grow pt-28 pb-20 px-5 md:px-20 max-w-2xl mx-auto w-full">
       <h1 className="display-lg text-on-surface mb-10">Paramètres du compte</h1>
 
-      <form onSubmit={sauvegarder} className="glass-panel rounded-xl p-8 mb-8 flex flex-col gap-5">
+      <form onSubmit={sauvegarder} className="bg-surface-low border border-outline-variant rounded-xl p-8 mb-8 flex flex-col gap-5">
         <h2 className="title-lg text-primary">Informations personnelles</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -132,7 +132,7 @@ export default function Parametres() {
         </button>
       </form>
 
-      <form onSubmit={appairerTv} className="glass-panel rounded-xl p-8 mb-8">
+      <form onSubmit={appairerTv} className="bg-surface-low border border-outline-variant rounded-xl p-8 mb-8">
         <h2 className="title-lg text-primary mb-2">Connecter une Smart TV</h2>
         <p className="caption text-on-surface-variant mb-4">
           Saisissez le code à 6 chiffres affiché sur votre TV pour la connecter à votre compte.
@@ -175,7 +175,7 @@ export default function Parametres() {
         )}
       </form>
 
-      <div className="glass-panel rounded-xl p-8">
+      <div className="bg-surface-low border border-outline-variant rounded-xl p-8">
         <h2 className="title-lg text-primary mb-2">Sécurité</h2>
         <div className="flex items-center justify-between">
           <div>

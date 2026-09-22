@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function AdminAUne() {
@@ -77,13 +76,13 @@ export default function AdminAUne() {
 
       {message && <p className="caption text-error mb-4">{message}</p>}
 
-      <form onSubmit={ajouter} className="glass-panel rounded-xl p-6 mb-8 flex flex-col sm:flex-row gap-4 items-end">
+      <form onSubmit={ajouter} className="bg-surface-low border border-outline-variant rounded-xl p-6 mb-8 flex flex-col sm:flex-row gap-4 items-end">
         <div className="flex-1 w-full">
           <label className="caption text-on-surface-variant block mb-2">Ajouter un contenu au carrousel</label>
           <select
             value={choix}
             onChange={(e) => setChoix(e.target.value)}
-            className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-2.5 outline-none focus:border-primary-container transition-colors text-sm"
+            className="w-full bg-surface-low border border-outline-variant rounded-lg text-on-surface px-4 py-2.5 outline-none focus:border-outline transition-colors text-sm"
           >
             <option value="">— Choisir un contenu —</option>
             {contenus.map((c) => (
@@ -92,7 +91,7 @@ export default function AdminAUne() {
           </select>
         </div>
         <button type="submit" className="flex items-center gap-2 bg-primary text-on-primary-fixed label-md px-6 py-2.5 rounded hover:bg-primary-container transition-colors">
-          <Plus size={16} /> Ajouter
+          <i className="ph-duotone ph-plus" style={{ fontSize: 16 }} /> Ajouter
         </button>
       </form>
 
@@ -108,13 +107,13 @@ export default function AdminAUne() {
               {s.actif ? "Visible" : "Masqué"}
             </button>
             <button onClick={() => monter(i)} disabled={i === 0} className="text-on-surface-variant hover:text-primary disabled:opacity-30 p-1">
-              <ChevronUp size={16} />
+              <i className="ph-duotone ph-caret-up" style={{ fontSize: 16 }} />
             </button>
             <button onClick={() => descendre(i)} disabled={i === slides.length - 1} className="text-on-surface-variant hover:text-primary disabled:opacity-30 p-1">
-              <ChevronDown size={16} />
+              <i className="ph-duotone ph-caret-down" style={{ fontSize: 16 }} />
             </button>
             <button onClick={() => supprimer(s.id)} className="text-on-surface-variant hover:text-error p-1">
-              <Trash2 size={16} />
+              <i className="ph-duotone ph-trash" style={{ fontSize: 16 }} />
             </button>
           </div>
         ))}

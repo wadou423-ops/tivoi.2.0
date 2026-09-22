@@ -32,7 +32,7 @@ export default function ReinitialiserMotDePasse() {
 
   return (
     <main className="flex-grow flex items-center justify-center py-16 px-5">
-      <div className="glass-panel rounded-xl p-8 w-full max-w-md">
+      <div className="bg-surface-low border border-outline-variant rounded-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="display-lg text-primary tracking-tight mb-3">TiVoi</h1>
           <p className="text-on-surface-variant">Nouveau mot de passe</p>
@@ -52,7 +52,7 @@ export default function ReinitialiserMotDePasse() {
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-primary-container transition-colors"
+                className="w-full bg-surface-low border border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-outline transition-colors"
               />
             </div>
             <div>
@@ -63,7 +63,7 @@ export default function ReinitialiserMotDePasse() {
                 minLength={6}
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-primary-container transition-colors"
+                className="w-full bg-surface-low border border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-outline transition-colors"
               />
             </div>
             <button

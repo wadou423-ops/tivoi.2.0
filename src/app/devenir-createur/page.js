@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Clock, CheckCircle2, XCircle, User, CreditCard, Clapperboard } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Spinner from "../components/Spinner";
 
@@ -22,7 +21,7 @@ const TYPES_CONTENU = [
 ];
 
 const inputClass =
-  "w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-primary-container transition-colors";
+  "w-full bg-surface-low border border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-outline transition-colors";
 
 export default function DevenirCreateur() {
   const router = useRouter();
@@ -120,8 +119,8 @@ export default function DevenirCreateur() {
   if (demande?.statut === "en_attente") {
     return (
       <main className="flex-grow pt-28 pb-20 px-5 md:px-20">
-        <div className="glass-panel rounded-xl p-10 max-w-xl mx-auto text-center">
-          <Clock size={64} className="text-primary mx-auto mb-6" />
+        <div className="bg-surface-low border border-outline-variant rounded-xl p-10 max-w-xl mx-auto text-center">
+          <i className="ph-duotone ph-clock text-primary mx-auto mb-6" style={{ fontSize: 64 }} />
           <h1 className="display-lg text-on-surface mb-3">Demande en cours d&apos;examen</h1>
           <p className="body-lg text-on-surface-variant mb-4">
             Votre demande de compte créateur est en attente de validation par notre équipe.
@@ -136,8 +135,8 @@ export default function DevenirCreateur() {
   if (demande?.statut === "valide") {
     return (
       <main className="flex-grow pt-28 pb-20 px-5 md:px-20">
-        <div className="glass-panel rounded-xl p-10 max-w-xl mx-auto text-center">
-          <CheckCircle2 size={64} className="text-primary mx-auto mb-6" />
+        <div className="bg-surface-low border border-outline-variant rounded-xl p-10 max-w-xl mx-auto text-center">
+          <i className="ph-duotone ph-check-circle text-primary mx-auto mb-6" style={{ fontSize: 64 }} />
           <h1 className="display-lg text-on-surface mb-3">Compte créateur actif</h1>
           <p className="body-lg text-on-surface-variant mb-8">
             Vous pouvez programmer des lives et recevoir des cadeaux de votre communauté.
@@ -153,8 +152,8 @@ export default function DevenirCreateur() {
   if (demande?.statut === "rejete") {
     return (
       <main className="flex-grow pt-28 pb-20 px-5 md:px-20">
-        <div className="glass-panel rounded-xl p-10 max-w-xl mx-auto text-center">
-          <XCircle size={64} className="text-error mx-auto mb-6" />
+        <div className="bg-surface-low border border-outline-variant rounded-xl p-10 max-w-xl mx-auto text-center">
+          <i className="ph-duotone ph-x-circle text-error mx-auto mb-6" style={{ fontSize: 64 }} />
           <h1 className="display-lg text-on-surface mb-3">Demande refusée</h1>
           <p className="body-lg text-on-surface-variant mb-8">
             Votre demande n&apos;a pas été retenue. Vous pouvez la soumettre à nouveau
@@ -177,12 +176,12 @@ export default function DevenirCreateur() {
       <div className="max-w-2xl mx-auto">
         <h1 className="display-lg text-on-surface mb-10">Devenir créateur</h1>
 
-        <form onSubmit={soumettre} className="glass-panel rounded-xl p-8 flex flex-col gap-5">
+        <form onSubmit={soumettre} className="bg-surface-low border border-outline-variant rounded-xl p-8 flex flex-col gap-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label className="label-md text-on-surface mb-2 block">Nom *</label>
               <div className="relative">
-                <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+                <i className="ph-duotone ph-user absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style={{ fontSize: 16 }} />
                 <input
                   required
                   value={form.nom}
@@ -207,7 +206,7 @@ export default function DevenirCreateur() {
           <div>
             <label className="label-md text-on-surface mb-2 block">Numéro de CNI *</label>
             <div className="relative">
-              <CreditCard size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+              <i className="ph-duotone ph-credit-card absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style={{ fontSize: 16 }} />
               <input
                 required
                 value={form.numero_cni}
@@ -224,7 +223,7 @@ export default function DevenirCreateur() {
           <div>
             <label className="label-md text-on-surface mb-2 block">Type de contenu *</label>
             <div className="relative">
-              <Clapperboard size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" />
+              <i className="ph-duotone ph-film-slate absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" style={{ fontSize: 16 }} />
               <select
                 required
                 value={form.type_contenu}
@@ -256,7 +255,7 @@ export default function DevenirCreateur() {
           <button
             type="submit"
             disabled={saving}
-            className="bg-primary text-on-primary-fixed label-md py-4 rounded-lg hover:bg-primary-container transition-colors shadow-[0_0_15px_rgba(212,175,55,0.3)] disabled:opacity-60 flex items-center justify-center gap-2"
+            className="bg-primary text-on-primary-fixed label-md py-4 rounded-lg hover:bg-primary-container transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {saving && <Spinner size={16} />}
             {saving ? "Envoi en cours..." : "Soumettre ma demande"}

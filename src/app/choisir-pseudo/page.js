@@ -70,7 +70,7 @@ export default function ChoisirPseudo() {
     <main className="relative min-h-[calc(100vh-73px)] flex items-center justify-center overflow-hidden px-6">
       <form
         onSubmit={handleSubmit}
-        className="relative z-10 w-full max-w-md p-8 rounded-xl glass-panel glow-focus shadow-2xl"
+        className="relative z-10 w-full max-w-md p-8 rounded-xl bg-surface-low border border-outline-variant glow-focus"
       >
         <div className="text-center mb-8">
           <h1 className="font-display font-bold text-4xl text-primary tracking-tight mb-3">
@@ -101,7 +101,7 @@ export default function ChoisirPseudo() {
                 value={pseudo}
                 onChange={(e) => setPseudo(e.target.value)}
                 placeholder="votre_pseudo"
-                className="w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant text-on-surface pl-10 pr-4 py-3 outline-none focus:border-primary-container transition-colors"
+                className="w-full bg-surface-low border border-outline-variant text-on-surface pl-10 pr-4 py-3 outline-none focus:border-outline transition-colors"
               />
             </div>
           </div>

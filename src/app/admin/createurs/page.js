@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, X } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../../components/LoaderCentered";
 import { useRealtimeReload } from "@/lib/useRealtime";
@@ -100,7 +99,7 @@ export default function AdminCreateurs() {
                 </p>
               </div>
               <div className="flex items-center gap-3 flex-wrap">
-                <span className="caption px-3 py-1.5 rounded-lg border border-primary/30 bg-primary/5 text-primary">
+                <span className="caption px-3 py-1.5 rounded-lg border border-outline/30 bg-primary/5 text-primary">
                   {d.type_contenu}
                 </span>
                 <span
@@ -135,13 +134,13 @@ export default function AdminCreateurs() {
                           onClick={() => traiter(d, "valide")}
                           className="flex items-center gap-1 caption bg-primary text-on-primary-fixed px-4 py-2 rounded hover:bg-primary-container transition-colors"
                         >
-                          <Check size={14} /> Valider
+                          <i className="ph-duotone ph-check" style={{ fontSize: 14 }} /> Valider
                         </button>
                         <button
                           onClick={() => traiter(d, "rejete")}
                           className="flex items-center gap-1 caption border border-outline-variant text-on-surface-variant px-4 py-2 rounded hover:border-error hover:text-error transition-colors"
                         >
-                          <X size={14} /> Rejeter
+                          <i className="ph-duotone ph-x" style={{ fontSize: 14 }} /> Rejeter
                         </button>
                       </>
                     )}

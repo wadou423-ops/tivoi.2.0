@@ -11,25 +11,24 @@ import CarteFilm from "./components/CarteFilm";
 import FicheRapide from "./components/FicheRapide";
 import FiltreCategories from "./components/FiltreCategories";
 import ModaleConnexion from "./components/ModaleConnexion";
-import IconeMS from "./components/IconeMS";
 
 const PILIERS = [
   {
-    icone: "movie",
+    icone: "film-slate",
     titre: "VOD Premium",
     texte: "Films et séries exclusifs, sélectionnés pour une expérience cinématographique ultime.",
     href: "/catalogue",
     decalage: "",
   },
   {
-    icone: "live_tv",
+    icone: "broadcast",
     titre: "Lives en Direct",
     texte: "Connectez-vous avec les créateurs et icônes culturelles en temps réel.",
     href: "/lives",
     decalage: "md:mt-8",
   },
   {
-    icone: "tv",
+    icone: "television",
     titre: "Chaînes TV",
     texte: "Accès ininterrompu à vos chaînes de télévision premium favorites.",
     href: "/guide-tv",
@@ -171,12 +170,13 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const t = setTimeout(() => {
+    // Déferral microtask : évite un setState synchrone dans l'effet (lint)
+    // sans ajouter de délai perceptible au chargement
+    queueMicrotask(() => {
       loadCatalogue();
       loadALaUne();
       loadProgressions();
-    }, 0);
-    return () => clearTimeout(t);
+    });
   }, [loadCatalogue, loadALaUne, loadProgressions]);
 
   // Mises à jour automatiques : plus besoin de rafraîchir
@@ -313,7 +313,7 @@ export default function Home() {
             >
               {choixReprise.image_url && (
                 <div
-                  className="w-20 h-28 mx-auto rounded-lg bg-cover bg-center border border-primary/20 mb-4"
+                  className="w-20 h-28 mx-auto rounded-lg bg-cover bg-center border border-outline-variant/30 mb-4"
                   style={{ backgroundImage: `url('${choixReprise.image_url}')` }}
                 />
               )}
@@ -367,13 +367,13 @@ export default function Home() {
           <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-background via-background/80 to-transparent" />
         </div>
         <div className="relative z-10 text-center px-5 md:px-20 max-w-4xl mx-auto flex flex-col items-center gap-12">
-          <h1 className="display-lg text-on-surface drop-shadow-2xl">
+          <h1 className="display-lg text-on-surface">
             Le cinéma premium ouest-africain.
           </h1>
           <div className="flex flex-wrap justify-center gap-6 mt-8">
             <Link
               href="/catalogue"
-              className="bg-primary text-on-primary-fixed label-md px-8 py-3 rounded hover:bg-primary-container transition-colors shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+              className="bg-primary text-on-primary-fixed label-md px-8 py-3 rounded hover:bg-primary-container transition-colors"
             >
               Explorer la VOD
             </Link>
@@ -395,10 +395,10 @@ export default function Home() {
             <button
               key={p.titre}
               onClick={() => setModaleConnexion(true)}
-              className={`text-left bg-surface-container border border-outline-variant/30 rounded-xl p-6 flex flex-col gap-4 relative overflow-hidden group hover:border-primary/50 transition-colors ${p.decalage}`}
+              className={`text-left bg-surface-container border border-outline-variant/30 rounded-xl p-6 flex flex-col gap-4 relative overflow-hidden group hover:border-outline/50 transition-colors ${p.decalage}`}
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/20 transition-all" />
-              <IconeMS nom={p.icone} taille={38} className="text-primary" />
+              <i className={`ph-duotone ph-${p.icone} text-primary inline-block`} style={{ fontSize: 38 }} aria-hidden="true" />
               <h3 className="title-lg text-on-surface z-10">{p.titre}</h3>
               <p className="body-md text-on-surface-variant z-10">{p.texte}</p>
             </button>

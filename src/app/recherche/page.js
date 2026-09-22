@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function Recherche() {
@@ -34,8 +33,8 @@ export default function Recherche() {
     <main className="flex-grow pt-28 pb-20 px-5 md:px-20 min-h-screen">
       <h1 className="display-lg text-on-surface mb-8">Recherche</h1>
 
-      <div className="glass-panel glow-focus rounded-xl p-4 mb-10 max-w-2xl flex items-center gap-3">
-        <Search size={20} className="text-on-surface-variant" />
+      <div className="bg-surface-low border border-outline-variant glow-focus rounded-xl p-4 mb-10 max-w-2xl flex items-center gap-3">
+        <i className="ph-duotone ph-magnifying-glass text-on-surface-variant" style={{ fontSize: 20 }} />
         <input
           autoFocus
           value={q}

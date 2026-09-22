@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, Phone, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Spinner from "../components/Spinner";
 
@@ -206,7 +205,7 @@ function ConnexionContent() {
   }
 
   const inputClass =
-    "w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant text-on-surface py-3 outline-none focus:border-primary-container transition-colors";
+    "w-full bg-surface-low border border-outline-variant text-on-surface py-3 outline-none focus:border-outline transition-colors";
 
   return (
     <main className="relative min-h-[calc(100vh-73px)] flex items-center justify-center overflow-hidden px-6">
@@ -224,10 +223,8 @@ function ConnexionContent() {
 
       <form
         onSubmit={etapeOtp ? verifierOtp : mode === "email" ? handleEmail : demanderOtp}
-        className="relative z-10 w-full max-w-md p-8 rounded-xl glass-panel glow-focus shadow-2xl"
+        className="relative z-10 w-full max-w-md p-8 rounded-xl bg-surface-low border border-outline-variant glow-focus"
       >
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary-container to-transparent opacity-50" />
-
         <div className="text-center mb-6">
           <h1 className="font-display font-bold text-4xl text-primary tracking-tight mb-3">TiVoi</h1>
           <p className="text-on-surface-variant">Connectez-vous pour découvrir le meilleur du cinéma.</p>
@@ -243,7 +240,7 @@ function ConnexionContent() {
                 mode === "email" ? "bg-primary-container text-on-primary" : "text-on-surface-variant hover:text-on-surface"
               }`}
             >
-              <Mail size={15} /> Email
+              <i className="ph-duotone ph-envelope-simple" style={{ fontSize: 15 }} /> Email
             </button>
             <button
               type="button"
@@ -252,7 +249,7 @@ function ConnexionContent() {
                 mode === "telephone" ? "bg-primary-container text-on-primary" : "text-on-surface-variant hover:text-on-surface"
               }`}
             >
-              <Phone size={15} /> Téléphone
+              <i className="ph-duotone ph-phone" style={{ fontSize: 15 }} /> Téléphone
             </button>
           </div>
         )}
@@ -288,7 +285,7 @@ function ConnexionContent() {
               onClick={() => { setEtapeOtp(false); setOtp(""); setMessage(""); }}
               className="w-full flex items-center justify-center gap-2 caption text-on-surface-variant hover:text-primary transition-colors"
             >
-              <ArrowLeft size={13} /> Changer de numéro
+              <i className="ph-duotone ph-arrow-left" style={{ fontSize: 13 }} /> Changer de numéro
             </button>
           </div>
         ) : mode === "email" ? (
@@ -297,7 +294,7 @@ function ConnexionContent() {
             <div>
               <label htmlFor="email" className="font-title font-semibold text-sm text-on-surface mb-2 block">Email</label>
               <div className="relative rounded-lg glow-focus transition-all">
-                <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+                <i className="ph-duotone ph-envelope-simple absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style={{ fontSize: 18 }} />
                 <input
                   id="email"
                   type="email"
@@ -312,7 +309,7 @@ function ConnexionContent() {
             <div>
               <label htmlFor="password" className="font-title font-semibold text-sm text-on-surface mb-2 block">Mot de passe</label>
               <div className="relative rounded-lg glow-focus transition-all">
-                <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+                <i className="ph-duotone ph-lock absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style={{ fontSize: 18 }} />
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -327,7 +324,7 @@ function ConnexionContent() {
                   onClick={() => setShowPassword((s) => !s)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors"
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? <i className="ph-duotone ph-eye-slash" style={{ fontSize: 18 }} /> : <i className="ph-duotone ph-eye" style={{ fontSize: 18 }} />}
                 </button>
               </div>
             </div>
@@ -353,7 +350,7 @@ function ConnexionContent() {
                 Numéro de téléphone
               </label>
               <div className="relative rounded-lg glow-focus transition-all">
-                <Phone size={18} className="absolute left-3 top-[calc(50%-7px)] -translate-y-1/2 text-on-surface-variant pointer-events-none" />
+                <i className="ph-duotone ph-phone absolute left-3 top-[calc(50%-7px)] -translate-y-1/2 text-on-surface-variant pointer-events-none" style={{ fontSize: 18 }} />
                 <span className="absolute left-10 top-[calc(50%-9px)] -translate-y-1/2 text-on-surface-variant text-sm font-semibold pointer-events-none pr-2 border-r border-outline-variant h-6 flex items-center justify-center">
                   +225
                 </span>

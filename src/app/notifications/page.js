@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Bell, Check } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function Notifications() {
@@ -37,8 +36,8 @@ export default function Notifications() {
       <h1 className="display-lg text-on-surface mb-10">Notifications</h1>
 
       {notifs.length === 0 ? (
-        <div className="glass-panel rounded-xl p-10 text-center">
-          <Bell size={40} className="text-outline mx-auto mb-4" />
+        <div className="bg-surface-low border border-outline-variant rounded-xl p-10 text-center">
+          <i className="ph-duotone ph-bell text-outline mx-auto mb-4" style={{ fontSize: 40 }} />
           <p className="body-lg text-on-surface-variant">Aucune notification pour l&apos;instant.</p>
         </div>
       ) : (
@@ -49,7 +48,7 @@ export default function Notifications() {
               className={`rounded-xl border p-5 flex gap-4 items-start ${
                 n.lu
                   ? "border-outline-variant/20 bg-surface-container"
-                  : "border-primary/30 bg-primary/5"
+                  : "border-outline/30 bg-primary/5"
               }`}
             >
               <div className="flex-1">
@@ -59,7 +58,7 @@ export default function Notifications() {
                   {new Date(n.created_at).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" })}
                 </p>
               </div>
-              {!n.lu && <Check size={16} className="text-primary mt-1" />}
+              {!n.lu && <i className="ph-duotone ph-check text-primary mt-1" style={{ fontSize: 16 }} />}
             </div>
           ))}
         </div>

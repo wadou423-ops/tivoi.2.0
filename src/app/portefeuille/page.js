@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Wallet, TrendingUp, ShoppingCart } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import Banniere from "../components/Banniere";
 import LoaderCentered from "../components/LoaderCentered";
@@ -75,11 +74,11 @@ export default function Portefeuille() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Colonne gauche */}
         <div className="lg:col-span-4 flex flex-col gap-6">
-          <div className="bg-surface-high rounded-xl p-8 border border-primary/10 relative overflow-hidden group hover:border-primary/30 transition-all duration-300">
+          <div className="bg-surface-high rounded-xl p-8 border border-outline-variant/20 relative overflow-hidden group hover:border-outline-variant/40 transition-all duration-300">
             <div className="absolute -top-12 -right-12 w-32 h-32 bg-primary/20 rounded-full blur-[50px] pointer-events-none" />
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-4">
-                <Wallet size={18} className="text-primary" />
+                <i className="ph-duotone ph-wallet text-primary" style={{ fontSize: 18 }} />
                 <span className="label-md text-on-surface-variant uppercase">Solde Actuel</span>
               </div>
               <div className="flex items-baseline gap-2 mb-2">
@@ -95,7 +94,7 @@ export default function Portefeuille() {
                 href="/jetons"
                 className="w-full mt-8 bg-primary text-on-primary-fixed label-md py-4 rounded-lg flex items-center justify-center gap-2 hover:bg-primary-container transition-all"
               >
-                <ShoppingCart size={16} /> Acheter des Jetons
+                <i className="ph-duotone ph-shopping-cart" style={{ fontSize: 16 }} /> Acheter des Jetons
               </Link>
             </div>
           </div>
@@ -104,7 +103,7 @@ export default function Portefeuille() {
             <div>
               <span className="caption text-on-surface-variant block mb-1">Revenus créateur</span>
               <span className="title-lg text-on-surface flex items-center gap-1">
-                <TrendingUp size={16} className="text-secondary" />
+                <i className="ph-duotone ph-trend-up text-secondary" style={{ fontSize: 16 }} />
                 {revenus.toLocaleString("fr-FR")} FCFA
               </span>
             </div>
@@ -119,7 +118,7 @@ export default function Portefeuille() {
         </div>
 
         {/* Historique */}
-        <div className="lg:col-span-8 bg-surface-high rounded-xl border border-primary/5 p-6">
+        <div className="lg:col-span-8 bg-surface-high rounded-xl border border-outline-variant/20 p-6">
           <h2 className="title-lg text-on-surface mb-6">Historique des transactions</h2>
           {paiements.length === 0 ? (
             <p className="body-md text-on-surface-variant">Aucune transaction pour l&apos;instant.</p>
@@ -147,7 +146,7 @@ export default function Portefeuille() {
                         <span
                           className={`caption px-2 py-1 rounded border ${
                             t.statut === "confirme"
-                              ? "text-primary border-primary/30 bg-primary/5"
+                              ? "text-primary border-outline/30 bg-primary/5"
                               : t.statut === "echoue"
                                 ? "text-error border-error/30"
                                 : "text-on-surface-variant border-outline-variant/30"

@@ -79,7 +79,7 @@ export default function GuideTV() {
           <h2 className="headline-md text-on-surface mt-4">{active?.nom}</h2>
 
           {/* Guide des programmes */}
-          <div className="glass-panel rounded-xl mt-6 p-6">
+          <div className="bg-surface-low border border-outline-variant rounded-xl mt-6 p-6">
             <h3 className="title-lg text-primary mb-4">Guide des programmes</h3>
             {epg.length === 0 ? (
               <p className="body-md text-on-surface-variant">
@@ -92,7 +92,7 @@ export default function GuideTV() {
                   return (
                     <div
                       key={p.id}
-                      className={`flex gap-4 items-start rounded-lg p-3 ${enCours ? "bg-primary/10 border border-primary/30" : ""}`}
+                      className={`flex gap-4 items-start rounded-lg p-3 ${enCours ? "bg-primary/10 border border-outline/30" : ""}`}
                     >
                       <div className="flex-none text-right">
                         <p className="label-md text-on-surface">
@@ -118,7 +118,7 @@ export default function GuideTV() {
 
         {/* Liste des chaînes + bannière */}
         <div className="lg:col-span-4 flex flex-col gap-6">
-          <div className="glass-panel rounded-xl p-4">
+          <div className="bg-surface-low border border-outline-variant rounded-xl p-4">
             <h3 className="label-md text-primary uppercase mb-3">Toutes les chaînes</h3>
             <div className="flex flex-col gap-1">
               {chaines.map((c) => (
@@ -127,7 +127,7 @@ export default function GuideTV() {
                   onClick={() => setActive(c)}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
                     active?.id === c.id
-                      ? "bg-primary/10 text-primary border border-primary/30"
+                      ? "bg-primary/10 text-primary border border-outline/30"
                       : "text-on-surface-variant hover:bg-surface-variant/50"
                   }`}
                 >

@@ -60,7 +60,7 @@ function Rangée({ titre, liste, onPayant }) {
                   <img src={film.image_url} alt={film.titre} className="w-full h-full object-cover" />
                 )}
                 {payant && (
-                  <span className="absolute bottom-2 right-2 caption px-2 py-0.5 rounded bg-surface-lowest/80 text-primary border border-primary/30">
+                  <span className="absolute bottom-2 right-2 caption px-2 py-0.5 rounded bg-surface-lowest/80 text-primary border border-outline-variant/30">
                     {film.type_acces === "abonnement" ? "VIP" : `${film.prix_fcfa} F`}
                   </span>
                 )}
@@ -244,7 +244,7 @@ export default function TV() {
           {appareil.code_activation.split("").map((c, i) => (
             <span
               key={i}
-              className="w-16 h-20 md:w-20 md:h-24 rounded-xl glass-panel flex items-center justify-center text-4xl font-mono font-bold text-primary"
+              className="w-16 h-20 md:w-20 md:h-24 rounded-xl bg-surface-low border border-outline-variant flex items-center justify-center text-4xl font-mono font-bold text-primary"
             >
               {c}
             </span>
@@ -288,7 +288,7 @@ export default function TV() {
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
             placeholder={t.recherche}
-            className="w-56 bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-2 outline-none focus:border-primary transition-colors text-sm"
+            className="w-56 bg-surface-low border border-outline-variant rounded-lg text-on-surface px-4 py-2 outline-none focus:border-outline transition-colors text-sm"
           />
           <button
             data-tv

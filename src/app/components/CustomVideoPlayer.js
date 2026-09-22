@@ -1,8 +1,7 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import IconeMS from "./IconeMS";
 import { supabase } from "@/lib/supabaseClient";
 
 const VITESSES = [0.5, 1, 1.25, 1.5, 2];
@@ -42,7 +41,7 @@ export default function CustomVideoPlayer({ src, contenuId, restart = false, onE
     reprise();
   }, [contenuId, restart]);
 
-  // Contenu suivant (mÃªme catÃ©gorie)
+  // Contenu suivant (même catégorie)
   useEffect(() => {
     async function next() {
       if (!contenuId) return;
@@ -128,7 +127,7 @@ export default function CustomVideoPlayer({ src, contenuId, restart = false, onE
       if (document.pictureInPictureElement) await document.exitPictureInPicture();
       else await v.requestPictureInPicture();
     } catch {
-      /* non supportÃ© */
+      /* non supporté */
     }
   }
 
@@ -170,19 +169,19 @@ export default function CustomVideoPlayer({ src, contenuId, restart = false, onE
         className="w-full h-full object-contain bg-black"
       />
 
-      {/* Bouton Suivant en fin de vidÃ©o */}
+      {/* Bouton Suivant en fin de vidéo */}
       {!playing && duration > 0 && current >= duration - 1 && suivant && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/70">
           <button
             onClick={() => router.push(`/lecteur/${suivant.id}`)}
             className="flex items-center gap-3 bg-primary text-on-primary-fixed label-md px-8 py-4 rounded-lg hover:bg-primary-container transition-colors"
           >
-            <IconeMS nom="skip_next" taille={20} /> Suivant : {suivant.titre}
+            <i className="ph-duotone ph-skip-forward" style={{ fontSize: 20 }} aria-hidden="true" /> Suivant : {suivant.titre}
           </button>
         </div>
       )}
 
-      {/* ContrÃ´les â€” toujours visibles en pause */}
+      {/* Contrôles — toujours visibles en pause */}
       <div
         className={`absolute bottom-0 left-0 right-0 z-30 px-5 pb-4 pt-10 bg-gradient-to-t from-background/90 to-transparent transition-opacity duration-300 ${
           montre || !playing ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -201,7 +200,7 @@ export default function CustomVideoPlayer({ src, contenuId, restart = false, onE
 
         <div className="flex items-center gap-4">
           <button onClick={basculerLecture} className="text-on-surface hover:text-primary transition-colors">
-            {playing ? <IconeMS nom="pause" taille={26} /> : <IconeMS nom="play_arrow" taille={26} />}
+            {playing ? <i className="ph-duotone ph-pause" style={{ fontSize: 26 }} aria-hidden="true" /> : <i className="ph-duotone ph-play" style={{ fontSize: 26 }} aria-hidden="true" />}
           </button>
           <button
             onClick={() => {
@@ -213,7 +212,7 @@ export default function CustomVideoPlayer({ src, contenuId, restart = false, onE
             }}
             className="text-on-surface hover:text-primary transition-colors"
           >
-            {muted ? <IconeMS nom="volume_off" taille={24} /> : <IconeMS nom="volume_up" taille={24} />}
+            {muted ? <i className="ph-duotone ph-speaker-slash" style={{ fontSize: 24 }} aria-hidden="true" /> : <i className="ph-duotone ph-speaker-high" style={{ fontSize: 24 }} aria-hidden="true" />}
           </button>
           <span className="text-xs text-on-surface-variant font-mono">
             {formater(current)} / {formater(duration)}
@@ -225,7 +224,7 @@ export default function CustomVideoPlayer({ src, contenuId, restart = false, onE
                 onClick={() => setSpeedOpen((o) => !o)}
                 className="flex items-center gap-1 text-xs text-on-surface hover:text-primary transition-colors font-mono"
               >
-                <IconeMS nom="speed" taille={20} rempli={false} /> {speed}x
+                <i className="ph-duotone ph-gauge" style={{ fontSize: 20 }} aria-hidden="true" /> {speed}x
               </button>
               {speedOpen && (
                 <div className="absolute bottom-8 right-0 glass-panel rounded-lg py-1 w-20">
@@ -244,10 +243,10 @@ export default function CustomVideoPlayer({ src, contenuId, restart = false, onE
               )}
             </div>
             <button onClick={pip} className="text-on-surface hover:text-primary transition-colors">
-              <IconeMS nom="picture_in_picture_alt" taille={22} rempli={false} />
+              <i className="ph-duotone ph-picture-in-picture" style={{ fontSize: 22 }} aria-hidden="true" />
             </button>
             <button onClick={pleinEcran} className="text-on-surface hover:text-primary transition-colors">
-              <IconeMS nom="fullscreen" taille={22} rempli={false} />
+              <i className="ph-duotone ph-corners-out" style={{ fontSize: 22 }} aria-hidden="true" />
             </button>
           </div>
         </div>

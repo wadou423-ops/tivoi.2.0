@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Wallet, Clapperboard, Settings, LogOut, ChevronRight, Star } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../components/LoaderCentered";
 
@@ -53,17 +52,17 @@ export default function Profil() {
   }
 
   const MENU = [
-    { label: "Portefeuille & Jetons", href: "/portefeuille", icone: Wallet },
-    { label: "Espace créateur", href: "/devenir-createur", icone: Clapperboard },
-    { label: "Paramètres du compte", href: "/parametres", icone: Settings },
-    { label: "Notifications", href: "/notifications", icone: Star },
+    { label: "Portefeuille & Jetons", href: "/portefeuille", icone: "wallet" },
+    { label: "Espace créateur", href: "/devenir-createur", icone: "film-slate" },
+    { label: "Paramètres du compte", href: "/parametres", icone: "gear-six" },
+    { label: "Notifications", href: "/notifications", icone: "star" },
   ];
 
   return (
     <main className="flex-grow pt-28 pb-20 px-5 md:px-20 max-w-3xl mx-auto w-full">
       {/* Carte profil */}
-      <div className="glass-panel rounded-xl p-8 mb-10 flex items-center gap-6">
-        <div className="w-20 h-20 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-display font-bold text-3xl">
+      <div className="bg-surface-low border border-outline-variant rounded-xl p-8 mb-10 flex items-center gap-6">
+        <div className="w-20 h-20 rounded-full bg-surface-container text-primary flex items-center justify-center font-display font-bold text-3xl">
           {(profile.pseudo || "?").charAt(0).toUpperCase()}
         </div>
         <div className="flex-1">
@@ -89,7 +88,7 @@ export default function Profil() {
       {!abonnement && (
         <Link
           href="/abonnements"
-          className="rounded-xl border border-primary/30 bg-primary/5 p-6 mb-10 flex items-center justify-between hover:border-primary transition-colors group"
+          className="rounded-xl border border-outline/30 bg-primary/5 p-6 mb-10 flex items-center justify-between hover:border-outline transition-colors group"
         >
           <div>
             <p className="label-md text-on-surface">Aucun abonnement actif</p>
@@ -111,16 +110,16 @@ export default function Profil() {
             href={m.href}
             className="flex items-center gap-4 px-6 py-4 bg-surface-container border-b border-outline-variant/10 last:border-b-0 hover:bg-surface-variant/50 transition-colors"
           >
-            <m.icone size={20} className="text-primary" />
+            <i className={`ph-duotone ph-${m.icone} text-primary inline-block`} style={{ fontSize: 20 }} />
             <span className="body-md text-on-surface flex-1">{m.label}</span>
-            <ChevronRight size={18} className="text-outline" />
+            <i className="ph-duotone ph-caret-right text-outline" style={{ fontSize: 18 }} />
           </Link>
         ))}
         <button
           onClick={deconnexion}
           className="w-full flex items-center gap-4 px-6 py-4 bg-surface-container hover:bg-surface-variant/50 transition-colors text-left"
         >
-          <LogOut size={20} className="text-error" />
+          <i className="ph-duotone ph-sign-out text-error" style={{ fontSize: 20 }} />
           <span className="body-md text-error">Se déconnecter</span>
         </button>
       </nav>

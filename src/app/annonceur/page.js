@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Megaphone } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function EspaceAnnonceur() {
@@ -27,7 +26,7 @@ export default function EspaceAnnonceur() {
   return (
     <main className="flex-grow pt-28 pb-20 px-5 md:px-20">
       <header className="mb-10 flex items-center gap-4">
-        <Megaphone size={32} className="text-primary" />
+        <i className="ph-duotone ph-megaphone text-primary" style={{ fontSize: 32 }} />
         <div>
           <h1 className="display-lg text-on-surface">Espace Annonceur</h1>
           <p className="body-lg text-on-surface-variant">

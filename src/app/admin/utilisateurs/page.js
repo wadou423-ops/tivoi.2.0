@@ -61,7 +61,7 @@ export default function AdminUtilisateurs() {
           value={recherche}
           onChange={(e) => setRecherche(e.target.value)}
           placeholder="Rechercher..."
-          className="w-full rounded-lg bg-surface-variant/50 border-0 border-b-2 border-outline-variant text-on-surface px-4 py-2 outline-none focus:border-primary-container transition-colors"
+          className="w-full rounded-lg bg-surface-low border border-outline-variant text-on-surface px-4 py-2 outline-none focus:border-outline transition-colors"
         />
       </div>
 

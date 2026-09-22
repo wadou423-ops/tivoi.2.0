@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, Info, XCircle } from "lucide-react";
 
 export default function ToastHost() {
   const [toasts, setToasts] = useState([]);
@@ -24,14 +23,14 @@ export default function ToastHost() {
       {toasts.map((t) => (
         <div
           key={t.id}
-          className="toast-in glass-panel rounded-lg px-5 py-3 flex items-center gap-2.5 shadow-xl"
+          className="toast-in glass-panel rounded-lg px-5 py-3 flex items-center gap-2.5"
         >
           {t.type === "success" ? (
-            <CheckCircle2 size={16} className="text-primary shrink-0" />
+            <i className="ph-duotone ph-check-circle text-primary shrink-0" style={{ fontSize: 16 }} />
           ) : t.type === "error" ? (
-            <XCircle size={16} className="text-error shrink-0" />
+            <i className="ph-duotone ph-x-circle text-error shrink-0" style={{ fontSize: 16 }} />
           ) : (
-            <Info size={16} className="text-primary shrink-0" />
+            <i className="ph-duotone ph-info text-primary shrink-0" style={{ fontSize: 16 }} />
           )}
           <span className="text-sm text-on-surface">{t.message}</span>
         </div>

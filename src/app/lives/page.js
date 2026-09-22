@@ -1,8 +1,7 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import IconeMS from "../components/IconeMS";
 import { supabase } from "@/lib/supabaseClient";
 import Banniere from "../components/Banniere";
 
@@ -15,7 +14,7 @@ export default function Lives() {
         .from("lives")
         .select("id, titre, description, statut, programme_a, created_at, profiles(pseudo)")
         .order("created_at", { ascending: false });
-      // En direct en premier, puis programmÃ©s, puis terminÃ©s
+      // En direct en premier, puis programmés, puis terminés
       const ordre = { en_direct: 0, programme: 1, termine: 2 };
       setLives(
         (data || []).sort((a, b) => (ordre[a.statut] ?? 3) - (ordre[b.statut] ?? 3))
@@ -44,7 +43,7 @@ export default function Lives() {
 
       {lives.length === 0 ? (
         <p className="body-lg text-on-surface-variant">
-          Aucun live pour le moment â€” soyez le premier Ã  en lancer un !
+          Aucun live pour le moment — soyez le premier à en lancer un !
         </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -55,23 +54,23 @@ export default function Lives() {
                   <img src={l.profiles.avatar_url} alt={l.titre} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-surface-high to-surface-container">
-                    <IconeMS nom="live_tv" taille={52} rempli={false} className="text-primary/40" />
+                    <i className="ph-duotone ph-television text-primary/40" style={{ fontSize: 52 }} aria-hidden="true" />
                   </div>
                 )}
                 {l.statut === "en_direct" && (
                   <span className="absolute top-3 left-3 bg-error text-on-error caption font-bold px-2 py-1 rounded flex items-center gap-1">
-                    â— EN DIRECT
+                    ● EN DIRECT
                   </span>
                 )}
                 {l.statut === "programme" && (
                   <span className="absolute top-3 left-3 bg-surface-variant text-on-surface-variant caption px-2 py-1 rounded">
-                    ProgrammÃ© â€” {l.programme_a ? new Date(l.programme_a).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }) : "date Ã  venir"}
+                    Programmé — {l.programme_a ? new Date(l.programme_a).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }) : "date à venir"}
                   </span>
                 )}
               </div>
               <h3 className="title-lg text-on-surface group-hover:text-primary transition-colors">{l.titre}</h3>
               <p className="caption text-on-surface-variant mt-1">
-                par @{l.profiles?.pseudo || "crÃ©ateur"}
+                par @{l.profiles?.pseudo || "créateur"}
               </p>
             </Link>
           ))}

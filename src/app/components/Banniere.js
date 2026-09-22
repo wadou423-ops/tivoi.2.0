@@ -29,7 +29,7 @@ export default function Banniere({ emplacement, className = "" }) {
       href={banniere.lien || "#"}
       target={banniere.lien ? "_blank" : undefined}
       onClick={() => supabase.rpc("banniere_clic", { p_id: banniere.id })}
-      className={`block relative overflow-hidden rounded-xl border border-primary-container/10 ${className}`}
+      className={`block relative overflow-hidden rounded-xl border border-outline-variant/20 ${className}`}
     >
       <img src={banniere.image_url} alt={banniere.titre || "Publicité"} className="w-full h-full object-cover" />
       <span className="absolute bottom-2 right-2 caption bg-surface-lowest/70 text-on-surface-variant px-2 py-0.5 rounded">

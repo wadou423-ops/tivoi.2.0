@@ -56,7 +56,7 @@ export default function AcheterJetons() {
             <p className="title-lg text-on-surface mb-6">{p.prix_fcfa.toLocaleString("fr-FR")} FCFA</p>
             <Link
               href={`/paiement/tokens/${p.id}`}
-              className="w-full text-center bg-primary text-on-primary-fixed label-md py-3 rounded-lg hover:bg-primary-container transition-colors shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+              className="w-full text-center bg-primary text-on-primary-fixed label-md py-3 rounded-lg hover:bg-primary-container transition-colors"
             >
               Acheter
             </Link>

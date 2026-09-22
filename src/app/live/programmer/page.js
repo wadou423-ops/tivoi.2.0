@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar, Clock, Clapperboard } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import LoaderCentered from "../../components/LoaderCentered";
 
@@ -50,8 +49,8 @@ export default function ProgrammerLive() {
   if (!autorise) {
     return (
       <main className="flex-grow pt-28 pb-20 px-5 md:px-20">
-        <div className="glass-panel rounded-xl p-10 max-w-xl mx-auto text-center">
-          <Clapperboard size={56} className="text-primary mx-auto mb-6" />
+        <div className="bg-surface-low border border-outline-variant rounded-xl p-10 max-w-xl mx-auto text-center">
+          <i className="ph-duotone ph-film-slate text-primary mx-auto mb-6" style={{ fontSize: 56 }} />
           <h1 className="display-lg text-on-surface mb-4">Devenir créateur d&apos;abord</h1>
           <p className="body-lg text-on-surface-variant mb-8">{message}</p>
           <a
@@ -95,7 +94,7 @@ export default function ProgrammerLive() {
   }
 
   const inputClass =
-    "w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-primary-container transition-colors";
+    "w-full bg-surface-low border border-outline-variant rounded-lg text-on-surface px-4 py-3 outline-none focus:border-outline transition-colors";
 
   return (
     <main className="flex-grow pt-28 pb-20 px-5 md:px-20">
@@ -105,7 +104,7 @@ export default function ProgrammerLive() {
           Définissez les informations de votre diffusion. Une clé de stream unique sera générée.
         </p>
 
-        <form onSubmit={handleSubmit} className="glass-panel rounded-xl p-8 flex flex-col gap-6">
+        <form onSubmit={handleSubmit} className="bg-surface-low border border-outline-variant rounded-xl p-8 flex flex-col gap-6">
           <div>
             <label className="label-md text-on-surface mb-2 block">Titre du live</label>
             <input
@@ -129,10 +128,10 @@ export default function ProgrammerLive() {
           </div>
           <div>
             <label className="label-md text-on-surface mb-2 block flex items-center gap-2">
-              <Calendar size={16} className="text-primary" /> Date et heure (optionnel — vide pour un démarrage manuel)
+              <i className="ph-duotone ph-calendar text-primary" style={{ fontSize: 16 }} /> Date et heure (optionnel — vide pour un démarrage manuel)
             </label>
             <div className="flex items-center gap-3">
-              <Clock size={16} className="text-on-surface-variant" />
+              <i className="ph-duotone ph-clock text-on-surface-variant" style={{ fontSize: 16 }} />
               <input
                 type="datetime-local"
                 value={programmeA}
@@ -145,7 +144,7 @@ export default function ProgrammerLive() {
           <button
             type="submit"
             disabled={saving}
-            className="bg-primary text-on-primary-fixed label-md py-4 rounded-lg hover:bg-primary-container transition-colors shadow-[0_0_15px_rgba(212,175,55,0.3)] disabled:opacity-50"
+            className="bg-primary text-on-primary-fixed label-md py-4 rounded-lg hover:bg-primary-container transition-colors disabled:opacity-50"
           >
             {saving ? "Création..." : "Créer le live"}
           </button>

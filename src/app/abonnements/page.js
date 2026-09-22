@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Check } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function Abonnements() {
@@ -31,8 +30,8 @@ export default function Abonnements() {
             key={p.code}
             className={`relative rounded-xl border p-8 flex flex-col items-center text-center transition-all duration-300 ${
               p.code === "premium"
-                ? "border-primary bg-surface-container shadow-[0_0_25px_rgba(212,175,55,0.15)]"
-                : "border-outline-variant/30 bg-surface-container hover:border-primary/50"
+                ? "border-outline bg-surface-container"
+                : "border-outline-variant/30 bg-surface-container hover:border-outline"
             }`}
           >
             {p.code === "premium" && (
@@ -48,7 +47,7 @@ export default function Abonnements() {
             <ul className="flex flex-col gap-3 mb-8 w-full text-left">
               {(p.avantages || "").split(",").map((a, i) => (
                 <li key={i} className="flex items-start gap-2 body-md text-on-surface-variant">
-                  <Check size={16} className="text-primary mt-1 shrink-0" /> {a.trim()}
+                  <i className="ph-duotone ph-check text-primary mt-1 shrink-0" style={{ fontSize: 16 }} /> {a.trim()}
                 </li>
               ))}
             </ul>
@@ -56,7 +55,7 @@ export default function Abonnements() {
               href={`/paiement/abo/${p.code}`}
               className={`w-full text-center label-md py-4 rounded-lg transition-colors ${
                 p.code === "premium"
-                  ? "bg-primary text-on-primary-fixed hover:bg-primary-container shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                  ? "bg-primary text-on-primary-fixed hover:bg-primary-container"
                   : "border border-primary text-primary hover:bg-primary hover:text-on-primary-fixed"
               }`}
             >

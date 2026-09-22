@@ -3,8 +3,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { X } from "lucide-react";
-import IconeMS from "./IconeMS";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function Header() {
@@ -123,7 +121,7 @@ export default function Header() {
   }
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-outline-variant/10 shadow-md shadow-primary/5">
+    <nav className="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-outline-variant/10">
       <div className="flex justify-between items-center px-5 md:px-20 h-20 w-full relative">
         <div className="flex items-center gap-8">
           <Link href="/" className="display-lg text-primary tracking-tighter !text-2xl !leading-none">
@@ -138,7 +136,7 @@ export default function Header() {
               href={link.href}
               className={`label-md pb-1 transition-colors ${
                 pathname === link.href
-                  ? "text-primary border-b-2 border-primary"
+                  ? "text-primary"
                   : "text-on-surface-variant hover:text-primary"
               }`}
             >
@@ -149,10 +147,10 @@ export default function Header() {
 
         <div className="flex items-center gap-4">
           <Link href="/recherche" className="text-on-surface hover:text-primary transition-colors">
-            <IconeMS nom="search" taille={22} rempli={false} />
+            <i className="ph-duotone ph-magnifying-glass" style={{ fontSize: 22 }} aria-hidden="true" />
           </Link>
           <Link href="/notifications" className="relative hidden md:block text-on-surface hover:text-primary transition-colors">
-            <IconeMS nom="notifications" taille={22} rempli={false} />
+            <i className="ph-duotone ph-bell" style={{ fontSize: 22 }} aria-hidden="true" />
             {nonLues > 0 && (
               <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-error text-on-error caption font-bold flex items-center justify-center">
                 {nonLues > 9 ? "9+" : nonLues}
@@ -160,7 +158,6 @@ export default function Header() {
             )}
           </Link>
           <div className="hidden md:flex items-center gap-4">
-            <span className="label-md text-on-surface-variant hover:text-primary transition-colors cursor-default">FR/EN</span>
             {loading ? (
               <div className="w-9 h-9 rounded-full skeleton" />
             ) : userId ? (
@@ -175,7 +172,7 @@ export default function Header() {
                 </button>
 
                 {menuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 rounded-xl bg-surface-low border border-outline-variant shadow-lg py-2 z-50">
+                  <div className="absolute right-0 mt-2 w-56 rounded-xl bg-surface-low border border-outline-variant py-2 z-50">
                     <div className="px-4 py-2 border-b border-outline-variant/40">
                       <p className="title-lg text-on-surface">{pseudo ? `@${pseudo}` : "Compte sans pseudo"}</p>
                       {role === "createur" && (
@@ -214,7 +211,7 @@ export default function Header() {
             )}
           </div>
           <button className="md:hidden text-on-surface" onClick={() => setDrawerOpen(true)}>
-            <IconeMS nom="menu" taille={24} rempli={false} />
+            <i className="ph-duotone ph-list" style={{ fontSize: 24 }} aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -230,7 +227,7 @@ export default function Header() {
             <div className="flex justify-between items-center mb-8">
               <span className="font-display font-bold text-xl text-primary">TiVoi</span>
               <button onClick={() => setDrawerOpen(false)} className="text-on-surface-variant hover:text-primary">
-                <IconeMS nom="close" taille={24} rempli={false} />
+                <i className="ph-duotone ph-x" style={{ fontSize: 24 }} aria-hidden="true" />
               </button>
             </div>
 

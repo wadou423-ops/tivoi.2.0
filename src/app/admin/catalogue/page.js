@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Pencil } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import UploadFichier from "../../components/UploadFichier";
 
@@ -60,7 +59,7 @@ export default function AdminCatalogue() {
   }
 
   const inputClass =
-    "w-full bg-surface-variant/50 border-0 border-b-2 border-outline-variant rounded-lg text-on-surface px-4 py-2.5 outline-none focus:border-primary-container transition-colors text-sm";
+    "w-full bg-surface-low border border-outline-variant rounded-lg text-on-surface px-4 py-2.5 outline-none focus:border-outline transition-colors text-sm";
 
   return (
     <main className="px-6 md:px-12 py-12">
@@ -70,7 +69,7 @@ export default function AdminCatalogue() {
           onClick={() => setEdition({ ...VIDE })}
           className="flex items-center gap-2 bg-primary text-on-primary-fixed label-md px-5 py-2.5 rounded hover:bg-primary-container transition-colors"
         >
-          <Plus size={16} /> Ajouter
+          <i className="ph-duotone ph-plus" style={{ fontSize: 16 }} /> Ajouter
         </button>
       </div>
 
@@ -78,7 +77,7 @@ export default function AdminCatalogue() {
 
       {/* Formulaire d'édition */}
       {edition && (
-        <form onSubmit={enregistrer} className="glass-panel rounded-xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={enregistrer} className="bg-surface-low border border-outline-variant rounded-xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="caption text-on-surface-variant block mb-1">Titre *</label>
             <input required value={edition.titre} onChange={(e) => setEdition({ ...edition, titre: e.target.value })} className={inputClass} />
@@ -172,10 +171,10 @@ export default function AdminCatalogue() {
               </p>
             </div>
             <button onClick={() => setEdition(f)} className="text-on-surface-variant hover:text-primary transition-colors p-2">
-              <Pencil size={16} />
+              <i className="ph-duotone ph-pencil-simple" style={{ fontSize: 16 }} />
             </button>
             <button onClick={() => supprimer(f.id)} className="text-on-surface-variant hover:text-error transition-colors p-2">
-              <Trash2 size={16} />
+              <i className="ph-duotone ph-trash" style={{ fontSize: 16 }} />
             </button>
           </div>
         ))}

@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Star, Play } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRealtimeReload } from "@/lib/useRealtime";
 import LoaderCentered from "../components/LoaderCentered";
@@ -125,9 +124,9 @@ export default function CatalogueVOD() {
   }, []);
 
   useEffect(() => {
-    // Différé d'une frame pour éviter un setState synchrone pendant l'effet
-    const t = setTimeout(chargerTout, 0);
-    return () => clearTimeout(t);
+    // Déferral microtask : évite un setState synchrone dans l'effet (lint),
+    // coût réel nul contrairement à un setTimeout
+    queueMicrotask(chargerTout);
   }, [chargerTout]);
 
   // Mises à jour automatiques du catalogue
@@ -195,7 +194,7 @@ export default function CatalogueVOD() {
             >
               {choixReprise.image_url && (
                 <div
-                  className="w-20 h-28 mx-auto rounded-lg bg-cover bg-center border border-primary/20 mb-4"
+                  className="w-20 h-28 mx-auto rounded-lg bg-cover bg-center border border-outline-variant/30 mb-4"
                   style={{ backgroundImage: `url('${choixReprise.image_url}')` }}
                 />
               )}
@@ -257,7 +256,7 @@ export default function CatalogueVOD() {
               onClick={() => setCategorie(g)}
               className={`px-4 py-2 rounded-lg text-sm font-title font-semibold whitespace-nowrap transition-colors ${
                 categorie === g
-                  ? "bg-primary-container/20 border border-primary text-primary"
+                  ? "bg-primary-container/20 border border-outline-variant text-primary"
                   : "bg-transparent border border-outline-variant text-on-surface-variant hover:border-primary/50 hover:text-on-surface"
               }`}
             >
@@ -284,13 +283,13 @@ export default function CatalogueVOD() {
                   <img src={film.image_url} alt={film.titre} className="w-full h-full object-cover" />
                 )}
                 {film.note && (
-                  <div className="absolute top-2 right-2 bg-surface-lowest/80 backdrop-blur-md px-2 py-1 rounded text-xs text-primary border border-primary-container/20 flex items-center gap-1">
-                    <Star size={12} fill="currentColor" /> {film.note}
+                  <div className="absolute top-2 right-2 bg-surface-lowest/80 backdrop-blur-md px-2 py-1 rounded text-xs text-primary border border-outline-variant/30 flex items-center gap-1">
+                    <i className="ph-duotone ph-star" style={{ fontSize: 12 }} /> {film.note}
                   </div>
                 )}
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <button className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary hover:scale-110 transition-transform">
-                    <Play size={20} fill="currentColor" />
+                  <button className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary">
+                    <i className="ph-duotone ph-play text-on-primary" style={{ fontSize: 20 }} />
                   </button>
                 </div>
               </div>
